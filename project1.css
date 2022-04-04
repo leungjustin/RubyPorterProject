@@ -1,0 +1,38 @@
+/* 
+	Vertical Navigation Menu CSS
+*/
+
+.navbar {
+	width: 10%;
+	background-color: #eee;
+	overflow-y: auto;
+}
+
+.navbar img {
+	width: 100%;
+}
+
+.navbar ul {
+	list-style-type: none;
+}
+
+.navbar li {			
+	text-decoration: none;
+	
+}
+
+.navbar a {	
+	display: block;
+	padding: 5px;
+	text-decoration: none;
+	color: black;	
+}
+
+.navbar li:hover {
+	background-color: #ccc;
+}
+
+.navbar .active {
+	background-color: #04AA6D;
+	color: white; 
+}
