@@ -1,0 +1,79 @@
+.navbar {
+	overflow: hidden;
+	background-color: #DDDDDD;
+	height: 70px;
+}
+
+.navbar a {
+	float: left;
+	color: black;
+	text-align: center;
+	padding: 27px;
+	text-decoration: none;
+}
+
+.navbar button {
+	float: left;
+	color: black;
+	text-align: center;
+	margin-top: 27px;
+	margin-bottom: 27px;
+	text-decoration: none;
+}
+
+.subnav {
+	float: left;
+	overflow: hidden;
+}
+
+.subnav a {
+	color: inherit;
+	background-color: inherit;
+	font-family: inherit;
+}
+
+.navbar a:hover, .subnav:hover {
+	background-color: #E5E5E5;
+}
+
+.subnav-content {
+	display: none;
+	position: absolute;
+	top: 77px;
+	background-color: #DDDDDD;
+	width: inherit;
+	margin: inherit;
+	z-index: 1;
+}
+
+.subnav-content a {
+	float: none;
+	color: black;
+	text-decoration: none;
+	display: block;
+	text-align: center;
+}
+
+.subnav-content button {
+	float: none;
+	color: black;
+	text-decoration: none;
+	display: block;
+	text-align: center;
+}
+
+.subnav:hover .subnav-content {
+	display: block;
+}
+
+.subnav-content a:hover {
+	background-color: #E5E5E5;
+}
+
+.logo {
+	font-size: 40px;
+	float: left;
+	display: block;
+	text-align: center;
+	padding: 8px;
+}
