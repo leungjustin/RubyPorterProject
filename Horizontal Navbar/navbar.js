@@ -11,7 +11,12 @@ class NavItem {
 
 class NavBar {
 	constructor() {
-		this.items = [];
+		this.items = [
+			new NavItem("Item1", "#item1"),
+			new NavItem("Item2", "#item2")
+		];
+		this.items[0].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
+		this.items[0].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -19,6 +24,8 @@ class NavBar {
 		this.$editName = document.getElementById("editName");
 		this.$editLink = document.getElementById("editLink");
 		this.$editButton = document.getElementById("editButton");
+		this.$deleteButton = document.getElementById("deleteButton");
+		this.$disableButton = document.getElementById("disableButton");
 		this.$addSubForm = document.getElementById("addSubForm");
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
@@ -57,7 +64,6 @@ class NavBar {
 		if (item.subnavItems == null) {
 			return `
 				<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
-				<button id="delete${index}">X</button>
 				<button id="edit${index}">E</button>
 				`;
 		}
@@ -65,15 +71,15 @@ class NavBar {
 			let navString = `
 				<div class="subnav">
 					<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
-					<button id="delete${index}">X</button>
 					<button id="edit${index}">E</button>
 					<div class="subnav-content">
 			`;
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
-					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
-					<button id="subdelete${i},${index}">X</buton>
-					<button id="subedit${i},${index}">E</button>
+					<div>
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+						<button id="subedit${i},${index}">E</button>
+					</div>
 				`;
 			}
 			navString += `
@@ -88,12 +94,12 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, "subitem", j, i);
+				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
 			}
 			document.getElementById("item"+i).onclick = this.reload.bind(this, "item", i);
-			document.getElementById("delete"+i).onclick = this.deleteNavItem.bind(this, i);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$disableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		disabled.forEach(element => element.disabled = true);
 	}
 	
@@ -101,6 +107,28 @@ class NavBar {
 		event.preventDefault();
 		let item = new NavItem(this.$name.value, this.$link.value);
 		this.items.push(item);
+		this.fillItems();
+		this.addEventListeners();
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
+	}
+
+	editNavItem(index) {
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$disableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		enabled.forEach(element => element.disabled = false);
+		this.$editName.value = this.items[index].name;
+		this.$editLink.value = this.items[index].link;
+
+		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
+		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
+		this.$disableButton.onclick = this.disableLink.bind(this);
+		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
+	}
+
+	submitEdit(index, event) {
+		event.preventDefault();
+		this.items[index].name = this.$editName.value;
+		this.items[index].link = this.$editLink.value;
 		this.fillItems();
 		this.addEventListeners();
 		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
@@ -115,30 +143,42 @@ class NavBar {
 		forms.forEach(element => element.reset());
 	}
 
-	editNavItem(index) {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
-		enabled.forEach(element => element.disabled = false);
-		this.$editName.value = this.items[index].name;
-		this.$editLink.value = this.items[index].link;
-
-		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
-		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
-	}
-
-	submitEdit(index, event) {
-		event.preventDefault();
-		this.items[index].name = this.$editName.value;
-		this.items[index].link = this.$editLink.value;
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+	disableLink() {
+		//TODO: Disable link.
 	}
 
 	addSubnavItem(index, event) {
 		event.preventDefault();
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
+		this.fillItems();
+		this.addEventListeners();
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
+	}
+
+	editSubnavItem(index, parentindex) {
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
+		enabled.forEach(element => element.disabled = false);
+		this.$editName.value = this.items[parentindex].subnavItems[index].name;
+		this.$editLink.value = this.items[parentindex].subnavItems[index].link;
+		
+		this.$editForm.onsubmit = this.submitSubEdit.bind(this, index, parentindex);
+		this.$deleteButton.onclick = this.deleteSubnavItem.bind(this, index, parentindex);
+	}
+
+	submitSubEdit(index, parentindex, event) {
+		event.preventDefault();
+		this.items[parentindex].subnavItems[index].name = this.$editName.value;
+		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
+		this.fillItems();
+		this.addEventListeners();
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
+	}
+
+	deleteSubnavItem(index, parentindex) {
+		this.items[parentindex].subnavItems.splice(index, 1);
 		this.fillItems();
 		this.addEventListeners();
 		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
