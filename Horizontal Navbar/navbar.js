@@ -1,5 +1,14 @@
 const URL = "file:///C:/Users/cal.don/Desktop/RubyPorterProject/Horizontal%20Navbar/Horizontal%20Navbar%20Template.html";
 
+class NavItem {
+	constructor(name, link) {
+		this.name = name,
+		this.link = link,
+		this.isActive = false,
+		this.subnavItems = [];
+	}
+}
+
 class NavBar {
 	constructor() {
 		this.items = [];
@@ -23,9 +32,7 @@ class NavBar {
 	reload(string, index, parentindex = -1) {
 		this.items.forEach(item => {
 			item.isActive = false;
-			if (item.subnavItems != null) {
-				item.subnavItems.forEach(subItem => subItem.isActive = false);
-			}
+			item.subnavItems.forEach(subItem => subItem.isActive = false);
 		});
 		if (string == "item") {
 			this.items[index].isActive = true;
@@ -79,10 +86,8 @@ class NavBar {
 
 	addEventListeners() {
 		for (let i = 0; i < this.items.length; i++) {
-			if (this.items[i].subnavItems != null) {
-				for (let j = 0; j < this.items[i].subnavItems.length; j++) {
+			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, "subitem", j, i);
-				}
 			}
 			document.getElementById("item"+i).onclick = this.reload.bind(this, "item", i);
 			document.getElementById("delete"+i).onclick = this.deleteNavItem.bind(this, i);
@@ -97,7 +102,8 @@ class NavBar {
 		let navItem = {
 			name: this.$name.value,
 			link: this.$link.value,
-			isActive: false
+			isActive: false,
+			subnavItems: []
 		};
 		this.items.push(navItem);
 		this.fillItems();
@@ -141,9 +147,6 @@ class NavBar {
 			link: this.$addSubLink.value,
 			isActive: false
 		};
-		if (this.items[index].subnavItems == null) {
-			this.items[index].subnavItems = [];
-		}
 		this.items[index].subnavItems.push(subnavItem);
 		this.fillItems();
 		this.addEventListeners();
