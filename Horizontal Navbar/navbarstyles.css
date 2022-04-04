@@ -21,9 +21,17 @@
 	text-decoration: none;
 }
 
+.active {
+	background-color: #BBBBBB;
+}
+
 .subnav {
 	float: left;
 	overflow: hidden;
+}
+
+.subnav .active {
+	background-color: #BBBBBB;
 }
 
 .subnav a {

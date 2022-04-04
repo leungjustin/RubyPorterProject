@@ -1,3 +1,5 @@
+const URL = "file:///C:/Users/cal.don/Desktop/RubyPorterProject/Horizontal%20Navbar/Horizontal%20Navbar%20Template.html";
+
 class NavBar {
 	constructor() {
 		this.items = [];
@@ -18,6 +20,24 @@ class NavBar {
 		this.addEventListeners();
 	}
 
+	reload(string, index, parentindex = -1) {
+		this.items.forEach(item => {
+			item.isActive = false;
+			if (item.subnavItems != null) {
+				item.subnavItems.forEach(subItem => subItem.isActive = false);
+			}
+		});
+		if (string == "item") {
+			this.items[index].isActive = true;
+		}
+		if (string == "subitem") {
+			this.items[parentindex].subnavItems[index].isActive = true;
+		}
+		this.fillItems();
+		this.$addForm.onsubmit = this.addNavItem.bind(this);
+		this.addEventListeners();
+	}
+
 	fillItems() {
 		let itemsHTML = `<div class="logo">Logo</div>`;
 		itemsHTML += this.items.reduce(
@@ -29,7 +49,7 @@ class NavBar {
 	renderNavItem(item, index) {
 		if (item.subnavItems == null) {
 			return `
-				<a href="${item.link}">${item.name}</a>
+				<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
 				<button id="delete${index}">X</button>
 				<button id="edit${index}">E</button>
 				`;
@@ -37,14 +57,14 @@ class NavBar {
 		else {
 			let navString = `
 				<div class="subnav">
-					<a href="${item.link}">${item.name}</a>
+					<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
 					<button id="delete${index}">X</button>
 					<button id="edit${index}">E</button>
 					<div class="subnav-content">
 			`;
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
-					<a href="${item.subnavItems[i].link}">${item.subnavItems[i].name}</a>
+					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
 					<button id="subdelete${i},${index}">X</buton>
 					<button id="subedit${i},${index}">E</button>
 				`;
@@ -59,6 +79,12 @@ class NavBar {
 
 	addEventListeners() {
 		for (let i = 0; i < this.items.length; i++) {
+			if (this.items[i].subnavItems != null) {
+				for (let j = 0; j < this.items[i].subnavItems.length; j++) {
+				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, "subitem", j, i);
+				}
+			}
+			document.getElementById("item"+i).onclick = this.reload.bind(this, "item", i);
 			document.getElementById("delete"+i).onclick = this.deleteNavItem.bind(this, i);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
@@ -70,7 +96,8 @@ class NavBar {
 		event.preventDefault();
 		let navItem = {
 			name: this.$name.value,
-			link: this.$link.value
+			link: this.$link.value,
+			isActive: false
 		};
 		this.items.push(navItem);
 		this.fillItems();
@@ -111,7 +138,8 @@ class NavBar {
 		event.preventDefault();
 		let subnavItem = {
 			name: this.$addSubName.value,
-			link: this.$addSubLink.value
+			link: this.$addSubLink.value,
+			isActive: false
 		};
 		if (this.items[index].subnavItems == null) {
 			this.items[index].subnavItems = [];
