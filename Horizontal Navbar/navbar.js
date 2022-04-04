@@ -99,13 +99,8 @@ class NavBar {
 	
 	addNavItem(event) {
 		event.preventDefault();
-		let navItem = {
-			name: this.$name.value,
-			link: this.$link.value,
-			isActive: false,
-			subnavItems: []
-		};
-		this.items.push(navItem);
+		let item = new NavItem(this.$name.value, this.$link.value);
+		this.items.push(item);
 		this.fillItems();
 		this.addEventListeners();
 		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
@@ -142,12 +137,8 @@ class NavBar {
 
 	addSubnavItem(index, event) {
 		event.preventDefault();
-		let subnavItem = {
-			name: this.$addSubName.value,
-			link: this.$addSubLink.value,
-			isActive: false
-		};
-		this.items[index].subnavItems.push(subnavItem);
+		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
+		this.items[index].subnavItems.push(subItem);
 		this.fillItems();
 		this.addEventListeners();
 		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
