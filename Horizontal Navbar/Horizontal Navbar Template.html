@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Horizontal Navbar Template</title>
+	<link rel="stylesheet" href="navbarstyles.css">
+</head>
+<body>
+	<div class="navbar" id="navbar">
+	</div>
+	
+	<h2>Add Navbar Item</h2>
+	<form action="#" method="post" id="addForm">
+		<label for="name">Name:</label>
+		<input type="text" name="name" id="name"><br>
+		<label for="link">Link:</label>
+		<input type="text" name="link" id="link"><br>
+		<button type="submit">Add</button>
+	</form>
+
+	<h2>Edit Navbar Item</h2>
+	<form action="#" method="post" id="editForm">
+		<label for="name">Name:</label>
+		<input type="text" name="name" id="editName" value=""><br>
+		<label for="link">Link:</label>
+		<input type="text" name="link" id="editLink" value=""><br>
+		<button type="submit" id="editButton">Edit</button>
+	</form>
+
+	<h3>Add Subnav Item</h3>
+	<form action="#" method="post" id="addSubForm">
+		<label for="name">Name:</label>
+		<input type="text" name="name" id="addSubName"><br>
+		<label for="link">Link:</label>
+		<input type="text" name="link" id="addSubLink"><br>
+		<button type="submit" id="addSubButton">Add</button>
+	</form>
+	
+	<script src="./navbar.js"></script>
+</body>
+</html>
