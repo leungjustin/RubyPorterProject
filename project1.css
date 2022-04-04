@@ -36,3 +36,11 @@
 	background-color: #04AA6D;
 	color: white; 
 }
+
+.subnav-content {
+	display:none;
+}
+
+.navItem:hover .subnav-content {
+	display: block;
+}
