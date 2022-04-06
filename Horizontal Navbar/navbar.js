@@ -31,26 +31,17 @@ class NavBar {
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
 		this.$addSubButton = document.getElementById("addSubButton");
-		
-		this.fillItems();
+
 		this.$addForm.onsubmit = this.addNavItem.bind(this);
-		this.addEventListeners();
+
+		this.reload();
 	}
 
-	reload(string, index, parentindex = -1) {
-		this.items.forEach(item => {
-			item.isActive = false;
-			item.subnavItems.forEach(subItem => subItem.isActive = false);
-		});
-		if (string == "item") {
-			this.items[index].isActive = true;
-		}
-		if (string == "subitem") {
-			this.items[parentindex].subnavItems[index].isActive = true;
-		}
+	reload() {
 		this.fillItems();
-		this.$addForm.onsubmit = this.addNavItem.bind(this);
 		this.addEventListeners();
+		this.disableAll();
+		this.resetForms();
 	}
 
 	fillItems() {
@@ -94,31 +85,59 @@ class NavBar {
 	addEventListeners() {
 		for (let i = 0; i < this.items.length; i++) {
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, "subitem", j, i);
+				document.getElementById("subitem"+j+","+i).onclick = this.changeActive.bind(this, "subitem", j, i);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
 			}
-			document.getElementById("item"+i).onclick = this.reload.bind(this, "item", i);
+			document.getElementById("item"+i).onclick = this.changeActive.bind(this, "item", i);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
+	}
+
+	disableAll() {
 		this.$enableDisableButton.innerHTML = "Enable/Disable Link";
 		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		disabled.forEach(element => element.disabled = true);
+	}
+
+	enableAll() {
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		enabled.forEach(element => element.disabled = false);
+	}
+
+	enableSub() {
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
+		enabled.forEach(element => element.disabled = false);
+	}
+
+	resetForms() {
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
+	}
+
+	changeActive(string, index, parentindex = -1) {
+		this.items.forEach(item => {
+			item.isActive = false;
+			item.subnavItems.forEach(subItem => subItem.isActive = false);
+		});
+		if (string == "item") {
+			this.items[index].isActive = true;
+		}
+		if (string == "subitem") {
+			this.items[parentindex].subnavItems[index].isActive = true;
+		}
+		this.reload();
 	}
 	
 	addNavItem(event) {
 		event.preventDefault();
 		let item = new NavItem(this.$name.value, this.$link.value);
 		this.items.push(item);
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	editNavItem(index) {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
-		enabled.forEach(element => element.disabled = true);
-		enabled.forEach(element => element.disabled = false);
+		this.disableAll();
+		this.enableAll();
 		this.$editName.value = this.items[index].name;
 		this.$editLink.value = this.items[index].link;
 
@@ -139,18 +158,12 @@ class NavBar {
 		event.preventDefault();
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	deleteNavItem(index) {
 		this.items.splice(index, 1);
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	enableOrDisableLink(index) {
@@ -160,27 +173,19 @@ class NavBar {
 		else {
 			this.items[index].isDisabled = true;
 		}
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	addSubnavItem(index, event) {
 		event.preventDefault();
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	editSubnavItem(index, parentindex) {
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton]
-		disabled.forEach(element => element.disabled = true);
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
-		enabled.forEach(element => element.disabled = false);
+		this.disableAll();
+		this.enableSub();
 		this.$editName.value = this.items[parentindex].subnavItems[index].name;
 		this.$editLink.value = this.items[parentindex].subnavItems[index].link;
 		
@@ -192,18 +197,12 @@ class NavBar {
 		event.preventDefault();
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 
 	deleteSubnavItem(index, parentindex) {
 		this.items[parentindex].subnavItems.splice(index, 1);
-		this.fillItems();
-		this.addEventListeners();
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
-		forms.forEach(element => element.reset());
+		this.reload();
 	}
 }
 
