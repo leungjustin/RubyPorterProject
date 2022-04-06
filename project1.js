@@ -1,10 +1,10 @@
 // TODO: figure out where to declare MenuItem class, so it can be used inside of the class Navbar
 class MenuItem 
 {
-	constructor(name, link, isActive){
+	constructor(name, link){
 		this.name = name;
 		this.link = link;
-		this.isActive = isActive;
+		this.isActive = false;
 		this.nestedItems = [];
 	}
 }
@@ -12,18 +12,19 @@ class MenuItem
 class Navbar
 {	
 	constructor(){
-		
+		this.$name = document.getElementById("name");
+		this.$link = document.getElementById("link");
 		// fill menuItems with an array of objects that have a name, link, and isActive attribute
 		this.menuItems = [			
-			new MenuItem('Item 1', '#item1', true),
-			new MenuItem('Item 2', '#item2', false),
-			new MenuItem('Item 3', '#item3', false),
-			new MenuItem('Item 4', '#item4', false),
-			new MenuItem('Item 5', '#item5', false)
+			new MenuItem('Item 1', '#item1'),
+			new MenuItem('Item 2', '#item2'),
+			new MenuItem('Item 3', '#item3'),
+			new MenuItem('Item 4', '#item4'),
+			new MenuItem('Item 5', '#item5')
 		];
-		this.menuItems[0].nestedItems.push(new MenuItem('Nested Item 1','#nested00', false));
-		this.menuItems[2].nestedItems.push(new MenuItem('Nested Item 1','#nested20', false));
-		this.menuItems[0].nestedItems[0].nestedItems.push(new MenuItem('Another Level', '#nested000', false));		
+		this.menuItems[0].nestedItems.push(new MenuItem('Nested Item 1','#nested00'));
+		this.menuItems[2].nestedItems.push(new MenuItem('Nested Item 1','#nested20'));
+		this.menuItems[0].nestedItems[0].nestedItems.push(new MenuItem('Another Level', '#nested000'));		
 		this.logo = "logoideas.jpg";		
 			
 		console.log(this.menuItems);
@@ -33,8 +34,8 @@ class Navbar
 	}
 
 	bindMethods() {
-		this.renderNavbar = this.renderNavbar.bind(this);
-		this.renderNavItem = this.renderNavItem.bind(this);		
+		this.renderNavbar = this.renderNavbar.bind(this);	
+		this.addNavItem = this.addNavItem.bind(this);		
 	}
 	
 	renderNavbar() {
@@ -50,23 +51,27 @@ class Navbar
 	renderNavItem(menuItem, index) {
 		// console.log("Render Nav Item " + index);						
 		let nestedItemHTML = "";
+		let id = `item${index}`;
 		// console.log("menuItem.nestedItems has items: " + (menuItem.nestedItems.length != 0));		
 		if (menuItem.nestedItems.length != 0)
 		{
-			nestedItemHTML = `<ul class="subnav-content">${menuItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, index)).join(' ')}</ul>`;
-		}		
-		return `<li class="navItem"><a href="${menuItem.link}" class="${activeHash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
+			nestedItemHTML = `<ul class="subnav-content">${menuItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, id)).join(' ')}</ul>`;
+		}	
+					
+		return `<li class="navItem"><a href="${menuItem.link}" id="${id}" class="${activeHash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
 	}	
 
-	renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)	{
+	renderNestedItem(nestedItem, nestedItemIndex, previousItemId)	{
 		// console.log("Render Nested Item " + nestedItemIndex + " of Nav Item " + previousItemIndex);
-		let nestedItemHTML = "";		
+		let nestedItemHTML = "";
+		let id = `${previousItemId}item${nestedItemIndex}`;		
 		if (nestedItem.nestedItems.length != 0)
 		{
 			// this is recursive
-			nestedItemHTML = `<ul class="subnav-content">${nestedItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)).join(' ')}</ul>`;
-		}
-		return `<li><a href="${nestedItem.link}" class="${activeHash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
+			nestedItemHTML = `<ul class="subnav-content">${nestedItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, id)).join(' ')}</ul>`;
+		}	
+		
+		return `<li><a href="${nestedItem.link}" id="${id}" class="${activeHash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
 
 	}
 	
@@ -117,8 +122,18 @@ class Navbar
 		}	
 	}
 	
-	addNavItem() {		
-		
+	addNavItem(event, id) {
+		event.preventDefault();
+		let item = new NavItem(this.$name.value, this.$link.value);	
+		let path = id.split('item');
+		path.splice(0);
+		let schema = this.menuItems[path[0]];
+		for (let i = 1; i < path.length; i++)
+		{
+			schema = schema.nestedItems[path[i]];
+		}
+		schema.push(item);
+		this.renderNavbar;		
 	}
 	
 	deleteNavItem() {

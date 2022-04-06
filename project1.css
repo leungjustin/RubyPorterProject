@@ -4,6 +4,8 @@
 
 .navbar {
 	width: 10%;
+	height: 100%;
+	float: left;	
 	background-color: #eee;
 	overflow-y: auto;
 }
