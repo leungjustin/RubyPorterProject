@@ -85,3 +85,7 @@
 	text-align: center;
 	padding: 8px;
 }
+
+.isDisabled {
+	pointer-events: none;
+}

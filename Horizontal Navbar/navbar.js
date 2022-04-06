@@ -5,6 +5,7 @@ class NavItem {
 		this.name = name,
 		this.link = link,
 		this.isActive = false,
+		this.isDisabled = false,
 		this.subnavItems = [];
 	}
 }
@@ -25,7 +26,7 @@ class NavBar {
 		this.$editLink = document.getElementById("editLink");
 		this.$editButton = document.getElementById("editButton");
 		this.$deleteButton = document.getElementById("deleteButton");
-		this.$disableButton = document.getElementById("disableButton");
+		this.$enableDisableButton = document.getElementById("enableDisableButton");
 		this.$addSubForm = document.getElementById("addSubForm");
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
@@ -63,14 +64,14 @@ class NavBar {
 	renderNavItem(item, index) {
 		if (item.subnavItems == null) {
 			return `
-				<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 				<button id="edit${index}">E</button>
 				`;
 		}
 		else {
 			let navString = `
 				<div class="subnav">
-					<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} id="item${index}">${item.name}</a>
+					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 					<button id="edit${index}">E</button>
 					<div class="subnav-content">
 			`;
@@ -99,7 +100,8 @@ class NavBar {
 			document.getElementById("item"+i).onclick = this.reload.bind(this, "item", i);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$disableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		this.$enableDisableButton.innerHTML = "Enable/Disable Link";
+		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		disabled.forEach(element => element.disabled = true);
 	}
 	
@@ -114,14 +116,22 @@ class NavBar {
 	}
 
 	editNavItem(index) {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$disableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		enabled.forEach(element => element.disabled = true);
 		enabled.forEach(element => element.disabled = false);
 		this.$editName.value = this.items[index].name;
 		this.$editLink.value = this.items[index].link;
 
+		if (this.items[index].isDisabled) {
+			this.$enableDisableButton.innerHTML = "Enable Link";
+		}
+		else {
+			this.$enableDisableButton.innerHTML = "Disable Link";
+		}
+
 		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
-		this.$disableButton.onclick = this.disableLink.bind(this);
+		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
 		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
 	}
 
@@ -143,8 +153,17 @@ class NavBar {
 		forms.forEach(element => element.reset());
 	}
 
-	disableLink() {
-		//TODO: Disable link.
+	enableOrDisableLink(index) {
+		if (this.items[index].isDisabled) {
+			this.items[index].isDisabled = false;
+		}
+		else {
+			this.items[index].isDisabled = true;
+		}
+		this.fillItems();
+		this.addEventListeners();
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
 	}
 
 	addSubnavItem(index, event) {
@@ -158,6 +177,8 @@ class NavBar {
 	}
 
 	editSubnavItem(index, parentindex) {
+		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton]
+		disabled.forEach(element => element.disabled = true);
 		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
 		enabled.forEach(element => element.disabled = false);
 		this.$editName.value = this.items[parentindex].subnavItems[index].name;
