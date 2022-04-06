@@ -73,8 +73,7 @@ class Navbar
 		console.log("change active")		
 		this.makeAllInactive(this.menuItems);			
 		// TODO: add active class to menu item whose link matches the current window href
-		this.makeActive(this.menuItems);
-		this.renderNavbar;
+		this.makeActive(this.menuItems);		
 	}	
 
 	makeActive(itemArray) {
@@ -94,8 +93,7 @@ class Navbar
 		{
 			activeItem.classList.add('active');
 			console.log(activeItem)
-		}
-		
+		}		
 	}
 
 	makeAllInactive(itemArray) {
