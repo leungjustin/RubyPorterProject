@@ -2,7 +2,6 @@ class NavItem {
 	constructor(name, link) {
 		this.name = name,
 		this.link = link,
-		this.isActive = false, //Item changes color based on this property.
 		this.isDisabled = false, //Determines whether the item can be clicked on.
 		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
@@ -10,7 +9,12 @@ class NavItem {
 
 class NavBar {
 	constructor() {
-		this.items = []; //A list of objects of the NavItem class.
+		this.items = [
+			new NavItem("Item1", "#item1"),
+			new NavItem("Item2", "#item2")
+		]; //A list of objects of the NavItem class.
+		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
+		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -31,7 +35,9 @@ class NavBar {
 	}
 
 	//Essentially redraws the navbar and resets forms.
-	reload() {
+	reload(hash = "") {
+		window.location.hash = hash;
+		console.log(window.location.hash == "" ? "Blank" : window.location.hash);
 		this.fillItems();
 		this.addEventListeners();
 		this.disableAll();
@@ -53,7 +59,7 @@ class NavBar {
 		//If the item has no subitems, create and return this string.
 		if (item.subnavItems == null) {
 			return `
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
+				<a href="${item.link}" class="${item.link == window.location.hash ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 				<button id="edit${index}">E</button>
 				`;
 		}
@@ -61,7 +67,7 @@ class NavBar {
 		else {
 			let navString = `
 				<div class="subnav">
-					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
+					<a href="${item.link}" class="${item.link == window.location.hash ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 					<button id="edit${index}">E</button>
 					<div class="subnav-content">
 			`;
@@ -69,7 +75,7 @@ class NavBar {
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
 					<div>
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].link == window.location.hash ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
 						<button id="subedit${i},${index}">E</button>
 					</div>
 				`;
@@ -88,10 +94,10 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+j+","+i).onclick = this.changeActive.bind(this, "subitem", j, i);
+				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
 			}
-			document.getElementById("item"+i).onclick = this.changeActive.bind(this, "item", i);
+			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
 	}
@@ -120,31 +126,13 @@ class NavBar {
 		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
 		forms.forEach(element => element.reset());
 	}
-
-	//Changes which navbar item or subitem is the active.
-	changeActive(string, index, parentindex = -1) {
-		//Sets the active property of all items and subitems to false.
-		this.items.forEach(item => {
-			item.isActive = false;
-			item.subnavItems.forEach(subItem => subItem.isActive = false);
-		});
-		//Sets the item or subitem that was clicked on to be active. If statements are to check whether an item was clicked or a subitem was clicked.
-		if (string == "item") {
-			this.items[index].isActive = true;
-		}
-		if (string == "subitem") {
-			this.items[parentindex].isActive = true;
-			this.items[parentindex].subnavItems[index].isActive = true;
-		}
-		this.reload();
-	}
 	
 	//Creates a new navbar item based on user input and then adds it to the item list.
 	addNavItem(event) {
 		event.preventDefault();
 		let item = new NavItem(this.$name.value, this.$link.value);
 		this.items.push(item);
-		this.reload();
+		this.reload(window.location.hash);
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
@@ -175,7 +163,7 @@ class NavBar {
 		event.preventDefault();
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
-		this.reload();
+		this.reload(this.items[index].link);
 	}
 
 	//Removes an existing navbar item from the list.
@@ -192,7 +180,7 @@ class NavBar {
 		else {
 			this.items[index].isDisabled = true;
 		}
-		this.reload();
+		this.reload(window.location.hash);
 	}
 
 	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
@@ -200,7 +188,7 @@ class NavBar {
 		event.preventDefault();
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
-		this.reload();
+		this.reload(window.location.hash);
 	}
 
 	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
@@ -221,7 +209,7 @@ class NavBar {
 		event.preventDefault();
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		this.reload();
+		this.reload(this.items[parentindex].subnavItems[index].link);
 	}
 
 	//Removes an existing navbar subitem from a item's list.
