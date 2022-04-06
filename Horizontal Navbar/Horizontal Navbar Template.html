@@ -5,9 +5,11 @@
 	<link rel="stylesheet" href="navbarstyles.css">
 </head>
 <body>
+	<!-- This is where the navbar is placed -->
 	<div class="navbar" id="navbar">
 	</div>
 	
+	<!-- For adding a new navbar item -->
 	<h2>Add Navbar Item</h2>
 	<form action="#" method="post" id="addForm">
 		<label for="name">Name:</label>
@@ -17,7 +19,8 @@
 		<button type="submit">Add</button>
 	</form>
 
-	<h2>Edit Navbar Item</h2>
+	<!-- For editing an existing navbar item or subitem -->
+	<h2>Edit Item</h2>
 	<form action="#" method="post" id="editForm">
 		<label for="name">Name:</label>
 		<input type="text" name="name" id="editName" value=""><br>
@@ -25,8 +28,11 @@
 		<input type="text" name="link" id="editLink" value=""><br>
 		<button type="submit" id="editButton">Edit</button>
 	</form>
+	<button id="deleteButton">Delete Item</button>
+	<button id="enableDisableButton">Enable/Disable Link</button>
 
-	<h3>Add Subnav Item</h3>
+	<!-- For adding a navbar subitem to an existing item -->
+	<h2>Add Subnav Item</h2>
 	<form action="#" method="post" id="addSubForm">
 		<label for="name">Name:</label>
 		<input type="text" name="name" id="addSubName"><br>

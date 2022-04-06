@@ -21,9 +21,17 @@
 	text-decoration: none;
 }
 
+.active {
+	background-color: #BBBBBB;
+}
+
 .subnav {
 	float: left;
 	overflow: hidden;
+}
+
+.subnav .active {
+	background-color: #BBBBBB;
 }
 
 .subnav a {
@@ -54,16 +62,16 @@
 	text-align: center;
 }
 
+.subnav:hover .subnav-content {
+	display: block;
+}
+
 .subnav-content button {
 	float: none;
 	color: black;
 	text-decoration: none;
-	display: block;
-	text-align: center;
-}
-
-.subnav:hover .subnav-content {
-	display: block;
+	position: relative;
+	bottom: 75px;
 }
 
 .subnav-content a:hover {
@@ -76,4 +84,8 @@
 	display: block;
 	text-align: center;
 	padding: 8px;
+}
+
+.isDisabled {
+	pointer-events: none;
 }
