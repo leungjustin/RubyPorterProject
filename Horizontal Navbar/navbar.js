@@ -133,6 +133,7 @@ class NavBar {
 			this.items[index].isActive = true;
 		}
 		if (string == "subitem") {
+			this.items[parentindex].isActive = true;
 			this.items[parentindex].subnavItems[index].isActive = true;
 		}
 		this.reload();
