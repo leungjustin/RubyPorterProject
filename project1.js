@@ -27,6 +27,7 @@ class Navbar
 		this.logo = "logoideas.jpg";		
 			
 		console.log(this.menuItems);
+		console.log(window.location.hash);
 		this.bindMethods();
 		this.renderNavbar();
 	}
@@ -54,7 +55,7 @@ class Navbar
 		{
 			nestedItemHTML = `<ul class="subnav-content">${menuItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, index)).join(' ')}</ul>`;
 		}		
-		return `<li class="navItem"><a href="${menuItem.link}" class="${menuItem.isActive ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
+		return `<li class="navItem"><a href="${menuItem.link}" class="${window.location.hash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
 	}	
 
 	renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)	{
@@ -65,7 +66,7 @@ class Navbar
 			// this is recursive
 			nestedItemHTML = `<ul class="subnav-content">${nestedItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)).join(' ')}</ul>`;
 		}
-		return `<li><a href="${nestedItem.link}" class="${nestedItem.isActive ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
+		return `<li><a href="${nestedItem.link}" class="${window.location.hash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
 
 	}
 	
@@ -73,14 +74,16 @@ class Navbar
 		console.log("change active")		
 		this.makeAllInactive(this.menuItems);			
 		// TODO: add active class to menu item whose link matches the current window href
-		this.makeActive(this.menuItems);		
+		// this.makeActive(this.menuItems);		
+		this.renderNavbar();
 	}	
 
+	/*
 	makeActive(itemArray) {
 		let activeItem;
 		for (let i=0; i < itemArray.length; i++)
 		{
-			if (window.location.href.includes(itemArray[i].link))
+			if (window.location.hash == itemArray[i].link)
 			{
 				activeItem = document.querySelector(`[href='${itemArray[i].link}']`);
 			}
@@ -95,6 +98,7 @@ class Navbar
 			console.log(activeItem)
 		}		
 	}
+	*/
 
 	makeAllInactive(itemArray) {
 		let inactiveItem;
