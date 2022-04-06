@@ -40,8 +40,14 @@
 	font-family: inherit;
 }
 
-.navbar a:hover, .subnav:hover {
+.navbar a:hover {
 	background-color: #cccccc;
+	animation: backgroundFade1 linear 0.2s;
+}
+
+@keyframes backgroundFade1 {
+	from {background-color: #bbbbbb;}
+	to {background-color: #cccccc;}
 }
 
 .subnav-content {
@@ -64,6 +70,12 @@
 
 .subnav:hover .subnav-content {
 	display: block;
+	animation: fadeIn linear 0.1s;
+}
+
+@keyframes fadeIn {
+	0% {opacity: 0;}
+	100% {opacity: 1;}
 }
 
 .subnav-content button {
