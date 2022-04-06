@@ -55,7 +55,7 @@ class Navbar
 		{
 			nestedItemHTML = `<ul class="subnav-content">${menuItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, index)).join(' ')}</ul>`;
 		}		
-		return `<li class="navItem"><a href="${menuItem.link}" class="${window.location.hash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
+		return `<li class="navItem"><a href="${menuItem.link}" class="${activeHash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
 	}	
 
 	renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)	{
@@ -66,7 +66,7 @@ class Navbar
 			// this is recursive
 			nestedItemHTML = `<ul class="subnav-content">${nestedItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, previousItemIndex)).join(' ')}</ul>`;
 		}
-		return `<li><a href="${nestedItem.link}" class="${window.location.hash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
+		return `<li><a href="${nestedItem.link}" class="${activeHash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
 
 	}
 	
@@ -130,3 +130,4 @@ class Navbar
 
 let navbar;
 window.onload = () => navbar = new Navbar();
+var activeHash = window.location.hash;
