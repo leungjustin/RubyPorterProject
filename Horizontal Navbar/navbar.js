@@ -3,6 +3,7 @@ class NavItem {
 		this.name = name,
 		this.link = link,
 		this.isDisabled = false, //Determines whether the item can be clicked on.
+		this.isActive = false,
 		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
 }
@@ -35,9 +36,19 @@ class NavBar {
 	}
 
 	//Essentially redraws the navbar and resets forms.
-	reload(hash = "") {
-		window.location.hash = hash;
-		console.log(window.location.hash == "" ? "Blank" : window.location.hash);
+	reload() {
+		this.items.forEach(item => {
+			item.isActive = false;
+			if (item.link == window.location.hash) {
+				item.isActive = true;
+			}
+			item.subnavItems.forEach(subitem => {
+				subitem.isActive = false;
+				if (subitem.link == window.location.hash) {
+					subitem.isActive = true;
+				}
+			})
+		})
 		this.fillItems();
 		this.addEventListeners();
 		this.disableAll();
@@ -57,9 +68,9 @@ class NavBar {
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item, index) {
 		//If the item has no subitems, create and return this string.
-		if (item.subnavItems == null) {
+		if (item.subnavItems.length == null) {
 			return `
-				<a href="${item.link}" class="${item.link == window.location.hash ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 				<button id="edit${index}">E</button>
 				`;
 		}
@@ -67,7 +78,7 @@ class NavBar {
 		else {
 			let navString = `
 				<div class="subnav">
-					<a href="${item.link}" class="${item.link == window.location.hash ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
+					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 					<button id="edit${index}">E</button>
 					<div class="subnav-content">
 			`;
@@ -75,7 +86,7 @@ class NavBar {
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
 					<div>
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].link == window.location.hash ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
 						<button id="subedit${i},${index}">E</button>
 					</div>
 				`;
@@ -94,10 +105,10 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
+				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
 			}
-			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
+			document.getElementById("item"+i).onclick = this.reload.bind(this);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
 	}
@@ -132,7 +143,7 @@ class NavBar {
 		event.preventDefault();
 		let item = new NavItem(this.$name.value, this.$link.value);
 		this.items.push(item);
-		this.reload(window.location.hash);
+		this.reload();
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
@@ -180,7 +191,7 @@ class NavBar {
 		else {
 			this.items[index].isDisabled = true;
 		}
-		this.reload(window.location.hash);
+		this.reload();
 	}
 
 	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
@@ -188,7 +199,7 @@ class NavBar {
 		event.preventDefault();
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
-		this.reload(window.location.hash);
+		this.reload();
 	}
 
 	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
@@ -209,7 +220,7 @@ class NavBar {
 		event.preventDefault();
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		this.reload(this.items[parentindex].subnavItems[index].link);
+		this.reload();
 	}
 
 	//Removes an existing navbar subitem from a item's list.
