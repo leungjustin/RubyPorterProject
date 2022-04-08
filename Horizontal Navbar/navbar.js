@@ -71,36 +71,26 @@ class NavBar {
 
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item, index) {
-		//If the item has no subitems, create and return this string.
-		if (item.subnavItems.length == null) {
-			return `
+		let navString = `
+			<div class="subnav">
 				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
 				<button id="edit${index}">E</button>
-				`;
-		}
-		//If the item does have subitems, create and return this string instead.
-		else {
-			let navString = `
-				<div class="subnav">
-					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
-					<button id="edit${index}">E</button>
-					<div class="subnav-content">
-			`;
-			//Creates a string for each subitem.
-			for (let i = 0; i < item.subnavItems.length; i++) {
-				navString += `
-					<div>
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
-						<button id="subedit${i},${index}">E</button>
-					</div>
-				`;
-			}
+				<div class="subnav-content">
+		`;
+		//Creates a string for each subitem.
+		for (let i = 0; i < item.subnavItems.length; i++) {
 			navString += `
-					</div>
+				<div>
+					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+					<button id="subedit${i},${index}">E</button>
 				</div>
 			`;
-			return navString;
 		}
+		navString += `
+				</div>
+			</div>
+		`;
+		return navString;
 	}
 
 	//Adds click and submit events for navbar items and buttons.
@@ -178,14 +168,18 @@ class NavBar {
 		event.preventDefault();
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
-		window.location.hash = this.items[index].link;
+		if (this.items[index].isActive) {
+			window.location.hash = this.items[index].link;
+		}
 		this.reload();
 	}
 
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
+		if (this.items[index].isActive) {
+			window.location.hash = "";
+		}
 		this.items.splice(index, 1);
-		window.location.hash = "";
 		this.reload();
 	}
 
@@ -226,14 +220,18 @@ class NavBar {
 		event.preventDefault();
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		window.location.hash = this.items[parentindex].subnavItems[index].link;
+		if (this.items[parentindex].subnavItems[index].isActive) {
+			window.location.hash = this.items[parentindex].subnavItems[index].link;		
+		}
 		this.reload();
 	}
 
 	//Removes an existing navbar subitem from a item's list.
 	deleteSubnavItem(index, parentindex) {
+		if (this.items[parentindex].subnavItems[index].isActive) {
+			window.location.hash = "";
+		}
 		this.items[parentindex].subnavItems.splice(index, 1);
-		window.location.hash = "";
 		this.reload();
 	}
 }
