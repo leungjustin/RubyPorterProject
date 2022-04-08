@@ -31,28 +31,32 @@ class NavBar {
 		this.$addSubButton = document.getElementById("addSubButton");
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this);
-
 		this.reload();
 	}
 
 	//Essentially redraws the navbar and resets forms.
-	reload() {
-		this.items.forEach(item => {
-			item.isActive = false;
-			if (item.link == window.location.hash) {
-				item.isActive = true;
-			}
-			item.subnavItems.forEach(subitem => {
-				subitem.isActive = false;
-				if (subitem.link == window.location.hash) {
-					subitem.isActive = true;
-				}
-			})
-		})
+	reload(hash = window.location.hash) {
+		this.changeActive(hash);
 		this.fillItems();
 		this.addEventListeners();
 		this.disableAll();
 		this.resetForms();
+	}
+
+	changeActive(hash) {
+		this.items.forEach(item => {
+			item.isActive = false;
+			if (item.link == hash) {
+				item.isActive = true;
+			}
+			item.subnavItems.forEach(subitem => {
+				subitem.isActive = false;
+				if (subitem.link == hash) {
+					item.isActive = true;
+					subitem.isActive = true;
+				}
+			});
+		});
 	}
 
 	//Fills the navbar with existing items and subitems.
@@ -105,10 +109,10 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this);
+				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
 			}
-			document.getElementById("item"+i).onclick = this.reload.bind(this);
+			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
 		}
 	}
@@ -174,12 +178,14 @@ class NavBar {
 		event.preventDefault();
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
-		this.reload(this.items[index].link);
+		window.location.hash = this.items[index].link;
+		this.reload();
 	}
 
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
 		this.items.splice(index, 1);
+		window.location.hash = "";
 		this.reload();
 	}
 
@@ -220,12 +226,14 @@ class NavBar {
 		event.preventDefault();
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
+		window.location.hash = this.items[parentindex].subnavItems[index].link;
 		this.reload();
 	}
 
 	//Removes an existing navbar subitem from a item's list.
 	deleteSubnavItem(index, parentindex) {
 		this.items[parentindex].subnavItems.splice(index, 1);
+		window.location.hash = "";
 		this.reload();
 	}
 }
