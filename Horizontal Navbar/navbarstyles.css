@@ -1,6 +1,6 @@
 .navbar {
 	overflow: hidden;
-	background-color: #DDDDDD;
+	background-color: #bbbbbb;
 	height: 70px;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .active {
-	background-color: #BBBBBB;
+	color: #ffffff;
 }
 
 .subnav {
@@ -31,7 +31,7 @@
 }
 
 .subnav .active {
-	background-color: #BBBBBB;
+	color: #ffffff;
 }
 
 .subnav a {
@@ -40,15 +40,21 @@
 	font-family: inherit;
 }
 
-.navbar a:hover, .subnav:hover {
-	background-color: #E5E5E5;
+.navbar a:hover {
+	background-color: #cccccc;
+	animation: backgroundFade1 linear 0.2s;
+}
+
+@keyframes backgroundFade1 {
+	from {background-color: #bbbbbb;}
+	to {background-color: #cccccc;}
 }
 
 .subnav-content {
 	display: none;
 	position: absolute;
 	top: 77px;
-	background-color: #DDDDDD;
+	background-color: #bbbbbb;
 	width: inherit;
 	margin: inherit;
 	z-index: 1;
@@ -64,6 +70,12 @@
 
 .subnav:hover .subnav-content {
 	display: block;
+	animation: fadeIn linear 0.1s;
+}
+
+@keyframes fadeIn {
+	0% {opacity: 0;}
+	100% {opacity: 1;}
 }
 
 .subnav-content button {
@@ -75,7 +87,7 @@
 }
 
 .subnav-content a:hover {
-	background-color: #E5E5E5;
+	background-color: #cccccc;
 }
 
 .logo {
