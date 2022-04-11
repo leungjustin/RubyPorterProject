@@ -43,6 +43,6 @@
 	display:none;
 }
 
-.navItem:hover .subnav-content {
+.subnav:hover .subnav-content {
 	display: block;
 }
