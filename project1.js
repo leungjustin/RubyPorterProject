@@ -1,5 +1,5 @@
 // TODO: figure out where to declare MenuItem class, so it can be used inside of the class Navbar
-class MenuItem 
+class NavItem 
 {
 	constructor(name, link){
 		this.name = name;
@@ -12,25 +12,39 @@ class MenuItem
 class Navbar
 {	
 	constructor(){
+		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
+		this.$editForm = document.getElementById("editForm");
+		this.$editName = document.getElementById("editName");
+		this.$editLink = document.getElementById("editLink");
+		this.$editButton = document.getElementById("editButton");
+		this.$deleteButton = document.getElementById("deleteButton");
+		this.$enableDisableButton = document.getElementById("enableDisableButton");
+		this.$addSubForm = document.getElementById("addSubForm");
+		this.$addSubName = document.getElementById("addSubName");
+		this.$addSubLink = document.getElementById("addSubLink");
+		this.$addSubButton = document.getElementById("addSubButton");
+
 		// fill menuItems with an array of objects that have a name, link, and isActive attribute
 		this.menuItems = [			
-			new MenuItem('Item 1', '#item1'),
-			new MenuItem('Item 2', '#item2'),
-			new MenuItem('Item 3', '#item3'),
-			new MenuItem('Item 4', '#item4'),
-			new MenuItem('Item 5', '#item5')
+			new NavItem('Item 1', '#item1'),
+			new NavItem('Item 2', '#item2'),
+			new NavItem('Item 3', '#item3'),
+			new NavItem('Item 4', '#item4'),
+			new NavItem('Item 5', '#item5')
 		];
-		this.menuItems[0].nestedItems.push(new MenuItem('Nested Item 1','#nested00'));
-		this.menuItems[2].nestedItems.push(new MenuItem('Nested Item 1','#nested20'));
-		this.menuItems[0].nestedItems[0].nestedItems.push(new MenuItem('Another Level', '#nested000'));		
+		this.menuItems[0].nestedItems.push(new NavItem('Nested Item 1','#nested00'));
+		this.menuItems[2].nestedItems.push(new NavItem('Nested Item 1','#nested20'));
+		this.menuItems[0].nestedItems[0].nestedItems.push(new NavItem('Another Level', '#nested000'));		
 		this.logo = "logoideas.jpg";		
 			
 		console.log(this.menuItems);
 		console.log(window.location.hash);
 		this.bindMethods();
 		this.renderNavbar();
+		
+		this.$addForm.onsubmit = this.addNavItem.bind(this);
 	}
 
 	bindMethods() {
@@ -58,7 +72,7 @@ class Navbar
 			nestedItemHTML = `<ul class="subnav-content">${menuItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, id)).join(' ')}</ul>`;
 		}	
 					
-		return `<li class="navItem"><a href="${menuItem.link}" id="${id}" class="${activeHash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a>${nestedItemHTML}</li>`;		
+		return `<li class="navItem"><a href="${menuItem.link}" class="${activeHash == menuItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${menuItem.name}</a><button  id="${id}">E</button>${nestedItemHTML}</li>`;		
 	}	
 
 	renderNestedItem(nestedItem, nestedItemIndex, previousItemId)	{
@@ -71,7 +85,7 @@ class Navbar
 			nestedItemHTML = `<ul class="subnav-content">${nestedItem.nestedItems.map((nestedItem, nestedItemIndex) => this.renderNestedItem(nestedItem, nestedItemIndex, id)).join(' ')}</ul>`;
 		}	
 		
-		return `<li><a href="${nestedItem.link}" id="${id}" class="${activeHash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a>${nestedItemHTML}</li>`
+		return `<li><a href="${nestedItem.link}" class="${activeHash == nestedItem.link ? 'active':''}" onclick="navbar.makeNavItemActive(event)">${nestedItem.name}</a><button id="${id}">E</button>${nestedItemHTML}</li>`
 
 	}
 	
@@ -121,24 +135,38 @@ class Navbar
 			}		
 		}	
 	}
-	
-	addNavItem(event, id) {
+
+	addNavItem(event)
+	{
 		event.preventDefault();
-		let item = new NavItem(this.$name.value, this.$link.value);	
+		let item = new NavItem(this.$name.value, this.$link.value);
+		this.menuItems.push(item);
+		this.resetForms();
+		this.renderNavbar();
+	}
+	
+	addSubNavItem(event, id) {
+		event.preventDefault();
+		let item = new NavItem(this.$addSubName.value, this.$addSubLink.value);	
 		let path = id.split('item');
-		path.splice(0);
+		path.splice(0, 1);
 		let schema = this.menuItems[path[0]];
 		for (let i = 1; i < path.length; i++)
 		{
 			schema = schema.nestedItems[path[i]];
 		}
 		schema.push(item);
-		this.renderNavbar;		
+		this.renderNavbar();		
 	}
 	
 	deleteNavItem() {
 		
 	}	
+
+	resetForms() {
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		forms.forEach(element => element.reset());
+	}
 }
 
 
