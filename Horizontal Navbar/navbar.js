@@ -159,10 +159,11 @@ class NavBar {
 		this.items.push(item);
 
 		//Renders the new item and adds it to the navbar.
-		document.getElementById("navbar").innerHTML += this.renderNavItem(item);
-		//Add event handlers for new link and edit button.
-		document.getElementById("item"+item.name).onclick = this.reload.bind(this, item.link);
-		document.getElementById("edit"+item.name).onclick = this.editNavItem.bind(this, this.items.length-1);
+		document.getElementById("navbar").innerHTML += this.renderNavItem(item); //This currently appears to remove event listeners from other elements.
+		this.addEventListeners(); //Currently implemented because of above method's behavior.
+		//Add event listeners for new link and edit button.
+		//document.getElementById("item"+item.name).onclick = this.reload.bind(this, item.link);
+		//document.getElementById("edit"+item.name).onclick = this.editNavItem.bind(this, this.items.length-1);
 		
 		this.reload();
 	}
@@ -195,7 +196,7 @@ class NavBar {
 
 		let editHTML = document.getElementById("item"+this.items[index].name);
 		
-		//Changes the current item's name and/or link.
+		//Change the current item's name and/or link.
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
 
@@ -248,9 +249,12 @@ class NavBar {
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
 
-		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1);
-		document.getElementById("subitem"+subItem.name+","+this.items[index].name).onclick = this.reload.bind(this, subItem.link);
-		document.getElementById("subedit"+subItem.name+","+this.items[index].name).onclick = this.editSubnavItem.bind(this, this.items[index].subnavItems.length-1, index);
+		//Renders the new subitem and adds it to the navbar.
+		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1); //Currently behaving in the same problematic way as in addNavItem.
+		this.addEventListeners();
+		//Add event listeners for new link and edit button.
+		//document.getElementById("subitem"+subItem.name+","+this.items[index].name).onclick = this.reload.bind(this, subItem.link);
+		//document.getElementById("subedit"+subItem.name+","+this.items[index].name).onclick = this.editSubnavItem.bind(this, this.items[index].subnavItems.length-1, index);
 		this.reload();
 	}
 
@@ -270,10 +274,23 @@ class NavBar {
 	//Changes the name and/or link of an existing navbar subitem.
 	submitSubEdit(index, parentindex, event) {
 		event.preventDefault();
+
+		let editHTML = document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name);
+
+		//Change the current subitem's name and/or link.
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		if (this.items[parentindex].subnavItems[index].isActive) {
-			window.location.hash = this.items[parentindex].subnavItems[index].link;		
+
+		//Set the properties of the edited subitem's corresponding html element to match.
+		editHTML.href = this.items[parentindex].subnavItems[index].link;
+		editHTML.id = "item"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
+		editHTML.innerHTML = this.items[parentindex].subnavItems[index].name;
+		//Binds new event listener for the edited subitem.
+		editHTML.onclick = this.reload.bind(this, this.items[parentindex].subnavItems[index].link);
+
+		//If the edited subitem is the currently active subitem, updates the hash so it match the update.
+		if (editHTML.classList.contains("active")) {
+			window.location.hash = this.items[parentindex].subnavItems[index].link;
 		}
 		this.reload();
 	}
