@@ -3,9 +3,11 @@
 */
 
 .navbar {
+	margin: 0;
+	padding: 0;
 	width: 10%;
 	height: 100%;
-	float: left;	
+	position: fixed;	
 	background-color: #eee;
 	overflow-y: auto;
 }
@@ -45,4 +47,9 @@
 
 .subnav:hover .subnav-content {
 	display: block;
+}
+
+.container {
+	margin-left: 10%;
+	padding: 1px 16px;
 }
