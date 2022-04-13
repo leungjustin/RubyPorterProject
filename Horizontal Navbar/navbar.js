@@ -2,7 +2,7 @@ class NavItem {
 	constructor(name, link, isDisabled = false) {
 		this.name = name,
 		this.link = link,
-		this.isActive = false;
+		this.isActive = false; //Currently not in use. May be implemented when using data storage method.
 		this.isDisabled = isDisabled, //Determines whether the item can be clicked on.
 		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
@@ -14,9 +14,9 @@ class NavBar {
 			new NavItem("Item1", "#item1"),
 			new NavItem("Item2", "#item2")
 		]; //A list of objects of the NavItem class.
-
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -91,7 +91,7 @@ class NavBar {
 				<button id="edit${item.name}">E</button>
 				<div class="subnav-content" id="subnavContent${item.name}">
 		`;
-		//Called for each subitem the item has.
+		//Each call to renderSubnavItem adds a new subitem to the navbar string.
 		for (let i = 0; i < item.subnavItems.length; i++) {
 			navString += this.renderSubnavItem(item, i);
 		}
@@ -105,7 +105,7 @@ class NavBar {
 	//Creates a subnav item to be placed within an item.
 	renderSubnavItem(item, i) {
 		return `
-			<div>
+			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
 				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
@@ -159,8 +159,8 @@ class NavBar {
 		this.items.push(item);
 
 		//Renders the new item and adds it to the navbar.
-		document.getElementById("navbar").innerHTML += this.renderNavItem(item); //This currently appears to remove event listeners from other elements.
-		this.addEventListeners(); //Currently implemented because of above method's behavior.
+		document.getElementById("navbar").innerHTML += this.renderNavItem(item); //This appears to remove event listeners from other elements.
+		this.addEventListeners(); //Currently implemented because of above line's behavior.
 		//Add event listeners for new link and edit button.
 		//document.getElementById("item"+item.name).onclick = this.reload.bind(this, item.link);
 		//document.getElementById("edit"+item.name).onclick = this.editNavItem.bind(this, this.items.length-1);
@@ -207,7 +207,7 @@ class NavBar {
 		//Binds new event listener for the edited item.
 		editHTML.onclick = this.reload.bind(this, this.items[index].link);
 
-		//If the edited item is the currently active item, updates the hash so it match the update.
+		//If the edited item is the currently active item, updates the hash so it matches the update.
 		if (editHTML.classList.contains("active")) {
 			window.location.hash = this.items[index].link;
 		}
@@ -283,7 +283,7 @@ class NavBar {
 
 		//Set the properties of the edited subitem's corresponding html element to match.
 		editHTML.href = this.items[parentindex].subnavItems[index].link;
-		editHTML.id = "item"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
+		editHTML.id = "subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
 		editHTML.innerHTML = this.items[parentindex].subnavItems[index].name;
 		//Binds new event listener for the edited subitem.
 		editHTML.onclick = this.reload.bind(this, this.items[parentindex].subnavItems[index].link);
@@ -297,10 +297,16 @@ class NavBar {
 
 	//Removes an existing navbar subitem from a item's list.
 	deleteSubnavItem(index, parentindex) {
-		if (this.items[parentindex].subnavItems[index].isActive) {
+		//If the subitem being deleted is currently active, removes the hash from the URL.
+		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
 			window.location.hash = "";
 		}
+
+		//Removes the subitem's corresponding html from the navbar.
+		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
+
 		this.items[parentindex].subnavItems.splice(index, 1);
+
 		this.reload();
 	}
 }
