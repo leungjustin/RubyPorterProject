@@ -13,7 +13,7 @@ class NavBar {
 		this.items = [
 			new NavItem("Item1", "#item1"),
 			new NavItem("Item2", "#item2"),
-			new NavItem("Item3", "#item3", true)
+			new NavItem("Item3", "#item3")
 		]; //A list of objects of the NavItem class.
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
@@ -91,7 +91,7 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav" id="subnav${item.name}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${item.name}">${item.name}</a>
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
 				<button id="edit${item.name}">E</button>
 				<div class="subnav-content" id="subnavContent${item.name}">
 		`;
@@ -110,7 +110,7 @@ class NavBar {
 	renderSubnavItem(item, i) {
 		return `
 			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
-				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
+				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
 		`;
@@ -124,9 +124,17 @@ class NavBar {
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragstart = this.dragStart.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragover = this.dragOver.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondrop = this.drop.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).parameters = j+","+i;
 			}
 			document.getElementById("item"+this.items[i].name).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
+			document.getElementById("item"+this.items[i].name).ondragstart = this.dragStart.bind(this);
+			document.getElementById("item"+this.items[i].name).ondragover = this.dragOver.bind(this);
+			document.getElementById("item"+this.items[i].name).ondrop = this.drop.bind(this);
+			document.getElementById("item"+this.items[i].name).parameters = i.toString();
 		}
 	}
 
@@ -345,6 +353,44 @@ class NavBar {
 		let subitem = this.items[parentindex].subnavItems[index];
 		this.items[parentindex].subnavItems.splice(index, 1);
 		this.items[parentindex].subnavItems.splice(this.$positionSelect.value, 0, subitem);
+		this.load();
+	}
+
+	dragStart(event) {
+		event.dataTransfer.setData("text/plain", event.target.parameters);
+		let subnavArray = document.getElementsByClassName("subnav-content");
+		for (let i = 0; i < subnavArray.length; i++) {
+			subnavArray[i].style.display = "block";
+		}
+	}
+
+	dragOver(event) {
+		event.preventDefault();
+	}
+
+	drop(event) {
+		let dragIndex = event.dataTransfer.getData("text/plain");
+		event.dataTransfer.clearData();
+		let dragArray = dragIndex.split(",");
+		let dropIndex = event.target.parameters;
+		let dropArray = dropIndex.split(",");
+		let dragVar;
+
+		if (dragArray.length == 1) {
+			dragVar = this.items[dragArray[0]];
+			this.items.splice(dragArray[0], 1);
+		}
+		else {
+			dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
+			this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
+		}
+
+		if (dropArray.length == 1) {
+			this.items.splice(dropArray[0], 0, dragVar);
+		}
+		else {
+			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+		}
 		this.load();
 	}
 }
