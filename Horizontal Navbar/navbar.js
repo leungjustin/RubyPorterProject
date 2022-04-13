@@ -12,7 +12,8 @@ class NavBar {
 	constructor() {
 		this.items = [
 			new NavItem("Item1", "#item1"),
-			new NavItem("Item2", "#item2")
+			new NavItem("Item2", "#item2"),
+			new NavItem("Item3", "#item3", true)
 		]; //A list of objects of the NavItem class.
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
@@ -30,6 +31,9 @@ class NavBar {
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
 		this.$addSubButton = document.getElementById("addSubButton");
+		this.$positionForm = document.getElementById("positionForm");
+		this.$positionSelect = document.getElementById("positionSelect");
+		this.$positionButton = document.getElementById("positionButton");
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this);
 		this.load();
@@ -129,25 +133,25 @@ class NavBar {
 	//Disables all fields and buttons in all forms.
 	disableAll() {
 		this.$enableDisableButton.innerHTML = "Enable/Disable Link";
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton, this.$positionSelect, this.$positionButton];
 		disabled.forEach(element => element.disabled = true);
 	}
 
 	//Enables all fields and buttons in all forms.
 	enableAll() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton, this.$positionSelect, this.$positionButton];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Enables all fields and buttons needed to edit a navbar subitem.
 	enableSub() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
+		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$positionSelect, this.$positionButton];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Sets all fields in all forms to blank.
 	resetForms() {
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		let forms = [this.$addForm, this.$editForm, this.$addSubForm, this.$positionForm];
 		forms.forEach(element => element.reset());
 	}
 	
@@ -159,11 +163,8 @@ class NavBar {
 		this.items.push(item);
 
 		//Renders the new item and adds it to the navbar.
-		document.getElementById("navbar").innerHTML += this.renderNavItem(item); //This appears to remove event listeners from other elements.
-		this.addEventListeners(); //Currently implemented because of above line's behavior.
-		//Add event listeners for new link and edit button.
-		//document.getElementById("item"+item.name).onclick = this.reload.bind(this, item.link);
-		//document.getElementById("edit"+item.name).onclick = this.editNavItem.bind(this, this.items.length-1);
+		document.getElementById("navbar").innerHTML += this.renderNavItem(item);
+		this.addEventListeners();
 		
 		this.reload();
 	}
@@ -188,6 +189,13 @@ class NavBar {
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
 		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
+		
+		this.$positionSelect.innerHTML = "";
+		//Adds an option to the position form's select for each element in the nav array.
+		for (let i = 0; i < this.items.length; i++) {
+			this.addPositionOption(i);
+		}
+		this.$positionForm.onsubmit = this.changePosition.bind(this, index);
 	}
 
 	//Changes the name and/or link of an existing navbar item.
@@ -250,11 +258,9 @@ class NavBar {
 		this.items[index].subnavItems.push(subItem);
 
 		//Renders the new subitem and adds it to the navbar.
-		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1); //Currently behaving in the same problematic way as in addNavItem.
+		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1);
 		this.addEventListeners();
-		//Add event listeners for new link and edit button.
-		//document.getElementById("subitem"+subItem.name+","+this.items[index].name).onclick = this.reload.bind(this, subItem.link);
-		//document.getElementById("subedit"+subItem.name+","+this.items[index].name).onclick = this.editSubnavItem.bind(this, this.items[index].subnavItems.length-1, index);
+
 		this.reload();
 	}
 
@@ -269,6 +275,13 @@ class NavBar {
 		//Adds events to the buttons on the edit form.
 		this.$editForm.onsubmit = this.submitSubEdit.bind(this, index, parentindex);
 		this.$deleteButton.onclick = this.deleteSubnavItem.bind(this, index, parentindex);
+
+		this.$positionSelect.innerHTML = "";
+		//Adds an option to the position form's select for each subitem in the item's array.
+		for (let i = 0; i < this.items[parentindex].subnavItems.length; i++) {
+			this.addPositionOption(i);
+		}
+		this.$positionForm.onsubmit = this.changeSubPosition.bind(this, index, parentindex);
 	}
 
 	//Changes the name and/or link of an existing navbar subitem.
@@ -308,6 +321,31 @@ class NavBar {
 		this.items[parentindex].subnavItems.splice(index, 1);
 
 		this.reload();
+	}
+
+	//Adds an option to the position form's select for each element in the nav array.
+	addPositionOption(index) {
+		this.$positionSelect.innerHTML += `
+			<option value="${index}">${index}</option>
+		`;
+	}
+
+	//Changes the position of an item in the array by removing and reinserting it.
+	changePosition(index, event) {
+		event.preventDefault();
+		let item = this.items[index];
+		this.items.splice(index, 1);
+		this.items.splice(this.$positionSelect.value, 0, item);
+		this.load();
+	}
+
+	//Changes the position of a subitem in an item's array by removing and reinserting it.
+	changeSubPosition(index, parentindex, event) {
+		event.preventDefault();
+		let subitem = this.items[parentindex].subnavItems[index];
+		this.items[parentindex].subnavItems.splice(index, 1);
+		this.items[parentindex].subnavItems.splice(this.$positionSelect.value, 0, subitem);
+		this.load();
 	}
 }
 
