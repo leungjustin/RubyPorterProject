@@ -20,13 +20,14 @@
 	list-style-type: none;
 }
 
-.navbar li {			
+.navbar li {
+	display: block;			
 	text-decoration: none;
 	
 }
 
 .navbar a {	
-	display: block;
+	
 	padding: 5px;
 	text-decoration: none;
 	color: black;	

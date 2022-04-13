@@ -75,7 +75,7 @@ class NavBar {
 	renderNavItem(item, index) {
 		let navString = `
 			<li class="subnav">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" id="item${index}">${item.name}</a>
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${index}">${item.name}</a>
 				<button id="edit${index}">E</button>
 				<ul class="subnav-content">
 		`;
@@ -83,7 +83,7 @@ class NavBar {
 		for (let i = 0; i < item.subnavItems.length; i++) {
 			navString += `
 				<li>
-					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${i},${index}">${item.subnavItems[i].name}</a>
 					<button id="subedit${i},${index}">E</button>
 				</li>
 			`;
@@ -103,9 +103,18 @@ class NavBar {
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
+				document.getElementById("subitem"+j+","+i).addEventListener("dragstart", this.onDragStart);
+				document.getElementById("subitem"+j+","+i).addEventListener("dragover", this.onDragOver);
+				document.getElementById("subitem"+j+","+i).addEventListener("drop", this.onDrop.bind(this));
+				document.getElementById("subitem"+j+","+i).parameters = (j+","+i);
 			}
 			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
+			document.getElementById("item"+i).addEventListener("dragstart", this.onDragStart);
+			document.getElementById("item"+i).addEventListener("dragover", this.onDragOver);
+			document.getElementById("item"+i).addEventListener("drop", this.onDrop.bind(this));
+			document.getElementById("item"+i).parameters = i.toString();
+
 		}
 	}
 
@@ -236,6 +245,48 @@ class NavBar {
 		this.items[parentindex].subnavItems.splice(index, 1);
 		this.reload();
 	}
+
+	onDragStart(event) {
+		event.dataTransfer.setData('text/plain', event.target.parameters);
+		let subnavArray = document.getElementsByClassName('subnav-content');
+		for (let i = 0; i < subnavArray.length; i++)
+		{
+			subnavArray[i].style.display = "block";
+		}
+	}
+
+	onDragOver(event) {
+		event.preventDefault();
+	}
+
+	onDrop(event) {
+		let dragIndex = event.dataTransfer.getData('text/plain');
+		event.dataTransfer.clearData();
+		let dragArray = dragIndex.split(',');		
+		let dropIndex = event.target.parameters;
+		let dropArray = dropIndex.split(',')	
+		let dragVar;
+		if (dragArray.length == 1)
+		{
+			dragVar = this.items[dragArray[0]];
+			this.items.splice(dragArray[0], 1);
+		}
+		else
+		{
+			dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
+			this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
+		}
+		if (dropArray.length == 1)
+		{	
+			this.items.splice(dropArray[0], 0, dragVar);
+		}
+		else 
+		{
+			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+		}
+		this.reload();		
+	}
+
 }
 
 let navbar;
