@@ -12,10 +12,13 @@ class NavBar {
 	constructor() {
 		this.items = [
 			new NavItem("Item1", "#item1"),
-			new NavItem("Item2", "#item2")
+			new NavItem("Item2", "#item2"),
+			new NavItem("Item3", "#item3"),
+			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -36,8 +39,7 @@ class NavBar {
         this.logo = "logoideas.jpg";
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
-		this.$navStyle.onchange = this.changeNavStyle.bind(this);
-		this.reload();
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
 	}
 
 	//Essentially redraws the navbar and resets forms.
@@ -148,24 +150,31 @@ class NavBar {
 
 
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners() {
+	addEventListeners() {		
 		//Adds events to each navbar item.
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
+				let subitemElem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
+				subitemElem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragstart = this.onDragStart;
-				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragover = this.onDragOver;
-				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondrop = this.onDrop.bind(this);
-				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).parameters = (j+","+i);
+				subitemElem.ondragstart = this.dragStart;
+				subitemElem.ondragover = this.dragOver;
+				subitemElem.ondrop = this.drop.bind(this);
+				subitemElem.ondragleave = this.dragLeave.bind(this);
+				subitemElem.ondragend = this.dragEnd.bind(this);
+				subitemElem.parameters = (j+","+i);
 			}
-			document.getElementById("item"+this.items[i].name).onclick = this.reload.bind(this, this.items[i].link);
+			
+			let itemElem = document.getElementById("item"+this.items[i].name);
+			itemElem.onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			document.getElementById("item"+this.items[i].name).ondragstart = this.onDragStart;
-			document.getElementById("item"+this.items[i].name).ondragover = this.onDragOver;
-			document.getElementById("item"+this.items[i].name).ondrop = this.onDrop.bind(this);
-			document.getElementById("item"+this.items[i].name).parameters = i.toString();
+			itemElem.ondragstart = this.dragStart;
+			itemElem.ondragover = this.dragOver;
+			itemElem.ondrop = this.drop.bind(this);
+			itemElem.ondragleave = this.dragLeave.bind(this);
+			itemElem.ondragend = this.dragEnd.bind(this);
+			itemElem.parameters = i.toString();
 		}
 
 	}
@@ -299,51 +308,68 @@ class NavBar {
 	}
 
 	//Saves the indexes of a dragged menu item and displays all subnavigation items
-	onDragStart(event) {
-		event.dataTransfer.setData('text/plain', event.target.parameters);
-		let subnavArray = document.getElementsByClassName('subnav-content');
-		for (let i = 0; i < subnavArray.length; i++)
-		{
+	dragStart(event) {
+		event.dataTransfer.setData("text/plain", event.target.parameters);
+		let dragIndex = event.target.parameters;
+		let dragArray = dragIndex.split(",");
+		if (dragArray.length != 1) {
+			document.getElementById("subnavMove to end").style.display = "block";
+		}
+		let subnavArray = document.getElementsByClassName("subnav-content");
+		for (let i = 0; i < subnavArray.length; i++) {
 			subnavArray[i].style.display = "block";
 		}
 	}
 
 	//This method must be called ondragover so that an event will fire ondrop
-	onDragOver(event) {
+	dragOver(event) {
 		event.preventDefault();
+		event.target.classList.add("drag-over");
+	}
+
+	//Removes drag-over class when no longer dragging over item
+	dragLeave(event) {
+		event.target.classList.remove("drag-over");
+	}
+
+	//Necessary to keep subnav menus from displaying if something is dragged to an invalid drop site
+	dragEnd(event) {
+		event.preventDefault();
+		this.reload();
 	}
 
 	//Replaces navigation item dropped on with navigation item dragged
-	onDrop(event) {
-		let dragIndex = event.dataTransfer.getData('text/plain');
+	drop(event) {
+		event.target.classList.remove("drag-over");
+		let dragIndex = event.dataTransfer.getData("text/plain");
 		event.dataTransfer.clearData();
-		let dragArray = dragIndex.split(',');		
+		let dragArray = dragIndex.split(",");
 		let dropIndex = event.target.parameters;
-		let dropArray = dropIndex.split(',')	
+		let dropArray = dropIndex.split(",");
 		let dragVar;
-		if (dragArray.length == 1)
-		{
-			dragVar = this.items[dragArray[0]];
-			this.items.splice(dragArray[0], 1);
+
+		if (!(dragArray.length == 1 && dropArray.length == 2 && dragArray[0] == dropArray[1])) {
+			if (dragArray.length == 1) {
+				dragVar = this.items[dragArray[0]];
+				this.items.splice(dragArray[0], 1);
+			}
+			else {
+				dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
+				this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
+			}
+
+			if (dropArray.length == 1) {
+				this.items.splice(dropArray[0], 0, dragVar);
+			}
+			else if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
+				this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
+			}
+			else {
+				this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+			}
 		}
-		else
-		{
-			dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
-			this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
-		}
-		if (dropArray.length == 1)
-		{	
-			this.items.splice(dropArray[0], 0, dragVar);
-		}
-		else if (dragArray.length == 1 && dropArray[1] > dragArray[0])
-		{
-			this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
-		}
-		else 
-		{
-			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
-		}
-		this.reload();		
+		
+		this.reload();
 	}
 
 	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div
