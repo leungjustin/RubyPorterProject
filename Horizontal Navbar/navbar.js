@@ -125,14 +125,18 @@ class NavBar {
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragstart = this.dragStart.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragenter = this.dragEnter.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragover = this.dragOver.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragleave = this.dragLeave.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondrop = this.drop.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).parameters = j+","+i;
 			}
 			document.getElementById("item"+this.items[i].name).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
 			document.getElementById("item"+this.items[i].name).ondragstart = this.dragStart.bind(this);
+			document.getElementById("item"+this.items[i].name).ondragenter = this.dragEnter.bind(this);
 			document.getElementById("item"+this.items[i].name).ondragover = this.dragOver.bind(this);
+			document.getElementById("item"+this.items[i].name).ondragleave = this.dragLeave.bind(this);
 			document.getElementById("item"+this.items[i].name).ondrop = this.drop.bind(this);
 			document.getElementById("item"+this.items[i].name).parameters = i.toString();
 		}
@@ -364,11 +368,21 @@ class NavBar {
 		}
 	}
 
+	dragEnter(event) {
+		event.target.classList.add("drag-over");
+	}
+
 	dragOver(event) {
 		event.preventDefault();
+		event.target.classList.add("drag-over");
+	}
+
+	dragLeave(event) {
+		event.target.classList.remove("drag-over");
 	}
 
 	drop(event) {
+		event.target.classList.remove("drag-over");
 		let dragIndex = event.dataTransfer.getData("text/plain");
 		event.dataTransfer.clearData();
 		let dragArray = dragIndex.split(",");
@@ -387,6 +401,12 @@ class NavBar {
 
 		if (dropArray.length == 1) {
 			this.items.splice(dropArray[0], 0, dragVar);
+		}
+		else if (dragArray.length != 1) {
+			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+		}
+		else if (dragArray[0] < dropArray[1]) {
+			this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
 		}
 		else {
 			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
