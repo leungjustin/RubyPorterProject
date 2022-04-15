@@ -94,7 +94,7 @@ class NavBar {
 		if (this.$navbar.classList.contains('vertical'))
 		{
 			let navString = `
-				<li class="subnav" id="subnav${item.name}>
+				<li class="subnav" id="subnav${item.name}">
 					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
 					<button id="edit${item.name}">E</button>
 					<ul class="subnav-content">
