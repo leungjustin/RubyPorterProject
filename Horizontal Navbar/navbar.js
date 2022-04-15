@@ -1,3 +1,8 @@
+//TODO: Add ability to move an item down a level and to the very end of a list of subitems.
+	//TODO: Do not display "move to end" in a subitem's own parent item.
+	//TODO: Display "move to end" when an item is dragged.
+//TODO: Add ability to move an item into another item's subitems, even if said item currently has no subitems.
+
 class NavItem {
 	constructor(name, link, isDisabled = false) {
 		this.name = name,
@@ -16,8 +21,12 @@ class NavBar {
 			new NavItem("Item3", "#item3"),
 			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
+		this.items[0].subnavItems.push(new NavItem("Test", "#test"));
+		this.items[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+		this.items[1].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
 
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -110,7 +119,7 @@ class NavBar {
 	//Creates a subnav item to be placed within an item.
 	renderSubnavItem(item, i) {
 		return `
-			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
+			<div id="subnavContent${item.subnavItems[i].name},${item.name}" ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""}>
 				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
@@ -365,6 +374,9 @@ class NavBar {
 		let dragArray = dragIndex.split(",");
 		if (dragArray.length != 1) {
 			document.getElementById("subnavMove to end").style.display = "block";
+			for (let i = 0; i < this.items.length-1; i++) {
+				document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
+			}
 		}
 		let subnavArray = document.getElementsByClassName("subnav-content");
 		for (let i = 0; i < subnavArray.length; i++) {
