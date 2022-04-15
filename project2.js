@@ -103,16 +103,16 @@ class NavBar {
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
-				document.getElementById("subitem"+j+","+i).addEventListener("dragstart", this.onDragStart);
-				document.getElementById("subitem"+j+","+i).addEventListener("dragover", this.onDragOver);
-				document.getElementById("subitem"+j+","+i).addEventListener("drop", this.onDrop.bind(this));
+				document.getElementById("subitem"+j+","+i).ondragstart = this.onDragStart;
+				document.getElementById("subitem"+j+","+i).ondragover = this.onDragOver;
+				document.getElementById("subitem"+j+","+i).ondrop = this.onDrop.bind(this);
 				document.getElementById("subitem"+j+","+i).parameters = (j+","+i);
 			}
 			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
-			document.getElementById("item"+i).addEventListener("dragstart", this.onDragStart);
-			document.getElementById("item"+i).addEventListener("dragover", this.onDragOver);
-			document.getElementById("item"+i).addEventListener("drop", this.onDrop.bind(this));
+			document.getElementById("item"+i).ondragstart = this.onDragStart;
+			document.getElementById("item"+i).ondragover = this.onDragOver;
+			document.getElementById("item"+i).ondrop = this.onDrop.bind(this);
 			document.getElementById("item"+i).parameters = i.toString();
 
 		}
@@ -279,6 +279,10 @@ class NavBar {
 		if (dropArray.length == 1)
 		{	
 			this.items.splice(dropArray[0], 0, dragVar);
+		}
+		else if (dragArray.length == 1)
+		{
+			this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
 		}
 		else 
 		{
