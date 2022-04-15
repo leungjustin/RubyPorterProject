@@ -68,7 +68,7 @@ class NavBar {
 		if (this.$navbar.classList.contains('vertical'))
 		{
 			this.$cssId.href = 'project1.css';
-			const itemsHTML = this.items.map((menuItem, index) => this.renderNavItem(menuItem, index)).join(' ');
+			const itemsHTML = this.items.map((menuItem) => this.renderNavItem(menuItem)).join(' ');
 			document.querySelector('#navbar').innerHTML = 
 			`
 				<img src="${this.logo}" alt="Logo">
@@ -89,22 +89,22 @@ class NavBar {
 	}
 
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
-	renderNavItem(item, index) {
+	renderNavItem(item) {
 		
 		if (this.$navbar.classList.contains('vertical'))
 		{
 			let navString = `
-				<li class="subnav">
-					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${index}">${item.name}</a>
-					<button id="edit${index}">E</button>
+				<li class="subnav" id="subnav${item.name}>
+					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
+					<button id="edit${item.name}">E</button>
 					<ul class="subnav-content">
 			`;
 			//Creates a string for each subitem.
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
-					<li>
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${i},${index}">${item.subnavItems[i].name}</a>
-						<button id="subedit${i},${index}">E</button>
+					<li id="subnavContent${item.subnavItems[i].name},${item.name}">
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
+						<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 					</li>
 				`;
 			}
@@ -151,19 +151,19 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				document.getElementById("subitem"+j+","+i).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
-				document.getElementById("subedit"+j+","+i).onclick = this.editSubnavItem.bind(this, j, i);
-				document.getElementById("subitem"+j+","+i).ondragstart = this.onDragStart;
-				document.getElementById("subitem"+j+","+i).ondragover = this.onDragOver;
-				document.getElementById("subitem"+j+","+i).ondrop = this.onDrop.bind(this);
-				document.getElementById("subitem"+j+","+i).parameters = (j+","+i);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
+				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragstart = this.onDragStart;
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragover = this.onDragOver;
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondrop = this.onDrop.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).parameters = (j+","+i);
 			}
-			document.getElementById("item"+i).onclick = this.reload.bind(this, this.items[i].link);
-			document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
-			document.getElementById("item"+i).ondragstart = this.onDragStart;
-			document.getElementById("item"+i).ondragover = this.onDragOver;
-			document.getElementById("item"+i).ondrop = this.onDrop.bind(this);
-			document.getElementById("item"+i).parameters = i.toString();
+			document.getElementById("item"+this.items[i].name).onclick = this.reload.bind(this, this.items[i].link);
+			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
+			document.getElementById("item"+this.items[i].name).ondragstart = this.onDragStart;
+			document.getElementById("item"+this.items[i].name).ondragover = this.onDragOver;
+			document.getElementById("item"+this.items[i].name).ondrop = this.onDrop.bind(this);
+			document.getElementById("item"+this.items[i].name).parameters = i.toString();
 
 		}
 	}

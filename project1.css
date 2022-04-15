@@ -54,3 +54,7 @@
 	margin-left: 10%;
 	padding: 16px;
 }
+
+.isDisabled {
+	pointer-events: none;
+}
