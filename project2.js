@@ -346,9 +346,8 @@ class NavBar {
 		this.reload();		
 	}
 
+	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div
 	changeNavStyle() {
-		console.log("change");
-		console.log(this.$navStyle.value);
 		if (this.$navStyle.value == 'horizontal')
 		{
 			this.$navbar.className = 'navbar horizontal';			
