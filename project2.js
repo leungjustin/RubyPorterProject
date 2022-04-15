@@ -44,24 +44,32 @@ class NavBar {
 
 	//Essentially redraws the navbar and resets forms.
 	reload(hash = window.location.hash) {
-		this.changeActive(hash);
 		this.fillItems();
+		this.changeActive(hash);		
 		this.addEventListeners();
 		this.disableAll();
 		this.resetForms();
 	}
 
+	//Changes which navbar link is active, changing its appearance.
 	changeActive(hash) {
+		//Removes active from all nav links, then makes the link with the matching hash active.
 		this.items.forEach(item => {
 			item.isActive = false;
+			document.getElementById("item"+item.name).classList.remove("active");
 			if (item.link == hash) {
 				item.isActive = true;
+				document.getElementById("item"+item.name).classList.add("active");
 			}
+			//Removes active from all subnav links as well, then makes the link with the matching hash and its parent item active.
 			item.subnavItems.forEach(subitem => {
 				subitem.isActive = false;
+				document.getElementById("subitem"+subitem.name+","+item.name).classList.remove("active");
 				if (subitem.link == hash) {
 					item.isActive = true;
 					subitem.isActive = true;
+					document.getElementById("item"+item.name).classList.add("active");
+					document.getElementById("subitem"+subitem.name+","+item.name).classList.add("active");
 				}
 			});
 		});
@@ -98,7 +106,7 @@ class NavBar {
 		if (this.$navbar.classList.contains('vertical'))
 		{
 			let navString = `
-				<li class="subnav" id="subnav${item.name}">
+				<li class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
 					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
 					<button id="edit${item.name}">E</button>
 					<ul class="subnav-content">
@@ -207,8 +215,13 @@ class NavBar {
 	//Creates a new navbar item based on user input and then adds it to the item list.
 	addNavItem(event) {
 		event.preventDefault();
+
 		let item = new NavItem(this.$name.value, this.$link.value);
+		let moveToEnd = this.items.pop();
 		this.items.push(item);
+		this.items.push(moveToEnd);
+
+		//Renders the new item and adds it to the navbar.
 		this.reload();
 	}
 
@@ -238,9 +251,22 @@ class NavBar {
 	//Changes the name and/or link of an existing navbar item.
 	submitEdit(index, event) {
 		event.preventDefault();
+
+		let editHTML = document.getElementById("item"+this.items[index].name);
+		
+		//Change the current item's name and/or link.
 		this.items[index].name = this.$editName.value;
 		this.items[index].link = this.$editLink.value;
-		if (this.items[index].isActive) {
+
+		//Set the properties of the edited item's corresponding html element to match.
+		editHTML.href = this.items[index].link;
+		editHTML.id = "item"+this.items[index].name;
+		editHTML.innerHTML = this.items[index].name;
+		//Binds new event listener for the edited item.
+		editHTML.onclick = this.reload.bind(this, this.items[index].link);
+
+		//If the edited item is the currently active item, updates the hash so it matches the update.
+		if (editHTML.classList.contains("active")) {
 			window.location.hash = this.items[index].link;
 		}
 		this.reload();
@@ -259,9 +285,11 @@ class NavBar {
 	enableOrDisableLink(index) {
 		if (this.items[index].isDisabled) {
 			this.items[index].isDisabled = false;
+			document.getElementById("item"+this.items[index].name).classList.remove("isDisabled");
 		}
 		else {
 			this.items[index].isDisabled = true;
+			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
 		}
 		this.reload();
 	}
@@ -269,8 +297,14 @@ class NavBar {
 	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
 	addSubnavItem(index, event) {
 		event.preventDefault();
+
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
 		this.items[index].subnavItems.push(subItem);
+
+		//Renders the new subitem and adds it to the navbar.
+		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1);
+		this.addEventListeners();
+
 		this.reload();
 	}
 
@@ -290,20 +324,39 @@ class NavBar {
 	//Changes the name and/or link of an existing navbar subitem.
 	submitSubEdit(index, parentindex, event) {
 		event.preventDefault();
+
+		let editHTML = document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name);
+
+		//Change the current subitem's name and/or link.
 		this.items[parentindex].subnavItems[index].name = this.$editName.value;
 		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-		if (this.items[parentindex].subnavItems[index].isActive) {
-			window.location.hash = this.items[parentindex].subnavItems[index].link;		
+
+		//Set the properties of the edited subitem's corresponding html element to match.
+		editHTML.href = this.items[parentindex].subnavItems[index].link;
+		editHTML.id = "subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
+		editHTML.innerHTML = this.items[parentindex].subnavItems[index].name;
+		//Binds new event listener for the edited subitem.
+		editHTML.onclick = this.reload.bind(this, this.items[parentindex].subnavItems[index].link);
+
+		//If the edited subitem is the currently active subitem, updates the hash so it match the update.
+		if (editHTML.classList.contains("active")) {
+			window.location.hash = this.items[parentindex].subnavItems[index].link;
 		}
 		this.reload();
 	}
 
 	//Removes an existing navbar subitem from a item's list.
 	deleteSubnavItem(index, parentindex) {
-		if (this.items[parentindex].subnavItems[index].isActive) {
+		//If the subitem being deleted is currently active, removes the hash from the URL.
+		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
 			window.location.hash = "";
 		}
+
+		//Removes the subitem's corresponding html from the navbar.
+		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
+
 		this.items[parentindex].subnavItems.splice(index, 1);
+
 		this.reload();
 	}
 
