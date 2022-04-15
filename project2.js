@@ -246,6 +246,7 @@ class NavBar {
 		this.reload();
 	}
 
+	//Saves the indexes of a dragged menu item and displays all subnavigation items
 	onDragStart(event) {
 		event.dataTransfer.setData('text/plain', event.target.parameters);
 		let subnavArray = document.getElementsByClassName('subnav-content');
@@ -255,10 +256,12 @@ class NavBar {
 		}
 	}
 
+	//This method must be called ondragover so that an event will fire ondrop
 	onDragOver(event) {
 		event.preventDefault();
 	}
 
+	//Replaces navigation item dropped on with navigation item dragged
 	onDrop(event) {
 		let dragIndex = event.dataTransfer.getData('text/plain');
 		event.dataTransfer.clearData();
