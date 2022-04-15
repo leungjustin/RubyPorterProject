@@ -3,7 +3,11 @@
 */
 
 .navbar {
+	margin: 0;
+	padding: 0;
 	width: 10%;
+	height: 100%;
+	position: fixed;	
 	background-color: #eee;
 	overflow-y: auto;
 }
@@ -16,13 +20,14 @@
 	list-style-type: none;
 }
 
-.navbar li {			
+.navbar li {
+	display: block;			
 	text-decoration: none;
 	
 }
 
 .navbar a {	
-	display: block;
+	
 	padding: 5px;
 	text-decoration: none;
 	color: black;	
@@ -41,6 +46,11 @@
 	display:none;
 }
 
-.navItem:hover .subnav-content {
+.subnav:hover .subnav-content {
 	display: block;
+}
+
+.container {
+	margin-left: 10%;
+	padding: 16px;
 }
