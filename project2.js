@@ -31,10 +31,12 @@ class NavBar {
 		this.$addSubButton = document.getElementById("addSubButton");
 		this.$navbar = document.getElementById('navbar');
 		this.$cssId = document.getElementById('cssId');
+		this.$navStyle = document.getElementById('navStyle');
 
         this.logo = "logoideas.jpg";
 
-		this.$addForm.onsubmit = this.addNavItem.bind(this);
+		this.$addForm.onsubmit = this.addNavItem.bind(this);		
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.reload();
 	}
 
@@ -164,8 +166,8 @@ class NavBar {
 			document.getElementById("item"+this.items[i].name).ondragover = this.onDragOver;
 			document.getElementById("item"+this.items[i].name).ondrop = this.onDrop.bind(this);
 			document.getElementById("item"+this.items[i].name).parameters = i.toString();
-
 		}
+
 	}
 
 	//Disables all fields and buttons in all forms.
@@ -342,6 +344,24 @@ class NavBar {
 			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
 		}
 		this.reload();		
+	}
+
+	changeNavStyle() {
+		console.log("change");
+		console.log(this.$navStyle.value);
+		if (this.$navStyle.value == 'horizontal')
+		{
+			this.$navbar.className = 'navbar horizontal';			
+		}
+		else if (this.$navStyle.value == 'vertical')
+		{
+			this.$navbar.className = 'navbar vertical';
+		}
+		else 
+		{
+			this.$navbar.className = 'navbar';
+		}
+		this.reload();
 	}
 
 }
