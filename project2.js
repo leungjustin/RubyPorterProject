@@ -328,7 +328,7 @@ class NavBar {
 		{	
 			this.items.splice(dropArray[0], 0, dragVar);
 		}
-		else if (dragArray.length == 1)
+		else if (dragArray.length == 1 && dropArray[1] > dragArray[0])
 		{
 			this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
 		}
