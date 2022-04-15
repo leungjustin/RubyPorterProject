@@ -30,6 +30,7 @@ class NavBar {
 		this.$addSubLink = document.getElementById("addSubLink");
 		this.$addSubButton = document.getElementById("addSubButton");
 		this.$navbar = document.getElementById('navbar');
+		this.$cssId = document.getElementById('cssId');
 
         this.logo = "logoideas.jpg";
 
@@ -66,15 +67,19 @@ class NavBar {
 	fillItems() {
 		if (this.$navbar.classList.contains('vertical'))
 		{
+			this.$cssId.href = 'project1.css';
 			const itemsHTML = this.items.map((menuItem, index) => this.renderNavItem(menuItem, index)).join(' ');
 			document.querySelector('#navbar').innerHTML = 
 			`
 				<img src="${this.logo}" alt="Logo">
 				<ul class="itemList">${itemsHTML}</ul>
 			`;
+
+
 		}
 		else if (this.$navbar.classList.contains('horizontal'))
 		{
+			this.$cssId.href = 'navbarstyles.css';
 			let itemsHTML = `<div class="logo">Logo</div>`;
 			//Each call to renderNavItem adds a new item to the navbar string.
 			itemsHTML += this.items.reduce((html, item) => html += this.renderNavItem(item), '');
