@@ -29,6 +29,7 @@ class NavBar {
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
 		this.$addSubButton = document.getElementById("addSubButton");
+		this.$navbar = document.getElementById('navbar');
 
         this.logo = "logoideas.jpg";
 
@@ -63,37 +64,81 @@ class NavBar {
 
 	//Fills the navbar with existing items and subitems.
 	fillItems() {
-		const itemsHTML = this.items.map((menuItem, index) => this.renderNavItem(menuItem, index)).join(' ');
-		document.querySelector('#navbar').innerHTML = 
-		`
-			<img src="${this.logo}" alt="Logo">
-			<ul class="itemList">${itemsHTML}</ul>
-		`;
+		if (this.$navbar.classList.contains('vertical'))
+		{
+			const itemsHTML = this.items.map((menuItem, index) => this.renderNavItem(menuItem, index)).join(' ');
+			document.querySelector('#navbar').innerHTML = 
+			`
+				<img src="${this.logo}" alt="Logo">
+				<ul class="itemList">${itemsHTML}</ul>
+			`;
+		}
+		else if (this.$navbar.classList.contains('horizontal'))
+		{
+			let itemsHTML = `<div class="logo">Logo</div>`;
+			//Each call to renderNavItem adds a new item to the navbar string.
+			itemsHTML += this.items.reduce((html, item) => html += this.renderNavItem(item), '');
+			document.getElementById("navbar").innerHTML = itemsHTML;
+
+		}
 	}
 
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item, index) {
-		let navString = `
-			<li class="subnav">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${index}">${item.name}</a>
-				<button id="edit${index}">E</button>
-				<ul class="subnav-content">
-		`;
-		//Creates a string for each subitem.
-		for (let i = 0; i < item.subnavItems.length; i++) {
+		
+		if (this.$navbar.classList.contains('vertical'))
+		{
+			let navString = `
+				<li class="subnav">
+					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${index}">${item.name}</a>
+					<button id="edit${index}">E</button>
+					<ul class="subnav-content">
+			`;
+			//Creates a string for each subitem.
+			for (let i = 0; i < item.subnavItems.length; i++) {
+				navString += `
+					<li>
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${i},${index}">${item.subnavItems[i].name}</a>
+						<button id="subedit${i},${index}">E</button>
+					</li>
+				`;
+			}
 			navString += `
-				<li>
-					<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${i},${index}">${item.subnavItems[i].name}</a>
-					<button id="subedit${i},${index}">E</button>
+					</ul>
 				</li>
 			`;
+			return navString;
 		}
-		navString += `
-				</ul>
-			</li>
-		`;
-		return navString;
+		else if (this.$navbar.classList.contains('horizontal'))
+		{
+			let navString = `
+				<div class="subnav" id="subnav${item.name}">
+					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
+					<button id="edit${item.name}">E</button>
+					<div class="subnav-content" id="subnavContent${item.name}">
+				`;
+			//Each call to renderSubnavItem adds a new subitem to the navbar string.
+			for (let i = 0; i < item.subnavItems.length; i++) {
+				navString += this.renderSubnavItem(item, i);
+			}
+			navString += `
+					</div>
+				</div>
+			`;
+			return navString;
+		}
 	}
+
+	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
+	renderSubnavItem(item, i) {
+		return `
+			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
+				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
+				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
+			</div>
+		`;
+	}
+
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
