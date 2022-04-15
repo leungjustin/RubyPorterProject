@@ -128,6 +128,7 @@ class NavBar {
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragenter = this.dragEnter.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragover = this.dragOver.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragleave = this.dragLeave.bind(this);
+				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondragend = this.dragEnd.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).ondrop = this.drop.bind(this);
 				document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name).parameters = j+","+i;
 			}
@@ -137,6 +138,7 @@ class NavBar {
 			document.getElementById("item"+this.items[i].name).ondragenter = this.dragEnter.bind(this);
 			document.getElementById("item"+this.items[i].name).ondragover = this.dragOver.bind(this);
 			document.getElementById("item"+this.items[i].name).ondragleave = this.dragLeave.bind(this);
+			document.getElementById("item"+this.items[i].name).ondragend = this.dragEnd.bind(this);
 			document.getElementById("item"+this.items[i].name).ondrop = this.drop.bind(this);
 			document.getElementById("item"+this.items[i].name).parameters = i.toString();
 		}
@@ -362,6 +364,7 @@ class NavBar {
 
 	dragStart(event) {
 		event.dataTransfer.setData("text/plain", event.target.parameters);
+		
 		let subnavArray = document.getElementsByClassName("subnav-content");
 		for (let i = 0; i < subnavArray.length; i++) {
 			subnavArray[i].style.display = "block";
@@ -379,6 +382,10 @@ class NavBar {
 
 	dragLeave(event) {
 		event.target.classList.remove("drag-over");
+	}
+
+	dragEnd(event) {
+		this.load();
 	}
 
 	drop(event) {
