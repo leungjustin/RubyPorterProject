@@ -390,24 +390,27 @@ class NavBar {
 		let dropArray = dropIndex.split(",");
 		let dragVar;
 
-		if (dragArray.length == 1) {
-			dragVar = this.items[dragArray[0]];
-			this.items.splice(dragArray[0], 1);
-		}
-		else {
-			dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
-			this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
-		}
+		if (!(dragArray.length == 1 && dropArray.length == 2 && dragArray[0] == dropArray[1])) {
+			if (dragArray.length == 1) {
+				dragVar = this.items[dragArray[0]];
+				this.items.splice(dragArray[0], 1);
+			}
+			else {
+				dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
+				this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
+			}
 
-		if (dropArray.length == 1) {
-			this.items.splice(dropArray[0], 0, dragVar);
+			if (dropArray.length == 1) {
+				this.items.splice(dropArray[0], 0, dragVar);
+			}
+			else if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
+				this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
+			}
+			else {
+				this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+			}
 		}
-		else if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
-			this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
-		}
-		else {
-			this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
-		}
+		
 		this.load();
 	}
 }
