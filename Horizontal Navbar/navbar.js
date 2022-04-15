@@ -13,7 +13,8 @@ class NavBar {
 		this.items = [
 			new NavItem("Item1", "#item1"),
 			new NavItem("Item2", "#item2"),
-			new NavItem("Item3", "#item3")
+			new NavItem("Item3", "#item3"),
+			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
@@ -90,7 +91,7 @@ class NavBar {
 	//Creates a navbar item to be placed in the navbar.
 	renderNavItem(item) {
 		let navString = `
-			<div class="subnav" id="subnav${item.name}">
+			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
 				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
 				<button id="edit${item.name}">E</button>
 				<div class="subnav-content" id="subnavContent${item.name}">
@@ -174,13 +175,12 @@ class NavBar {
 		event.preventDefault();
 
 		let item = new NavItem(this.$name.value, this.$link.value);
+		let moveToEnd = this.items.pop();
 		this.items.push(item);
+		this.items.push(moveToEnd);
 
 		//Renders the new item and adds it to the navbar.
-		document.getElementById("navbar").innerHTML += this.renderNavItem(item);
-		this.addEventListeners();
-		
-		this.reload();
+		this.load();
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
@@ -243,12 +243,9 @@ class NavBar {
 			window.location.hash = "";
 		}
 
-		//Removes the item's corresponding html from the navbar.
-		document.getElementById("subnav"+this.items[index].name).remove();
-		
 		this.items.splice(index, 1);
 
-		this.reload();
+		this.load();
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -364,7 +361,11 @@ class NavBar {
 
 	dragStart(event) {
 		event.dataTransfer.setData("text/plain", event.target.parameters);
-		
+		let dragIndex = event.target.parameters;
+		let dragArray = dragIndex.split(",");
+		if (dragArray.length != 1) {
+			document.getElementById("subnavMove to end").style.display = "block";
+		}
 		let subnavArray = document.getElementsByClassName("subnav-content");
 		for (let i = 0; i < subnavArray.length; i++) {
 			subnavArray[i].style.display = "block";
@@ -385,6 +386,7 @@ class NavBar {
 	}
 
 	dragEnd(event) {
+		event.preventDefault();
 		this.load();
 	}
 
