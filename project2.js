@@ -121,7 +121,7 @@ class NavBar {
 		else if (this.$navbar.classList.contains('horizontal'))
 		{
 			let navString = `
-				<div class="subnav" id="subnav${item.name}">
+				<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
 					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
 					<button id="edit${item.name}">E</button>
 					<div class="subnav-content" id="subnavContent${item.name}">
