@@ -159,9 +159,9 @@ class NavBar {
 				subitem.ondragstart = this.dragStart;
 				subitem.ondragenter = this.dragEnter;
 				subitem.ondragover = this.dragOver;
-				subitem.ondrop = this.drop.bind(this);
 				subitem.ondragleave = this.dragLeave.bind(this);
 				subitem.ondragend = this.dragEnd.bind(this);
+				subitem.ondrop = this.drop.bind(this);
 				subitem.parameters = (j+","+i);
 			}
 			let item = document.getElementById("item"+this.items[i].name);
@@ -170,9 +170,9 @@ class NavBar {
 			item.ondragstart = this.dragStart;
 			item.ondragenter = this.dragEnter;
 			item.ondragover = this.dragOver;
-			item.ondrop = this.drop.bind(this);
 			item.ondragleave = this.dragLeave.bind(this);
 			item.ondragend = this.dragEnd.bind(this);
+			item.ondrop = this.drop.bind(this);
 			item.parameters = i.toString();
 		}
 
@@ -213,7 +213,7 @@ class NavBar {
 		this.items.push(moveToEnd);
 
 		//Renders the new item and adds it to the navbar.
-		this.reload();
+		this.load();
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
@@ -265,11 +265,11 @@ class NavBar {
 
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
-		if (this.items[index].isActive) {
+		if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
 			window.location.hash = "";
 		}
 		this.items.splice(index, 1);
-		this.reload();
+		this.load();
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -365,10 +365,13 @@ class NavBar {
 		}
 	}
 
+	dragEnter(event) {
+		event.target.classList.add("drag-over");
+	}
+
 	//This method must be called ondragover so that an event will fire ondrop
 	dragOver(event) {
 		event.preventDefault();
-		event.target.classList.add("drag-over");
 	}
 
 	//Removes drag-over class when no longer dragging over item
@@ -379,7 +382,7 @@ class NavBar {
 	//Necessary to keep subnav menus from displaying if something is dragged to an invalid drop site
 	dragEnd(event) {
 		event.preventDefault();
-		this.reload();
+		this.load();
 	}
 
 	//Replaces navigation item dropped on with navigation item dragged

@@ -16,18 +16,7 @@
 	width: 100%;
 }
 
-.navbar ul {
-	list-style-type: none;
-}
-
-.navbar li {
-	display: block;			
-	text-decoration: none;
-	
-}
-
 .navbar a {	
-	
 	padding: 5px;
 	text-decoration: none;
 	color: black;	
@@ -57,4 +46,8 @@
 
 .isDisabled {
 	pointer-events: none;
+}
+
+.drag-over {
+	border: dashed 2px red;
 }

@@ -1,7 +1,17 @@
+/* Horizontal Navbar CSS */
+
 .navbar {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 70px;
 	overflow: hidden;
 	background-color: #bbbbbb;
-	height: 70px;
+}
+
+.navbar img {
+	float: left;
+	height: 100%;
 }
 
 .navbar a {
@@ -100,4 +110,8 @@
 
 .isDisabled {
 	pointer-events: none;
+}
+
+.drag-over {
+	border: dashed 2px red;
 }
