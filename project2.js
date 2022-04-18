@@ -1,9 +1,9 @@
 class NavItem {
-	constructor(name, link) {
+	constructor(name, link, isDisabled = false) {
 		this.name = name,
 		this.link = link,
-		this.isDisabled = false, //Determines whether the item can be clicked on.
-		this.isActive = false,
+		this.isActive = false, //Currently not in use. May be implemented when using data storage method.
+		this.isDisabled = isDisabled, //Determines whether the item can be clicked on.
 		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
 }
@@ -17,7 +17,6 @@ class NavBar {
 			new NavItem("Item4", "#item4"),
 			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
-		
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
 		
@@ -44,11 +43,35 @@ class NavBar {
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
 	}
 
-	//Essentially redraws the navbar and resets forms.
-	reload(hash = window.location.hash) {
+	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
+	changeNavStyle() {
+		if (this.$navStyle.value == 'horizontal')
+		{
+			this.$navbar.className = 'navbar horizontal';			
+		}
+		else if (this.$navStyle.value == 'vertical')
+		{
+			this.$navbar.className = 'navbar vertical';
+		}
+		else 
+		{
+			this.$navbar.className = 'navbar';
+		}
+		this.load();
+	}
+
+	//Renders the navbar, sets the active item if there is one, and disables all edit forms.
+	load() {
 		this.fillItems();
-		this.changeActive(hash);		
+		this.changeActive(window.location.hash);
 		this.addEventListeners();
+		this.disableAll();
+		this.resetForms();
+	}
+
+	//Same as load, expect without rendering the navbar or adding event listeners.
+	reload(hash = window.location.hash) {
+		this.changeActive(hash);		
 		this.disableAll();
 		this.resetForms();
 	}
@@ -82,70 +105,35 @@ class NavBar {
 		if (this.$navbar.classList.contains('vertical'))
 		{
 			this.$cssId.href = 'project1.css';
-			const itemsHTML = this.items.map((menuItem) => this.renderNavItem(menuItem)).join(' ');
-			document.querySelector('#navbar').innerHTML = 
-			`
-				<img src="${this.logo}" alt="Logo">
-				<ul class="itemList">${itemsHTML}</ul>
-			`;
-
-
 		}
 		else if (this.$navbar.classList.contains('horizontal'))
 		{
-			this.$cssId.href = 'navbarstyles.css';
-			let itemsHTML = `<div class="logo">Logo</div>`;
-			//Each call to renderNavItem adds a new item to the navbar string.
-			itemsHTML += this.items.reduce((html, item) => html += this.renderNavItem(item), '');
-			document.getElementById("navbar").innerHTML = itemsHTML;
-
+			this.$cssId.href = 'Horizontal Navbar/navbarstyles.css';
 		}
+		let itemsHTML = this.items.map((item) => this.renderNavItem(item)).join('');
+		document.querySelector("#navbar").innerHTML = `
+			<img src="${this.logo}" alt="Logo">
+			${itemsHTML}
+		`
 	}
 
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item) {
-		
-		if (this.$navbar.classList.contains('vertical'))
-		{
-			let navString = `
-				<li class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
-					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
-					<button id="edit${item.name}">E</button>
-					<ul class="subnav-content">
-			`;
-			//Creates a string for each subitem.
-			for (let i = 0; i < item.subnavItems.length; i++) {
-				navString += `
-					<li id="subnavContent${item.subnavItems[i].name},${item.name}">
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
-						<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
-					</li>
-				`;
-			}
-			navString += `
-					</ul>
-				</li>
-			`;
-			return navString;
+		let navString = `
+			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
+				<button id="edit${item.name}">E</button>
+				<div class="subnav-content" id="subnavContent${item.name}">
+		`;
+		//Each call to renderSubnavItem adds a new subitem to the navbar string.
+		for (let i = 0; i < item.subnavItems.length; i++) {
+			navString += this.renderSubnavItem(item, i);
 		}
-		else if (this.$navbar.classList.contains('horizontal'))
-		{
-			let navString = `
-				<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
-					<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
-					<button id="edit${item.name}">E</button>
-					<div class="subnav-content" id="subnavContent${item.name}">
-				`;
-			//Each call to renderSubnavItem adds a new subitem to the navbar string.
-			for (let i = 0; i < item.subnavItems.length; i++) {
-				navString += this.renderSubnavItem(item, i);
-			}
-			navString += `
-					</div>
+		navString += `
 				</div>
-			`;
-			return navString;
-		}
+			</div>
+		`;
+		return navString;
 	}
 
 	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
@@ -165,27 +153,27 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.			
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				let subitemElem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
-				subitemElem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
+				let subitem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
+				subitem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				subitemElem.ondragstart = this.dragStart;
-				subitemElem.ondragover = this.dragOver;
-				subitemElem.ondrop = this.drop.bind(this);
-				subitemElem.ondragleave = this.dragLeave.bind(this);
-				subitemElem.ondragend = this.dragEnd.bind(this);
-				subitemElem.parameters = (j+","+i);
+				subitem.ondragstart = this.dragStart;
+				subitem.ondragenter = this.dragEnter;
+				subitem.ondragover = this.dragOver;
+				subitem.ondragleave = this.dragLeave.bind(this);
+				subitem.ondragend = this.dragEnd.bind(this);
+				subitem.ondrop = this.drop.bind(this);
+				subitem.parameters = (j+","+i);
 			}
-			
-			
-			let itemElem = document.getElementById("item"+this.items[i].name);
-			itemElem.onclick = this.reload.bind(this, this.items[i].link);
+			let item = document.getElementById("item"+this.items[i].name);
+			item.onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			itemElem.ondragstart = this.dragStart;
-			itemElem.ondragover = this.dragOver;
-			itemElem.ondrop = this.drop.bind(this);
-			itemElem.ondragleave = this.dragLeave.bind(this);
-			itemElem.ondragend = this.dragEnd.bind(this);
-			itemElem.parameters = i.toString();
+			item.ondragstart = this.dragStart;
+			item.ondragenter = this.dragEnter;
+			item.ondragover = this.dragOver;
+			item.ondragleave = this.dragLeave.bind(this);
+			item.ondragend = this.dragEnd.bind(this);
+			item.ondrop = this.drop.bind(this);
+			item.parameters = i.toString();
 		}
 
 	}
@@ -225,7 +213,7 @@ class NavBar {
 		this.items.push(moveToEnd);
 
 		//Renders the new item and adds it to the navbar.
-		this.reload();
+		this.load();
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
@@ -277,11 +265,11 @@ class NavBar {
 
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
-		if (this.items[index].isActive) {
+		if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
 			window.location.hash = "";
 		}
 		this.items.splice(index, 1);
-		this.reload();
+		this.load();
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -377,10 +365,13 @@ class NavBar {
 		}
 	}
 
+	dragEnter(event) {
+		event.target.classList.add("drag-over");
+	}
+
 	//This method must be called ondragover so that an event will fire ondrop
 	dragOver(event) {
 		event.preventDefault();
-		event.target.classList.add("drag-over");
 	}
 
 	//Removes drag-over class when no longer dragging over item
@@ -391,7 +382,7 @@ class NavBar {
 	//Necessary to keep subnav menus from displaying if something is dragged to an invalid drop site
 	dragEnd(event) {
 		event.preventDefault();
-		this.reload();
+		this.load();
 	}
 
 	//Replaces navigation item dropped on with navigation item dragged
@@ -426,24 +417,6 @@ class NavBar {
 		
 		this.reload();
 	}
-
-	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div
-	changeNavStyle() {
-		if (this.$navStyle.value == 'horizontal')
-		{
-			this.$navbar.className = 'navbar horizontal';			
-		}
-		else if (this.$navStyle.value == 'vertical')
-		{
-			this.$navbar.className = 'navbar vertical';
-		}
-		else 
-		{
-			this.$navbar.className = 'navbar';
-		}
-		this.reload();
-	}
-
 }
 
 let navbar;

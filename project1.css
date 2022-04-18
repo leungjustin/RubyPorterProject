@@ -16,24 +16,18 @@
 	width: 100%;
 }
 
-.navbar ul {
-	list-style-type: none;
-}
-
-.navbar li {
+.subnav {
 	display: block;			
 	text-decoration: none;
-	
 }
 
 .navbar a {	
-	
 	padding: 5px;
 	text-decoration: none;
 	color: black;	
 }
 
-.navbar li:hover {
+.navbar a:hover {
 	background-color: #ccc;
 }
 
@@ -57,4 +51,8 @@
 
 .isDisabled {
 	pointer-events: none;
+}
+
+.drag-over {
+	border: dashed 2px red;
 }
