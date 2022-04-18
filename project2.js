@@ -66,12 +66,12 @@ class NavBar {
 			//Removes active from all subnav links as well, then makes the link with the matching hash and its parent item active.
 			item.subnavItems.forEach(subitem => {
 				subitem.isActive = false;
-				document.getElementById("subitem"+subitem.name+","+item.name).classList.remove("active");
+				document.getElementById("subitem"+subitem.name+item.name).classList.remove("active");
 				if (subitem.link == hash) {
 					item.isActive = true;
 					subitem.isActive = true;
 					document.getElementById("item"+item.name).classList.add("active");
-					document.getElementById("subitem"+subitem.name+","+item.name).classList.add("active");
+					document.getElementById("subitem"+subitem.name+item.name).classList.add("active");
 				}
 			});
 		});
@@ -117,7 +117,7 @@ class NavBar {
 			for (let i = 0; i < item.subnavItems.length; i++) {
 				navString += `
 					<li id="subnavContent${item.subnavItems[i].name},${item.name}">
-						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
+						<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name+item.name}">${item.subnavItems[i].name}</a>
 						<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 					</li>
 				`;
@@ -152,7 +152,7 @@ class NavBar {
 	renderSubnavItem(item, i) {
 		return `
 			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
-				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
+				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name+item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
 		`;
@@ -165,7 +165,8 @@ class NavBar {
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.			
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				let subitemElem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
+				let subitemElem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+this.items[i].name);
+				console.log(subitemElem.id);
 				subitemElem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
 				subitemElem.ondragstart = this.dragStart;
