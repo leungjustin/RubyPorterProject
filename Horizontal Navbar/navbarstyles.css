@@ -23,7 +23,6 @@
 }
 
 .navbar button {
-	float: left;
 	color: black;
 	text-align: center;
 	margin-top: 27px;
@@ -65,8 +64,6 @@
 	position: absolute;
 	top: 77px;
 	background-color: #bbbbbb;
-	width: inherit;
-	margin: inherit;
 	z-index: 1;
 }
 
@@ -98,14 +95,6 @@
 
 .subnav-content a:hover {
 	background-color: #cccccc;
-}
-
-.logo {
-	font-size: 40px;
-	float: left;
-	display: block;
-	text-align: center;
-	padding: 8px;
 }
 
 .isDisabled {
