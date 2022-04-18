@@ -14,8 +14,10 @@ class NavBar {
 			new NavItem("Item1", "#item1"),
 			new NavItem("Item2", "#item2"),
 			new NavItem("Item3", "#item3"),
+			new NavItem("Item4", "#item4"),
 			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
+		
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
 		
@@ -161,7 +163,7 @@ class NavBar {
 	addEventListeners() {		
 		//Adds events to each navbar item.
 		for (let i = 0; i < this.items.length; i++) {
-			//Adds events to each item's subitems, if it has any.
+			//Adds events to each item's subitems, if it has any.			
 			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
 				let subitemElem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
 				subitemElem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
@@ -173,6 +175,7 @@ class NavBar {
 				subitemElem.ondragend = this.dragEnd.bind(this);
 				subitemElem.parameters = (j+","+i);
 			}
+			
 			
 			let itemElem = document.getElementById("item"+this.items[i].name);
 			itemElem.onclick = this.reload.bind(this, this.items[i].link);
@@ -361,7 +364,7 @@ class NavBar {
 	}
 
 	//Saves the indexes of a dragged menu item and displays all subnavigation items
-	dragStart(event) {
+	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let dragIndex = event.target.parameters;
 		let dragArray = dragIndex.split(",");
@@ -392,10 +395,9 @@ class NavBar {
 	}
 
 	//Replaces navigation item dropped on with navigation item dragged
-	drop(event) {
+	drop(event) {		
 		event.target.classList.remove("drag-over");
-		let dragIndex = event.dataTransfer.getData("text/plain");
-		event.dataTransfer.clearData();
+		let dragIndex = event.dataTransfer.getData("text/plain");		
 		let dragArray = dragIndex.split(",");
 		let dropIndex = event.target.parameters;
 		let dropArray = dropIndex.split(",");
