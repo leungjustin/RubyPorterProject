@@ -359,10 +359,12 @@ class NavBar {
 		if (dragArray.length != 1) {
 			document.getElementById("subnavMove to end").style.display = "block";
 		}
-		let subnavArray = document.getElementsByClassName("subnav-content");
-		for (let i = 0; i < subnavArray.length; i++) {
-			subnavArray[i].style.display = "block";
-		}
+		setTimeout(() => {
+			let subnavArray = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < subnavArray.length; i++) {
+				subnavArray[i].style.display = "block";
+			}
+		}, 0);
 	}
 
 	dragEnter(event) {
