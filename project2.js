@@ -48,7 +48,7 @@ class NavBar {
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
 	}
 
-	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
+	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
 		if (this.$navStyle.value == 'horizontal')
 		{
@@ -356,18 +356,23 @@ class NavBar {
 		this.reload();
 	}
 
-	//Saves the indexes of a dragged menu item and displays all subnavigation items
+	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let dragIndex = event.target.parameters;
 		let dragArray = dragIndex.split(",");
+		//This is called to work around a rendering bug in Chrome and Edge.
 		setTimeout(() => {
+			//If the drag item is a subitem, displays the moveToEnd item in the top level array.
 			if (dragArray.length != 1) {
 				document.getElementById("subnavMove to end").style.display = "block";
 			}
 			let subnavArray = document.getElementsByClassName("subnav-content");
+			//For each nav item...
 			for (let i = 0; i < subnavArray.length; i++) {
-				subnavArray[i].style.display = "block";
+				subnavArray[i].style.display = "block"; //Displays its subitems, and...
+				//If the item is not a moveToEnd item, display the item's moveToEnd subitem.
+				//Do not display the moveToEnd subitem if it is the item's own moveToEnd subitem, or if it is part of the same set of subitems.
 				if (this.items[i].name != "Move to end" && ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1]))) {
 					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
 				}
@@ -375,27 +380,28 @@ class NavBar {
 		}, 0);
 	}
 
+	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
 	}
 
-	//This method must be called ondragover so that an event will fire ondrop
+	//This must be called to allow an item to trigger the drop method when dropping onto an item.
 	dragOver(event) {
 		event.preventDefault();
 	}
 
-	//Removes drag-over class when no longer dragging over item
+	//Remove the box when item is not longer being dragged over.
 	dragLeave(event) {
 		event.target.classList.remove("drag-over");
 	}
 
-	//Necessary to keep subnav menus from displaying if something is dragged to an invalid drop site
+	//Rerenders the navbar to hide subitems in case an item is dragged to an invalid dropsite.
 	dragEnd(event) {
 		event.preventDefault();
 		this.load();
 	}
 
-	//Replaces navigation item dropped on with navigation item dragged
+	//Removes the drag item from where it is, then places it in the correct location.
 	drop(event) {		
 		event.target.classList.remove("drag-over");
 		let dragIndex = event.dataTransfer.getData("text/plain");		
