@@ -1,8 +1,3 @@
-//TODO: Add ability to move an item down a level and to the very end of a list of subitems.
-	//TODO: Do not display "move to end" in a subitem's own parent item.
-	//TODO: Display "move to end" when an item is dragged.
-//TODO: Add ability to move an item into another item's subitems, even if said item currently has no subitems.
-
 class NavItem {
 	constructor(name, link, isDisabled = false) {
 		this.name = name,
@@ -220,6 +215,7 @@ class NavBar {
 		let item = new NavItem(this.$name.value, this.$link.value);
 		let moveToEnd = this.items.pop();
 		this.items.push(item);
+		this.items[this.items.length-1].subnavItems.push(moveToEnd);
 		this.items.push(moveToEnd);
 
 		//Renders the new item and adds it to the navbar.
@@ -295,18 +291,30 @@ class NavBar {
 		this.reload();
 	}
 
+	/*addNavItem(event) {
+		event.preventDefault();
+
+		let item = new NavItem(this.$name.value, this.$link.value);
+		let moveToEnd = this.items.pop();
+		this.items.push(item);
+		this.items[this.items.length-1].subnavItems.push(moveToEnd);
+		this.items.push(moveToEnd);
+
+		//Renders the new item and adds it to the navbar.
+		this.load();
+	}*/
+
 	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
 	addSubnavItem(index, event) {
 		event.preventDefault();
 
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
+		let moveToEnd = this.items[index].subnavItems.pop();
 		this.items[index].subnavItems.push(subItem);
+		this.items[index].subnavItems.push(moveToEnd);
 
 		//Renders the new subitem and adds it to the navbar.
-		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1);
-		this.addEventListeners();
-
-		this.reload();
+		this.load();
 	}
 
 	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
