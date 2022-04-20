@@ -1,3 +1,8 @@
+//TODO: Add ability to move an item down a level and to the very end of a list of subitems.
+	//TODO: Do not display "move to end" in a subitem's own parent item.
+	//TODO: Display "move to end" when an item is dragged.
+//TODO: Add ability to move an item into another item's subitems, even if said item currently has no subitems.
+
 class NavItem {
 	constructor(name, link, isDisabled = false) {
 		this.name = name,
@@ -17,8 +22,13 @@ class NavBar {
 			new NavItem("Item4", "#item4"),
 			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
+		this.items[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+		this.items[1].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem("Subitem3", "#subitem3"));
+		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -139,7 +149,7 @@ class NavBar {
 	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
 	renderSubnavItem(item, i) {
 		return `
-			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
+			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},${item.name}">
 				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
@@ -156,7 +166,7 @@ class NavBar {
 				let subitem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
 				subitem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				subitem.ondragstart = this.dragStart;
+				subitem.ondragstart = this.dragStart.bind(this);
 				subitem.ondragenter = this.dragEnter;
 				subitem.ondragover = this.dragOver;
 				subitem.ondragleave = this.dragLeave.bind(this);
@@ -167,7 +177,7 @@ class NavBar {
 			let item = document.getElementById("item"+this.items[i].name);
 			item.onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			item.ondragstart = this.dragStart;
+			item.ondragstart = this.dragStart.bind(this);
 			item.ondragenter = this.dragEnter;
 			item.ondragover = this.dragOver;
 			item.ondragleave = this.dragLeave.bind(this);
@@ -356,13 +366,16 @@ class NavBar {
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let dragIndex = event.target.parameters;
 		let dragArray = dragIndex.split(",");
-		if (dragArray.length != 1) {
-			document.getElementById("subnavMove to end").style.display = "block";
-		}
 		setTimeout(() => {
+			if (dragArray.length != 1) {
+				document.getElementById("subnavMove to end").style.display = "block";
+			}
 			let subnavArray = document.getElementsByClassName("subnav-content");
 			for (let i = 0; i < subnavArray.length; i++) {
 				subnavArray[i].style.display = "block";
+				if ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1])) {
+					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
+				}
 			}
 		}, 0);
 	}
