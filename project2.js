@@ -291,19 +291,6 @@ class NavBar {
 		this.reload();
 	}
 
-	/*addNavItem(event) {
-		event.preventDefault();
-
-		let item = new NavItem(this.$name.value, this.$link.value);
-		let moveToEnd = this.items.pop();
-		this.items.push(item);
-		this.items[this.items.length-1].subnavItems.push(moveToEnd);
-		this.items.push(moveToEnd);
-
-		//Renders the new item and adds it to the navbar.
-		this.load();
-	}*/
-
 	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
 	addSubnavItem(index, event) {
 		event.preventDefault();
@@ -381,7 +368,7 @@ class NavBar {
 			let subnavArray = document.getElementsByClassName("subnav-content");
 			for (let i = 0; i < subnavArray.length; i++) {
 				subnavArray[i].style.display = "block";
-				if ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1])) {
+				if (this.items[i].name != "Move to end" && ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1]))) {
 					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
 				}
 			}
@@ -417,28 +404,43 @@ class NavBar {
 		let dropArray = dropIndex.split(",");
 		let dragVar;
 
+		//If the drop item is the child of the drag item, do nothing (e.g. An item can't be dropped onto one of its own subitems).
 		if (!(dragArray.length == 1 && dropArray.length == 2 && dragArray[0] == dropArray[1])) {
+			//If the drag item is a top level item, splice it from the items array.
 			if (dragArray.length == 1) {
 				dragVar = this.items[dragArray[0]];
 				this.items.splice(dragArray[0], 1);
 			}
+			//Otherwise (i.e. If the drag item is a subitem), splice it from the parent item's array.
 			else {
 				dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
 				this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
 			}
 
+			//If the drop item is a top level item, simply place the drag item back into the items array.
 			if (dropArray.length == 1) {
+				//Also if the drag item is a subitem, add a moveToEnd item to it before putting it back into the array.
+				if (dragArray.length != 1) {
+					dragVar.subnavItems.push(new NavItem("Move to end", "#"));
+				}
 				this.items.splice(dropArray[0], 0, dragVar);
 			}
-			else if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
-				this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
-			}
+			//Otherwise (i.e. If the drop item is a subitem)...
 			else {
-				this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+				dragVar.subnavItems.pop();
+				//Both of the following statements are for if a top level item is being placed into another item's subitems.
+				//The first is for if the drag item was before the drop item's parent in the array.
+				if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
+					this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
+				}
+				//The second is for if the drag item was after the drop item's parent in the array.
+				else {
+					this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+				}
 			}
 		}
 		
-		this.reload();
+		this.load();
 	}
 }
 
