@@ -417,6 +417,27 @@ class NavBar {
 		
 		this.reload();
 	}
+
+	//Retrieve navigation items and navigation bar style based on user
+	retrieveNavSettings(user) {
+		//TODO: add path to fetch request
+		fetch()
+		.then(response => response.json())
+		.then(data => {
+			this.items = data.items;
+			this.$navStyle.value = data.navStyle;
+			this.changeNavStyle();
+
+		})
+		.catch(error => {
+			console.log("There was a problem getting user settings.")
+		})
+	}
+
+	//Sets navigation items and navigation bar style
+	setNavSettings(user) {
+		
+	}
 }
 
 let navbar;
