@@ -24,6 +24,8 @@ class NavBar {
 		this.items[2].subnavItems.push(new NavItem("Subitem3", "#subitem3"));
 		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
+
+		this.navStyle = "none";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -42,28 +44,34 @@ class NavBar {
 		this.$navbar = document.getElementById('navbar');
 		this.$cssId = document.getElementById('cssId');
 		this.$navStyle = document.getElementById('navStyle');
+		this.$userForm = document.getElementById('userForm');
+		this.$userInput = document.getElementById('userInput');
 
         this.logo = "logoideas.jpg";
 
 		let disabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		disabled.forEach(element => element.disabled = true);
+
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
-		this.$navStyle.onchange = this.changeNavStyle.bind(this);	
-		this.retrieveNavSettings();	
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);	
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
 		if (this.$navStyle.value == 'horizontal')
 		{
+			this.navStyle = 'horizontal';
 			this.$navbar.className = 'navbar horizontal';			
 		}
 		else if (this.$navStyle.value == 'vertical')
 		{
+			this.navStyle = 'vertical';
 			this.$navbar.className = 'navbar vertical';
 		}
 		else 
 		{
+			this.navStyle = 'none';
 			this.$navbar.className = 'navbar';
 		}
 		this.enableAll();
@@ -71,11 +79,15 @@ class NavBar {
 	}
 
 	//Renders the navbar, sets the active item if there is one, and disables all edit forms.
-	load() {
-		this.fillItems();
+	load() {		
+		this.fillItems();		
 		this.changeActive(window.location.hash);
 		this.addEventListeners();
 		this.disableAll();
+		if (this.navStyle == 'none')
+		{
+			this.$navbar.innerHTML = "";
+		}
 		this.resetForms();
 	}
 
@@ -120,8 +132,12 @@ class NavBar {
 		{
 			this.$cssId.href = 'Horizontal Navbar/navbarstyles.css';
 		}
+		else
+		{
+			this.$cssId.href = "";
+		}
 		let itemsHTML = this.items.map((item) => this.renderNavItem(item)).join('');
-		document.querySelector("#navbar").innerHTML = `
+		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
 			${itemsHTML}
 		`
@@ -455,16 +471,16 @@ class NavBar {
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
-	retrieveNavSettings(user) {
-		//TODO: add path to fetch request
-		fetch("http://justin.navigation.test")
+	retrieveNavSettings(event) {
+		event.preventDefault();
+		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
-			/*
 			this.items = data.items;
 			this.$navStyle.value = data.navStyle;
+			this.navStyle = data.navStyle;
 			this.changeNavStyle();
-			*/
+			
 			console.log(data);
 
 		})
