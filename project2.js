@@ -17,12 +17,18 @@ class NavBar {
 			new NavItem("Item4", "#item4"),
 			new NavItem("Move to end", "#")
 		]; //A list of objects of the NavItem class.
+		this.items[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+		this.items[1].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem("Subitem3", "#subitem3"));
+		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
+		this.$addButton = document.getElementById("addButton");
 		this.$editForm = document.getElementById("editForm");
 		this.$editName = document.getElementById("editName");
 		this.$editLink = document.getElementById("editLink");
@@ -39,11 +45,13 @@ class NavBar {
 
         this.logo = "logoideas.jpg";
 
+		let disabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		disabled.forEach(element => element.disabled = true);
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
 	}
 
-	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
+	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
 		if (this.$navStyle.value == 'horizontal')
 		{
@@ -57,6 +65,7 @@ class NavBar {
 		{
 			this.$navbar.className = 'navbar';
 		}
+		this.enableAll();
 		this.load();
 	}
 
@@ -139,7 +148,7 @@ class NavBar {
 	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
 	renderSubnavItem(item, i) {
 		return `
-			<div id="subnavContent${item.subnavItems[i].name},${item.name}">
+			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},${item.name}">
 				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
 				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
 			</div>
@@ -156,7 +165,7 @@ class NavBar {
 				let subitem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
 				subitem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
 				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				subitem.ondragstart = this.dragStart;
+				subitem.ondragstart = this.dragStart.bind(this);
 				subitem.ondragenter = this.dragEnter;
 				subitem.ondragover = this.dragOver;
 				subitem.ondragleave = this.dragLeave.bind(this);
@@ -167,7 +176,7 @@ class NavBar {
 			let item = document.getElementById("item"+this.items[i].name);
 			item.onclick = this.reload.bind(this, this.items[i].link);
 			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			item.ondragstart = this.dragStart;
+			item.ondragstart = this.dragStart.bind(this);
 			item.ondragenter = this.dragEnter;
 			item.ondragover = this.dragOver;
 			item.ondragleave = this.dragLeave.bind(this);
@@ -187,7 +196,7 @@ class NavBar {
 
 	//Enables all fields and buttons in all forms.
 	enableAll() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		enabled.forEach(element => element.disabled = false);
 	}
 
@@ -209,6 +218,7 @@ class NavBar {
 
 		let item = new NavItem(this.$name.value, this.$link.value);
 		let moveToEnd = this.items.pop();
+		item.subnavItems.push(moveToEnd);
 		this.items.push(item);
 		this.items.push(moveToEnd);
 
@@ -290,13 +300,12 @@ class NavBar {
 		event.preventDefault();
 
 		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
+		let moveToEnd = this.items[index].subnavItems.pop();
 		this.items[index].subnavItems.push(subItem);
+		this.items[index].subnavItems.push(moveToEnd);
 
 		//Renders the new subitem and adds it to the navbar.
-		document.getElementById("subnavContent"+this.items[index].name).innerHTML += this.renderSubnavItem(this.items[index], this.items[index].subnavItems.length-1);
-		this.addEventListeners();
-
-		this.reload();
+		this.load();
 	}
 
 	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
@@ -351,43 +360,52 @@ class NavBar {
 		this.reload();
 	}
 
-	//Saves the indexes of a dragged menu item and displays all subnavigation items
+	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let dragIndex = event.target.parameters;
 		let dragArray = dragIndex.split(",");
-		if (dragArray.length != 1) {
-			document.getElementById("subnavMove to end").style.display = "block";
-		}
+		//This is called to work around a rendering bug in Chrome and Edge.
 		setTimeout(() => {
+			//If the drag item is a subitem, displays the moveToEnd item in the top level array.
+			if (dragArray.length != 1) {
+				document.getElementById("subnavMove to end").style.display = "block";
+			}
 			let subnavArray = document.getElementsByClassName("subnav-content");
+			//For each nav item...
 			for (let i = 0; i < subnavArray.length; i++) {
-				subnavArray[i].style.display = "block";
+				subnavArray[i].style.display = "block"; //Displays its subitems, and...
+				//If the item is not a moveToEnd item, display the item's moveToEnd subitem.
+				//Do not display the moveToEnd subitem if it is the item's own moveToEnd subitem, or if it is part of the same set of subitems.
+				if (this.items[i].name != "Move to end" && ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1]))) {
+					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
+				}
 			}
 		}, 0);
 	}
 
+	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
 	}
 
-	//This method must be called ondragover so that an event will fire ondrop
+	//This must be called to allow an item to trigger the drop method when dropping onto an item.
 	dragOver(event) {
 		event.preventDefault();
 	}
 
-	//Removes drag-over class when no longer dragging over item
+	//Remove the box when item is not longer being dragged over.
 	dragLeave(event) {
 		event.target.classList.remove("drag-over");
 	}
 
-	//Necessary to keep subnav menus from displaying if something is dragged to an invalid drop site
+	//Rerenders the navbar to hide subitems in case an item is dragged to an invalid dropsite.
 	dragEnd(event) {
 		event.preventDefault();
 		this.load();
 	}
 
-	//Replaces navigation item dropped on with navigation item dragged
+	//Removes the drag item from where it is, then places it in the correct location.
 	drop(event) {		
 		event.target.classList.remove("drag-over");
 		let dragIndex = event.dataTransfer.getData("text/plain");		
@@ -396,28 +414,43 @@ class NavBar {
 		let dropArray = dropIndex.split(",");
 		let dragVar;
 
+		//If the drop item is the child of the drag item, do nothing (e.g. An item can't be dropped onto one of its own subitems).
 		if (!(dragArray.length == 1 && dropArray.length == 2 && dragArray[0] == dropArray[1])) {
+			//If the drag item is a top level item, splice it from the items array.
 			if (dragArray.length == 1) {
 				dragVar = this.items[dragArray[0]];
 				this.items.splice(dragArray[0], 1);
 			}
+			//Otherwise (i.e. If the drag item is a subitem), splice it from the parent item's array.
 			else {
 				dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
 				this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
 			}
 
+			//If the drop item is a top level item, simply place the drag item back into the items array.
 			if (dropArray.length == 1) {
+				//Also if the drag item is a subitem, add a moveToEnd item to it before putting it back into the array.
+				if (dragArray.length != 1) {
+					dragVar.subnavItems.push(new NavItem("Move to end", "#"));
+				}
 				this.items.splice(dropArray[0], 0, dragVar);
 			}
-			else if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
-				this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
-			}
+			//Otherwise (i.e. If the drop item is a subitem)...
 			else {
-				this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+				dragVar.subnavItems.pop();
+				//Both of the following statements are for if a top level item is being placed into another item's subitems.
+				//The first is for if the drag item was before the drop item's parent in the array.
+				if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
+					this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
+				}
+				//The second is for if the drag item was after the drop item's parent in the array.
+				else {
+					this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
+				}
 			}
 		}
 		
-		this.reload();
+		this.load();
 	}
 }
 
