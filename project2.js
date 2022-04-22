@@ -25,7 +25,8 @@ class NavBar {
 		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
 
-		this.navStyle = "none";
+		this.navStyle = "none";			
+		this.logo = "logoideas.jpg";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -47,7 +48,11 @@ class NavBar {
 		this.$userForm = document.getElementById('userForm');
 		this.$userInput = document.getElementById('userInput');
 
-        this.logo = "logoideas.jpg";
+        this.settings = {
+			user: this.$userInput.value,
+			navStyle: this.navStyle,
+			items: this.items
+		}
 
 		let disabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		disabled.forEach(element => element.disabled = true);
@@ -493,8 +498,49 @@ class NavBar {
 	}
 
 	//Sets navigation items and navigation bar style
-	setNavSettings(user) {
-		
+	setNavSettings(event) {
+		event.preventDefault();
+		let users = [];
+		let isValid = false;
+		let userCounter = 0;
+		fetch('http://justin.navigation.test/users')
+		.then(response => response.json())
+		.then(data => {
+			users = data;
+			console.log(users);
+		})
+		.catch(error => {
+			console.log("Could not get user data.");
+		})
+
+		//Check to make sure valid user is entered in $userInput
+		while(isValid == false && userCounter < users.length)
+		{
+			if (users[userCounter].name == this.$userInput.value)
+			{
+				isValid = true;
+			}
+		}
+
+		if (isValid)
+		{
+			//TODO: add path information for POST request to upload this.settings as JSON
+			fetch(/* url here */ , {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(this.settings),
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log('Success', data);
+			})
+			.catch(error => {
+				console.error('Error', error);
+			});
+		}
+				
 	}
 }
 
