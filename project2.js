@@ -40,7 +40,8 @@ class NavBar {
         this.logo = "logoideas.jpg";
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
-		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);	
+		this.retrieveNavSettings();	
 	}
 
 	// This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -421,16 +422,19 @@ class NavBar {
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(user) {
 		//TODO: add path to fetch request
-		fetch()
+		fetch("http://justin.navigation.test")
 		.then(response => response.json())
 		.then(data => {
+			/*
 			this.items = data.items;
 			this.$navStyle.value = data.navStyle;
 			this.changeNavStyle();
+			*/
+			console.log(data);
 
 		})
 		.catch(error => {
-			console.log("There was a problem getting user settings.")
+			console.log("There was a problem getting user settings.");
 		})
 	}
 
