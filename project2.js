@@ -28,6 +28,7 @@ class NavBar {
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
+		this.$addButton = document.getElementById("addButton");
 		this.$editForm = document.getElementById("editForm");
 		this.$editName = document.getElementById("editName");
 		this.$editLink = document.getElementById("editLink");
@@ -44,6 +45,8 @@ class NavBar {
 
         this.logo = "logoideas.jpg";
 
+		let disabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		disabled.forEach(element => element.disabled = true);
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);		
 	}
@@ -62,6 +65,7 @@ class NavBar {
 		{
 			this.$navbar.className = 'navbar';
 		}
+		this.enableAll();
 		this.load();
 	}
 
@@ -192,7 +196,7 @@ class NavBar {
 
 	//Enables all fields and buttons in all forms.
 	enableAll() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
 		enabled.forEach(element => element.disabled = false);
 	}
 
