@@ -218,8 +218,8 @@ class NavBar {
 
 		let item = new NavItem(this.$name.value, this.$link.value);
 		let moveToEnd = this.items.pop();
+		item.subnavItems.push(moveToEnd);
 		this.items.push(item);
-		this.items[this.items.length-1].subnavItems.push(moveToEnd);
 		this.items.push(moveToEnd);
 
 		//Renders the new item and adds it to the navbar.
