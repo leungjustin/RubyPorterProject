@@ -87,6 +87,9 @@ class NavBar {
 		if (this.navStyle == 'none')
 		{
 			this.$navbar.innerHTML = "";
+			let disabled = [this.$name, this.$link, this.$addButton];
+			disabled.forEach(element => element.disabled = true);
+
 		}
 		this.resetForms();
 	}
