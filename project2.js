@@ -46,7 +46,8 @@ class NavBar {
 		this.$cssId = document.getElementById('cssId');
 		this.$navStyle = document.getElementById('navStyle');
 		this.$userForm = document.getElementById('userForm');
-		this.$userInput = document.getElementById('userInput');
+		this.$userInput = document.getElementById('userInput');		
+		this.$editSettings = document.getElementById('editSettings');
 
         this.settings = {
 			user: this.$userInput.value,
@@ -54,12 +55,25 @@ class NavBar {
 			items: this.items
 		}
 
-		let disabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let disabled = [
+			this.$name, 
+			this.$link, 
+			this.$addButton, 
+			this.$editName, 
+			this.$editLink, 
+			this.$editButton, 
+			this.$deleteButton, 
+			this.$enableDisableButton, 
+			this.$addSubName, 
+			this.$addSubLink, 
+			this.$addSubButton
+		];
 		disabled.forEach(element => element.disabled = true);
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
-		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);	
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
+		this.$editSettings.onclick = this.setNavSettings.bind(this);	
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -497,7 +511,7 @@ class NavBar {
 		})
 	}
 
-	//Sets navigation items and navigation bar style
+	//Sets navigation items and navigation bar style	
 	setNavSettings(event) {
 		event.preventDefault();
 		let users = [];
@@ -508,40 +522,42 @@ class NavBar {
 		.then(data => {
 			users = data;
 			console.log(users);
+			//Check to make sure valid user is entered in $userInput
+			while(isValid == false && userCounter < users.length)
+			{
+				if (users[userCounter].user == this.$userInput.value)
+				{
+					isValid = true;
+				}
+				userCounter++;
+			}
+
+			if (isValid)
+			{
+				fetch('http://justin.navigation.test/edit' , {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(this.settings),
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Success', data);
+				})
+				.catch(error => {
+					console.error('Error', error);
+				});
+			}
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
 		})
 
-		//Check to make sure valid user is entered in $userInput
-		while(isValid == false && userCounter < users.length)
-		{
-			if (users[userCounter].name == this.$userInput.value)
-			{
-				isValid = true;
-			}
-		}
-
-		if (isValid)
-		{
-			//TODO: add path information for POST request to upload this.settings as JSON
-			fetch(/* url here */ , {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(this.settings),
-			})
-			.then(response => response.json())
-			.then(data => {
-				console.log('Success', data);
-			})
-			.catch(error => {
-				console.error('Error', error);
-			});
-		}
+		
 				
 	}
+	
 }
 
 let navbar;
