@@ -24,7 +24,7 @@
 .navbar a {	
 	padding: 5px;
 	text-decoration: none;
-	color: black;	
+	color: #000000;	
 }
 
 .navbar a:hover {
@@ -33,7 +33,7 @@
 
 .navbar .active {
 	background-color: #04AA6D;
-	color: white; 
+	color: #FFFFFF; 
 }
 
 .subnav-content {
@@ -54,5 +54,5 @@
 }
 
 .drag-over {
-	border: dashed 2px red;
+	border: dashed 2px #FF0000;
 }
