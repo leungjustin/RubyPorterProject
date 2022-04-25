@@ -87,7 +87,7 @@ class NavBar {
 	load() {		
 		this.fillItems();		
 		this.changeActive(window.location.hash);
-		this.addEventListeners();
+		this.addEventListeners(this.items);
 		this.disableAll();
 		if (this.navStyle == 'none')
 		{
@@ -182,7 +182,8 @@ class NavBar {
 
 
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners() {		
+	addEventListeners(objectArray, parentIndex = -1) {		
+		
 		//Adds events to each navbar item.
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.			
@@ -209,7 +210,31 @@ class NavBar {
 			item.ondrop = this.drop.bind(this);
 			item.parameters = i.toString();
 		}
-
+		
+		/*
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].subnavItems.length > 1) {
+				this.addEventListeners(objectArray[i].subnavItems, i);
+			}
+			let item;
+			if (parentIndex == -1) {
+				item = document.getElementById("item"+objectArray[i].name);
+				document.getElementById("edit"+objectArray[i].name).onclick = this.editNavItem.bind(this, i);
+			}
+			else {
+				item = document.getElementById("subitem"+objectArray[i].name+","+this.items[parentIndex].name);
+				document.getElementById("subedit"+objectArray[i].name+","+this.items[parentIndex].name).onclick = this.editSubnavItem.bind(this, i, parentIndex);
+			}
+			item.onclick = this.reload.bind(this, objectArray[i].link);
+			item.ondragstart = this.dragStart.bind(this);
+			item.ondragenter = this.dragEnter.bind(this);
+			item.ondragover = this.dragOver.bind(this);
+			item.ondragleave = this.dragLeave.bind(this);
+			item.ondragend = this.dragEnd.bind(this);
+			item.ondrop = this.drop.bind(this);
+			item.parameters = (i+`${parentIndex == -1 ? "" : ","+parentIndex}`);
+		}
+		*/
 	}
 
 	//Disables all fields and buttons in all forms.
@@ -525,7 +550,7 @@ class NavBar {
 		if (isValid)
 		{
 			//TODO: add path information for POST request to upload this.settings as JSON
-			fetch(/* url here */ , {
+			fetch("/* url here */" , {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
