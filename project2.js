@@ -100,7 +100,7 @@ class NavBar {
 	//Renders the navbar, sets the active item if there is one, and disables all edit forms.
 	load() {		
 		this.fillItems();		
-		this.changeActive(window.location.hash);
+		this.changeActive(this.items, window.location.hash);
 		this.addEventListeners(this.items);
 		this.disableAll();
 		if (this.navStyle == 'none')
@@ -115,13 +115,14 @@ class NavBar {
 
 	//Same as load, expect without rendering the navbar or adding event listeners.
 	reload(hash = window.location.hash) {
-		this.changeActive(hash);		
+		this.changeActive(this.items, hash);		
 		this.disableAll();
 		this.resetForms();
 	}
 
 	//Changes which navbar link is active, changing its appearance.
-	changeActive(hash) {
+	changeActive(objectArray, hash, layer = 1) {
+		/*
 		//Removes active from all nav links, then makes the link with the matching hash active.
 		this.items.forEach(item => {
 			item.isActive = false;
@@ -141,6 +142,18 @@ class NavBar {
 					document.getElementById("subitem"+subitem.name+","+item.name).classList.add("active");
 				}
 			});
+		});
+		*/
+		objectArray.forEach(item => {
+			if (item.subnavItems.length > 1) {
+				this.changeActive(item.subnavItems, hash, layer + 1);
+			}
+			item.isActive = false;
+			document.getElementById("item"+item.name+","+layer).classList.remove("active");
+			if (item.link == hash) {
+				item.isActive = true;
+				document.getElementById("item"+item.name+","+layer).classList.add("active");
+			}
 		});
 	}
 
@@ -169,9 +182,9 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
-				<button id="edit${item.name}">E</button>
-				<div class="subnav-content" id="subnavContent${item.name}">
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name},1">${item.name}</a>
+				<button id="edit${item.name},1">E</button>
+				<div class="subnav-content">
 		`;
 		//Each call to renderSubnavItem adds a new subitem to the navbar string.
 		for (let i = 0; i < item.subnavItems.length; i++) {
@@ -187,17 +200,17 @@ class NavBar {
 	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
 	renderSubnavItem(item, i) {
 		return `
-			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},${item.name}">
-				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
-				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
+			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},2">
+				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="item${item.subnavItems[i].name},2">${item.subnavItems[i].name}</a>
+				<button id="edit${item.subnavItems[i].name},2">E</button>
 			</div>
 		`;
 	}
 
 
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners(objectArray, parentIndex = -1) {		
-		
+	addEventListeners(objectArray, layer = 1) {		
+		/*
 		//Adds events to each navbar item.
 		for (let i = 0; i < this.items.length; i++) {
 			//Adds events to each item's subitems, if it has any.			
@@ -224,61 +237,98 @@ class NavBar {
 			item.ondrop = this.drop.bind(this);
 			item.parameters = i.toString();
 		}
-		
-		/*
-		for (let i = 0; i < objectArray.length; i++) {
+		*/
+		for (let i = 0; i < objectArray.length ; i++) {
 			if (objectArray[i].subnavItems.length > 1) {
-				this.addEventListeners(objectArray[i].subnavItems, i);
+				this.addEventListeners(objectArray[i].subnavItems, layer + 1);
 			}
-			let item;
-			if (parentIndex == -1) {
-				item = document.getElementById("item"+objectArray[i].name);
-				document.getElementById("edit"+objectArray[i].name).onclick = this.editNavItem.bind(this, i);
-			}
-			else {
-				item = document.getElementById("subitem"+objectArray[i].name+","+this.items[parentIndex].name);
-				document.getElementById("subedit"+objectArray[i].name+","+this.items[parentIndex].name).onclick = this.editSubnavItem.bind(this, i, parentIndex);
-			}
+			let item = document.getElementById("item"+objectArray[i].name+","+layer);
 			item.onclick = this.reload.bind(this, objectArray[i].link);
+			document.getElementById("edit"+objectArray[i].name+","+layer).onclick = this.editNavItem.bind(this, i, layer);
 			item.ondragstart = this.dragStart.bind(this);
 			item.ondragenter = this.dragEnter.bind(this);
 			item.ondragover = this.dragOver.bind(this);
 			item.ondragleave = this.dragLeave.bind(this);
 			item.ondragend = this.dragEnd.bind(this);
 			item.ondrop = this.drop.bind(this);
-			item.parameters = (i+`${parentIndex == -1 ? "" : ","+parentIndex}`);
+			item.parameters = (i+","+layer);
 		}
-		*/
 	}
 
 	//Disables all fields and buttons in all forms.
 	disableAll() {
 		this.$enableDisableButton.innerHTML = "Enable/Disable Link";
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let disabled = [
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton,
+			this.$enableDisableButton,
+			this.$addSubName,
+			this.$addSubLink,
+			this.$addSubButton
+		];
 		disabled.forEach(element => element.disabled = true);
 	}
 
 	//Enables all fields and buttons in all forms.
 	enableAll() {
-		let enabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [
+			this.$name,
+			this.$link,
+			this.$addButton,
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton,
+			this.$enableDisableButton,
+			this.$addSubName,
+			this.$addSubLink,
+			this.$addSubButton
+		];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Enables all fields and buttons needed to edit a navbar subitem.
 	enableSub() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
+		let enabled = [
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton
+		];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Sets all fields in all forms to blank.
 	resetForms() {
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		let forms = [
+			this.$addForm,
+			this.$editForm,
+			this.$addSubForm
+		];
 		forms.forEach(element => element.reset());
 	}
+
+	/*addSubnavItem(index, event) {
+		event.preventDefault();
+
+		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
+		let moveToEnd = this.items[index].subnavItems.pop();
+		this.items[index].subnavItems.push(subItem);
+		this.items[index].subnavItems.push(moveToEnd);
+
+		//Renders the new subitem and adds it to the navbar.
+		this.load();
+	}*/
 	
 	//Creates a new navbar item based on user input and then adds it to the item list.
-	addNavItem(event) {
+	addNavItem(objectArray, index, layer = 1, event) {
 		event.preventDefault();
+
+		if (layer > 0) {
+			this.addNavItem(objectArray)
+		}
 
 		let item = new NavItem(this.$name.value, this.$link.value);
 		let moveToEnd = this.items.pop();
@@ -291,7 +341,7 @@ class NavBar {
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
-	editNavItem(index) {
+	editNavItem(index, layer) {
 		this.disableAll();
 		this.enableAll();
 		//Sets the text fields to what the item's name and link are currently.
@@ -310,7 +360,7 @@ class NavBar {
 		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, this.items, index, layer);
 	}
 
 	//Changes the name and/or link of an existing navbar item.
