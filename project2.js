@@ -517,6 +517,11 @@ class NavBar {
 		let users = [];
 		let isValid = false;
 		let userCounter = 0;
+		this.settings = {
+			user: this.$userInput.value,
+			navStyle: this.navStyle,
+			items: this.items
+		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
 		.then(data => {
