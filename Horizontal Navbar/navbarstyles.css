@@ -59,7 +59,7 @@
 .subnav-content {
 	display: none;
 	position: absolute;
-	top: 54px;
+	top: 46px;
 	left: 0;
 	background-color: #bbb;
 	width: 100%;
@@ -74,10 +74,14 @@
 	text-decoration: none;
 }
 
-.subnav:hover .subnav-content {
+.subnav:hover :last-child {
 	display: block;
 	animation: fadeIn linear 0.1s;
 }
+
+/*.subnav:hover > .subnav-content > .subnav-content-content > .subnav-content{
+	display: none;
+}*/
 
 @keyframes fadeIn {
 	0% {opacity: 0;}
@@ -86,6 +90,10 @@
 
 .subnav-content a:hover {
 	background-color: #ccc;
+}
+
+.subnav-content-content:hover > .subnav-content{
+	display: block;
 }
 
 .isDisabled {

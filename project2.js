@@ -19,9 +19,16 @@ class NavBar {
 		]; //A list of objects of the NavItem class.
 		this.items[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem("Subsubitem1", "#subsubitem1"));
+		this.items[1].subnavItems[0].subnavItems[0].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem("Subsubitem2", "#subsubitem2"));
+		this.items[1].subnavItems[1].subnavItems[0].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[1].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[2].subnavItems.push(new NavItem("Subitem3", "#subitem3"));
+		this.items[2].subnavItems[0].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
 		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
 
@@ -122,37 +129,23 @@ class NavBar {
 
 	//Changes which navbar link is active, changing its appearance.
 	changeActive(objectArray, hash, layer = 1) {
-		/*
-		//Removes active from all nav links, then makes the link with the matching hash active.
-		this.items.forEach(item => {
+		objectArray.forEach(item => {
 			item.isActive = false;
-			document.getElementById("item"+item.name).classList.remove("active");
+			let itemHTML = document.getElementById("item"+item.name+","+layer);
+			itemHTML.classList.remove("active");
 			if (item.link == hash) {
 				item.isActive = true;
-				document.getElementById("item"+item.name).classList.add("active");
-			}
-			//Removes active from all subnav links as well, then makes the link with the matching hash and its parent item active.
-			item.subnavItems.forEach(subitem => {
-				subitem.isActive = false;
-				document.getElementById("subitem"+subitem.name+","+item.name).classList.remove("active");
-				if (subitem.link == hash) {
-					item.isActive = true;
-					subitem.isActive = true;
-					document.getElementById("item"+item.name).classList.add("active");
-					document.getElementById("subitem"+subitem.name+","+item.name).classList.add("active");
+				itemHTML.classList.add("active");
+				if (layer > 1) {
+					let parent;
+					for (let i = 1; i < layer; i++) {
+						parent = itemHTML.parentElement.parentElement.parentElement.childNodes[1];
+						parent.classList.add("active");
+					}
 				}
-			});
-		});
-		*/
-		objectArray.forEach(item => {
+			}
 			if (item.subnavItems.length > 1) {
 				this.changeActive(item.subnavItems, hash, layer + 1);
-			}
-			item.isActive = false;
-			document.getElementById("item"+item.name+","+layer).classList.remove("active");
-			if (item.link == hash) {
-				item.isActive = true;
-				document.getElementById("item"+item.name+","+layer).classList.add("active");
 			}
 		});
 	}
@@ -180,15 +173,16 @@ class NavBar {
 
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item) {
+		let layer = 1;
 		let navString = `
 			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name},1">${item.name}</a>
-				<button id="edit${item.name},1">E</button>
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name},${layer}">${item.name}</a>
+				<button id="edit${item.name},${layer}">E</button>
 				<div class="subnav-content">
 		`;
 		//Each call to renderSubnavItem adds a new subitem to the navbar string.
 		for (let i = 0; i < item.subnavItems.length; i++) {
-			navString += this.renderSubnavItem(item, i);
+			navString += this.renderSubnavItem(item.subnavItems[i], layer + 1);
 		}
 		navString += `
 				</div>
@@ -198,46 +192,26 @@ class NavBar {
 	}
 
 	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
-	renderSubnavItem(item, i) {
-		return `
-			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},2">
-				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="item${item.subnavItems[i].name},2">${item.subnavItems[i].name}</a>
-				<button id="edit${item.subnavItems[i].name},2">E</button>
+	renderSubnavItem(item, layer) {
+		let navString = `
+			<div ${item.name == "Move to end" ? "style='display: none;'" : ""} class="subnav-content-content" id="subnavContent${item.name},${layer}">
+				<a href="${item.link}" ${item.isActive ? 'class="active"' : ''} draggable="true" id="item${item.name},${layer}">${item.name}</a>
+				<button id="edit${item.name},${layer}">E</button>
+				<div class="subnav-content">
+		`;
+		for (let i = 0; i < item.subnavItems.length; i++) {
+			navString += this.renderSubnavItem(item.subnavItems[i], layer + 1);
+		}
+		navString += `
+				</div>
 			</div>
 		`;
+		return navString;
 	}
 
 
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners(objectArray, layer = 1) {		
-		/*
-		//Adds events to each navbar item.
-		for (let i = 0; i < this.items.length; i++) {
-			//Adds events to each item's subitems, if it has any.			
-			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				let subitem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
-				subitem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
-				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				subitem.ondragstart = this.dragStart.bind(this);
-				subitem.ondragenter = this.dragEnter;
-				subitem.ondragover = this.dragOver;
-				subitem.ondragleave = this.dragLeave.bind(this);
-				subitem.ondragend = this.dragEnd.bind(this);
-				subitem.ondrop = this.drop.bind(this);
-				subitem.parameters = (j+","+i);
-			}
-			let item = document.getElementById("item"+this.items[i].name);
-			item.onclick = this.reload.bind(this, this.items[i].link);
-			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			item.ondragstart = this.dragStart.bind(this);
-			item.ondragenter = this.dragEnter;
-			item.ondragover = this.dragOver;
-			item.ondragleave = this.dragLeave.bind(this);
-			item.ondragend = this.dragEnd.bind(this);
-			item.ondrop = this.drop.bind(this);
-			item.parameters = i.toString();
-		}
-		*/
+	addEventListeners(objectArray, layer = 1) {
 		for (let i = 0; i < objectArray.length ; i++) {
 			if (objectArray[i].subnavItems.length > 1) {
 				this.addEventListeners(objectArray[i].subnavItems, layer + 1);
