@@ -77,10 +77,10 @@ class NavBar {
 		];
 		disabled.forEach(element => element.disabled = true);
 
-		this.$addForm.onsubmit = this.addNavItem.bind(this);		
-		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
+		this.$addForm.onsubmit = this.addNavItem.bind(this, this.items, -1, 1);
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
-		this.$editSettings.onclick = this.setNavSettings.bind(this);	
+		this.$editSettings.onclick = this.setNavSettings.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -88,14 +88,14 @@ class NavBar {
 		if (this.$navStyle.value == 'horizontal')
 		{
 			this.navStyle = 'horizontal';
-			this.$navbar.className = 'navbar horizontal';			
+			this.$navbar.className = 'navbar horizontal';
 		}
 		else if (this.$navStyle.value == 'vertical')
 		{
 			this.navStyle = 'vertical';
 			this.$navbar.className = 'navbar vertical';
 		}
-		else 
+		else
 		{
 			this.navStyle = 'none';
 			this.$navbar.className = 'navbar';
@@ -283,34 +283,26 @@ class NavBar {
 		];
 		forms.forEach(element => element.reset());
 	}
-
-	/*addSubnavItem(index, event) {
-		event.preventDefault();
-
-		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
-		let moveToEnd = this.items[index].subnavItems.pop();
-		this.items[index].subnavItems.push(subItem);
-		this.items[index].subnavItems.push(moveToEnd);
-
-		//Renders the new subitem and adds it to the navbar.
-		this.load();
-	}*/
 	
 	//Creates a new navbar item based on user input and then adds it to the item list.
-	addNavItem(objectArray, index, layer = 1, event) {
+	addNavItem(objectArray, index, layer, event) {
 		event.preventDefault();
 
-		if (layer > 0) {
-			this.addNavItem(objectArray)
+		for (let i = 1; i < layer; i++) {
+			objectArray = objectArray[index].subnavItems;
 		}
-
-		let item = new NavItem(this.$name.value, this.$link.value);
-		let moveToEnd = this.items.pop();
+		let item;
+		if (layer > 1) {
+			item = item = new NavItem(this.$addSubName.value, this.$addSubLink.value);
+		}
+		else {
+			item = new NavItem(this.$name.value, this.$link.value);
+		}
+		let moveToEnd = objectArray.pop();
 		item.subnavItems.push(moveToEnd);
-		this.items.push(item);
-		this.items.push(moveToEnd);
+		objectArray.push(item);
+		objectArray.push(moveToEnd);
 
-		//Renders the new item and adds it to the navbar.
 		this.load();
 	}
 
@@ -334,7 +326,7 @@ class NavBar {
 		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addNavItem.bind(this, this.items, index, layer);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, this.items, index, layer + 1);
 	}
 
 	//Changes the name and/or link of an existing navbar item.
