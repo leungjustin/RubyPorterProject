@@ -1,12 +1,10 @@
 /* Horizontal Navbar CSS */
 
 .navbar {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 70px;
 	overflow: hidden;
-	background-color: #bbbbbb;
+	background-color: #bbb;
+	width: 100%;
+	height: 46px;
 }
 
 .navbar img {
@@ -14,24 +12,8 @@
 	height: 100%;
 }
 
-.navbar a {
-	float: left;
-	color: black;
-	text-align: center;
-	padding: 27px;
-	text-decoration: none;
-}
-
-.navbar button {
-	color: black;
-	text-align: center;
-	margin-top: 27px;
-	margin-bottom: 27px;
-	text-decoration: none;
-}
-
 .active {
-	color: #ffffff;
+	color: #fff;
 }
 
 .subnav {
@@ -40,39 +22,56 @@
 }
 
 .subnav .active {
-	color: #ffffff;
+	color: #fff;
 }
 
 .subnav a {
-	color: inherit;
-	background-color: inherit;
+	float: left;
+	font-size: 16px;
+	color: #000;
+	text-align: center;
+	padding: 14px 16px;
 	font-family: inherit;
+	background-color: inherit;
+	margin: 0;
+	text-decoration: none;
 }
 
-.navbar a:hover {
-	background-color: #cccccc;
+.subnav button {
+	float: left;
+	color: #000;
+	text-align: center;
+	margin-top: 14px;
+	margin-bottom: 14px;
+	text-decoration: none;
+}
+
+.subnav a:hover {
+	background-color: #ccc;
 	animation: backgroundFade1 linear 0.2s;
 }
 
 @keyframes backgroundFade1 {
-	from {background-color: #bbbbbb;}
-	to {background-color: #cccccc;}
+	from {background-color: #bbb;}
+	to {background-color: #ccc;}
 }
 
 .subnav-content {
 	display: none;
 	position: absolute;
-	top: 77px;
-	background-color: #bbbbbb;
+	top: 54px;
+	left: 0;
+	background-color: #bbb;
+	width: 100%;
 	z-index: 1;
 }
 
 .subnav-content a {
-	float: none;
-	color: black;
-	text-decoration: none;
-	display: block;
+	float: left;
+	font-size: 16px;
+	color: #000;
 	text-align: center;
+	text-decoration: none;
 }
 
 .subnav:hover .subnav-content {
@@ -85,16 +84,8 @@
 	100% {opacity: 1;}
 }
 
-.subnav-content button {
-	float: none;
-	color: black;
-	text-decoration: none;
-	position: relative;
-	bottom: 75px;
-}
-
 .subnav-content a:hover {
-	background-color: #cccccc;
+	background-color: #ccc;
 }
 
 .isDisabled {
