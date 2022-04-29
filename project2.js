@@ -77,7 +77,7 @@ class NavBar {
 		];
 		disabled.forEach(element => element.disabled = true);
 
-		this.$addForm.onsubmit = this.addNavItem.bind(this, this.items, -1, 1);
+		this.$addForm.onsubmit = this.addNavItem.bind(this, this.items, [], -1, 1);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
@@ -219,7 +219,11 @@ class NavBar {
 			}
 			let item = document.getElementById("item"+objectArray[i].name+","+layer);
 			item.onclick = this.reload.bind(this, objectArray[i].link);
-			document.getElementById("edit"+objectArray[i].name+","+layer).onclick = this.editNavItem.bind(this, this.items, parentsArray, i, layer);
+			let array = new Array();
+			parentsArray.forEach(element => {
+				array.push(element);
+			})
+			document.getElementById("edit"+objectArray[i].name+","+layer).onclick = this.editNavItem.bind(this, this.items, array, i, layer);
 			item.ondragstart = this.dragStart.bind(this);
 			item.ondragenter = this.dragEnter.bind(this);
 			item.ondragover = this.dragOver.bind(this);
@@ -290,15 +294,16 @@ class NavBar {
 	}
 	
 	//Creates a new navbar item based on user input and then adds it to the item list.
-	addNavItem(objectArray, index, layer, event) {
+	addNavItem(objectArray, parentsArray, index, layer, event) {
 		event.preventDefault();
 
-		for (let i = 1; i < layer; i++) {
-			objectArray = objectArray[index].subnavItems;
-		}
+		parentsArray.forEach(element => {
+			objectArray = objectArray[element].subnavItems;
+		})
 		let item;
 		if (layer > 1) {
-			item = item = new NavItem(this.$addSubName.value, this.$addSubLink.value);
+			item = new NavItem(this.$addSubName.value, this.$addSubLink.value);
+			objectArray = objectArray[index].subnavItems;
 		}
 		else {
 			item = new NavItem(this.$name.value, this.$link.value);
@@ -334,7 +339,7 @@ class NavBar {
 		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addNavItem.bind(this, this.items, index, layer + 1);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, this.items, parentsArray, index, layer + 1);
 	}
 
 	//Changes the name and/or link of an existing navbar item.
