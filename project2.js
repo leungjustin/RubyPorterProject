@@ -137,9 +137,9 @@ class NavBar {
 				item.isActive = true;
 				itemHTML.classList.add("active");
 				if (layer > 1) {
-					let parent;
+					let parent = itemHTML;
 					for (let i = 1; i < layer; i++) {
-						parent = itemHTML.parentElement.parentElement.parentElement.childNodes[1];
+						parent = parent.parentElement.parentElement.parentElement.childNodes[1];
 						parent.classList.add("active");
 					}
 				}
@@ -211,22 +211,27 @@ class NavBar {
 
 
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners(objectArray, layer = 1) {
+	addEventListeners(objectArray, parentsArray = [], layer = 1) {
 		for (let i = 0; i < objectArray.length ; i++) {
 			if (objectArray[i].subnavItems.length > 1) {
-				this.addEventListeners(objectArray[i].subnavItems, layer + 1);
+				parentsArray.unshift(i);
+				this.addEventListeners(objectArray[i].subnavItems, parentsArray, layer + 1);
 			}
 			let item = document.getElementById("item"+objectArray[i].name+","+layer);
 			item.onclick = this.reload.bind(this, objectArray[i].link);
-			document.getElementById("edit"+objectArray[i].name+","+layer).onclick = this.editNavItem.bind(this, i, layer);
+			document.getElementById("edit"+objectArray[i].name+","+layer).onclick = this.editNavItem.bind(this, this.items, parentsArray, i, layer);
 			item.ondragstart = this.dragStart.bind(this);
 			item.ondragenter = this.dragEnter.bind(this);
 			item.ondragover = this.dragOver.bind(this);
 			item.ondragleave = this.dragLeave.bind(this);
 			item.ondragend = this.dragEnd.bind(this);
 			item.ondrop = this.drop.bind(this);
-			item.parameters = (i+","+layer);
+			item.parameters = i.toString();
+			parentsArray.forEach(element => {
+				item.parameters += "," + element;
+			});
 		}
+		parentsArray.shift();
 	}
 
 	//Disables all fields and buttons in all forms.
@@ -307,12 +312,15 @@ class NavBar {
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
-	editNavItem(index, layer) {
+	editNavItem(objectArray, parentsArray, index, layer) {
+		parentsArray.forEach(element => {
+			objectArray = objectArray[element].subnavItems;
+		})
 		this.disableAll();
 		this.enableAll();
 		//Sets the text fields to what the item's name and link are currently.
-		this.$editName.value = this.items[index].name;
-		this.$editLink.value = this.items[index].link;
+		this.$editName.value = objectArray[index].name;
+		this.$editLink.value = objectArray[index].link;
 
 		//Changes the text of the enable/disable button depending on whether the current item is disabled.
 		if (this.items[index].isDisabled) {
