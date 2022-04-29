@@ -48,6 +48,8 @@ class NavBar {
 		this.$userForm = document.getElementById('userForm');
 		this.$userInput = document.getElementById('userInput');		
 		this.$editSettings = document.getElementById('editSettings');
+		this.$addUserForm = document.getElementById('addUserForm');
+		this.$addUserInput = document.getElementById('addUserInput');
 
         this.settings = {
 			user: this.$userInput.value,
@@ -73,7 +75,8 @@ class NavBar {
 		this.$addForm.onsubmit = this.addNavItem.bind(this);		
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
-		this.$editSettings.onclick = this.setNavSettings.bind(this);	
+		this.$editSettings.onclick = this.setNavSettings.bind(this);
+		this.$addUserForm.onsubmit =  this.addUser.bind(this);	
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -582,8 +585,60 @@ class NavBar {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
+		})				
+	}	
+
+	addUser(event) {
+		event.preventDefault();
+		let users = [];
+		let isInvalid = false;
+		let userCounter = 0;
+		this.settings = {
+			user: this.$addUserInput.value,
+			navStyle: 'none',
+			items: [new NavItem("Move to end", "#")]
+		}
+		fetch('http://justin.navigation.test/users')
+		.then(response => response.json())
+		.then(data => {
+			users = data;
+			console.log(users);
+			//Check to make sure valid user is entered in $userInput
+			while(isInvalid == false && userCounter < users.length)
+			{
+				if (users[userCounter].user == this.$addUserInput.value)
+				{
+					isInvalid = true;
+				}
+				userCounter++;
+			}
+			if (this.$addUserInput.value == "")
+			{
+				isInvalid = true;
+			}
+
+			if (!isInvalid)
+			{
+				fetch('http://justin.navigation.test/edit' , {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(this.settings),
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Success', data);
+				})
+				.catch(error => {
+					console.error('Error', error);
+				});
+			}
 		})
-				
+		.catch(error => {
+			console.log("Could not get user data.");
+		})				
+
 	}
 	
 }
