@@ -26,7 +26,7 @@ class NavBar {
 		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
 
 		this.navStyle = "none";			
-		this.logo = "logoideas.jpg";
+		this.logo = "RubyPorterProject/logoideas.jpg";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -148,11 +148,11 @@ class NavBar {
 	fillItems() {
 		if (this.$navbar.classList.contains('vertical'))
 		{
-			this.$cssId.href = 'project1.css';
+			this.$cssId.href = 'RubyPorterProject/project1.css';
 		}
 		else if (this.$navbar.classList.contains('horizontal'))
 		{
-			this.$cssId.href = 'Horizontal Navbar/navbarstyles.css';
+			this.$cssId.href = 'RubyPorterProject/Horizontal Navbar/navbarstyles.css';
 		}
 		else
 		{
@@ -542,6 +542,11 @@ class NavBar {
 		let users = [];
 		let isValid = false;
 		let userCounter = 0;
+		this.settings = {
+			user: this.$userInput.value,
+			navStyle: this.navStyle,
+			items: this.items
+		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
 		.then(data => {
