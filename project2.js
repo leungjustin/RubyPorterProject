@@ -640,8 +640,55 @@ class NavBar {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})				
+		})		
+	}
 
+	deleteUser(event) {
+		event.preventDefault();
+		let users = [];
+		let isValid = false;
+		let userCounter = 0;
+		this.settings = {
+			user: this.$addUserInput.value,
+			navStyle: none,
+			items: []
+		}
+		fetch('http://justin.navigation.test/users')
+		.then(response => response.json())
+		.then(data => {
+			users = data;
+			console.log(users);
+			//Check to make sure valid user is entered in $userInput
+			while(isValid == false && userCounter < users.length)
+			{
+				if (users[userCounter].user == this.$addUserInput.value)
+				{
+					isValid = true;
+				}
+				userCounter++;
+			}
+
+			if (isValid)
+			{
+				fetch('http://justin.navigation.test/deleteuser' , {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(this.settings),
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Success', data);
+				})
+				.catch(error => {
+					console.error('Error', error);
+				});
+			}
+		})
+		.catch(error => {
+			console.log("Could not get user data.");
+		})				
 	}
 	
 }
