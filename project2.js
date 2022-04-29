@@ -76,7 +76,7 @@ class NavBar {
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
-		this.$addUserForm.onsubmit =  this.addUser.bind(this);	
+		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -589,6 +589,7 @@ class NavBar {
 	}	
 
 	addUser(event) {
+		console.log("addUser firing");
 		event.preventDefault();
 		let users = [];
 		let isInvalid = false;
@@ -609,12 +610,14 @@ class NavBar {
 				if (users[userCounter].user == this.$addUserInput.value)
 				{
 					isInvalid = true;
+					console.log("User already exists");
 				}
 				userCounter++;
 			}
 			if (this.$addUserInput.value == "")
 			{
 				isInvalid = true;
+				console.log("User is blank");
 			}
 
 			if (!isInvalid)
