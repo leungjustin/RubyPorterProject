@@ -588,9 +588,9 @@ class NavBar {
 		})				
 	}	
 
-	addUser(event) {
-		console.log("addUser firing");
+	addUser(event) {		
 		event.preventDefault();
+		console.log("addUser firing");
 		let users = [];
 		let isInvalid = false;
 		let userCounter = 0;
