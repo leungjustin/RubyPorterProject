@@ -590,6 +590,7 @@ class NavBar {
 		})				
 	}	
 
+	// Adds a user to the files on the webserver
 	addUser(event) {		
 		event.preventDefault();
 		console.log("addUser firing");
@@ -606,7 +607,7 @@ class NavBar {
 		.then(data => {
 			users = data;
 			console.log(users);
-			//Check to make sure valid user is entered in $userInput
+			//Check to make sure user in $addUserInput is not invalid
 			while(isInvalid == false && userCounter < users.length)
 			{
 				if (users[userCounter].user == this.$addUserInput.value)
@@ -645,6 +646,7 @@ class NavBar {
 		})		
 	}
 
+	// Deletes user from files on the webserver
 	deleteUser(event) {
 		event.preventDefault();
 		console.log("deleteUser firing");
@@ -661,7 +663,7 @@ class NavBar {
 		.then(data => {
 			users = data;
 			console.log(users);
-			//Check to make sure valid user is entered in $userInput
+			//Check to make sure valid user is entered in $addUserInput
 			while(isValid == false && userCounter < users.length && this.$addUserInput.value != "")
 			{
 				if (users[userCounter].user == this.$addUserInput.value)
