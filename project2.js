@@ -653,7 +653,7 @@ class NavBar {
 		let userCounter = 0;
 		this.settings = {
 			user: this.$addUserInput.value,
-			navStyle: none,
+			navStyle: 'none',
 			items: []
 		}
 		fetch('http://justin.navigation.test/users')
