@@ -50,6 +50,7 @@ class NavBar {
 		this.$editSettings = document.getElementById('editSettings');
 		this.$addUserForm = document.getElementById('addUserForm');
 		this.$addUserInput = document.getElementById('addUserInput');
+		this.$deleteUserButton = document.getElementById('deleteUserButton');
 
         this.settings = {
 			user: this.$userInput.value,
@@ -77,6 +78,7 @@ class NavBar {
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
+		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -645,6 +647,7 @@ class NavBar {
 
 	deleteUser(event) {
 		event.preventDefault();
+		console.log("deleteUser firing");
 		let users = [];
 		let isValid = false;
 		let userCounter = 0;
@@ -659,7 +662,7 @@ class NavBar {
 			users = data;
 			console.log(users);
 			//Check to make sure valid user is entered in $userInput
-			while(isValid == false && userCounter < users.length)
+			while(isValid == false && userCounter < users.length && this.$addUserInput.value != "")
 			{
 				if (users[userCounter].user == this.$addUserInput.value)
 				{
