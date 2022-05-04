@@ -277,7 +277,7 @@ class NavBar {
 
 		//Adds events to the buttons on each form.
 		this.$editForm.onsubmit = this.submitEdit.bind(this, matchingItem, index);
-		this.$deleteButton.onclick = this.deleteNavItem.bind(this, matchingItem, index);
+		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
 		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
 	}
@@ -373,42 +373,35 @@ class NavBar {
 	}
 	*/
 
-	/*deleteSubnavItem(index, parentindex) {
-		//If the subitem being deleted is currently active, removes the hash from the URL.
-		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
-			window.location.hash = "";
-		}
-
-		//Removes the subitem's corresponding html from the navbar.
-		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
-
-		this.items[parentindex].subnavItems.splice(index, 1);
-
-		this.reload();
-	}*/
-
 	//Removes an existing navbar item from the list.
-	deleteNavItem(item, index) {
-		/*if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
+	deleteNavItem(index) {
+		if (document.getElementById("item"+index).classList.contains("active")) {
 			window.location.hash = "";
 		}
-		this.items.splice(index, 1);
-		this.load();*/
 
-		let parentItem = this.findParentItem(this.items, index);
+		let isDeleted = this.deleteFromParent(this.items, index);
+		if (isDeleted == false) {
+			this.items.splice(index, 1);
+		}
+		this.load();
 	}
 
-	findParentItem(objectArray, index) {
+	deleteFromParent(objectArray, index) {
 		for (let i = 0; i < objectArray.length; i++) {
-			if (objectArray[i].id == index) {
-				objectArray[i].name = this.$editName.value;
-				objectArray[i].link = this.$editLink.value;
+			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
+				if (objectArray[i].subnavItems[j].id == index) {
+					objectArray[i].subnavItems.splice(j, 1);
+					return true;
+				}
 			}
 			if (objectArray[i].subnavItems.length > 1) {
-				objectArray[i].subnavItems = this.createEditedNav(objectArray[i].subnavItems, index);
+				let isDeleted = this.deleteFromParent(objectArray[i].subnavItems, index)
+				if (isDeleted == true) {
+					return true;
+				}
 			}
 		}
-		return objectArray;
+		return false;
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -421,21 +414,6 @@ class NavBar {
 			this.items[index].isDisabled = true;
 			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
 		}
-		this.reload();
-	}
-
-	//Removes an existing navbar subitem from a item's list.
-	deleteSubnavItem(index, parentindex) {
-		//If the subitem being deleted is currently active, removes the hash from the URL.
-		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
-			window.location.hash = "";
-		}
-
-		//Removes the subitem's corresponding html from the navbar.
-		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
-
-		this.items[parentindex].subnavItems.splice(index, 1);
-
 		this.reload();
 	}
 
