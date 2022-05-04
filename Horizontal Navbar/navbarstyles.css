@@ -74,7 +74,7 @@
 	text-decoration: none;
 }
 
-.subnav:hover :last-child {
+.subnav:hover > .subnav-content {
 	display: block;
 	animation: fadeIn linear 0.1s;
 }
@@ -92,9 +92,9 @@
 	background-color: #ccc;
 }
 
-.subnav-content-content:hover > .subnav-content{
+/*.subnav-content:hover > .subnav-content{
 	display: block;
-}
+}*/
 
 .isDisabled {
 	pointer-events: none;
