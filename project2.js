@@ -263,7 +263,7 @@ class NavBar {
 		this.disableAll();
 		this.enableAll();
 
-		let matchingItem = this.findMatchingItem(this.items, index)
+		let matchingItem = this.findMatchingItem(this.items, index);
 
 		this.$editName.value = matchingItem.name;
 		this.$editLink.value = matchingItem.link;
@@ -288,9 +288,9 @@ class NavBar {
 				return objectArray[i];
 			}
 			if (objectArray[i].subnavItems.length > 1) {
-				let matchingitem = this.findMatchingItem(objectArray[i].subnavItems, index);
-				if (matchingitem != undefined) {
-					return matchingitem;
+				let matchingItem = this.findMatchingItem(objectArray[i].subnavItems, index);
+				if (matchingItem != undefined) {
+					return matchingItem;
 				}
 			}
 		}
@@ -406,14 +406,17 @@ class NavBar {
 
 	//Changes whether a navbar item is clickable or not.
 	enableOrDisableLink(index) {
-		if (this.items[index].isDisabled) {
-			this.items[index].isDisabled = false;
-			document.getElementById("item"+this.items[index].name).classList.remove("isDisabled");
+		let matchingItem = this.findMatchingItem(this.items, index)
+
+		if (matchingItem.isDisabled) {
+			matchingItem.isDisabled = false;
+			document.getElementById("item"+index).classList.remove("isDisabled");
 		}
 		else {
-			this.items[index].isDisabled = true;
-			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
+			matchingItem.isDisabled = true;
+			document.getElementById("item"+index).classList.add("isDisabled");
 		}
+
 		this.reload();
 	}
 
