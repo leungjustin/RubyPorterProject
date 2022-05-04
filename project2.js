@@ -1,14 +1,3 @@
-// 5/4/22 recursive-methods commit
-// NavItem objects now have id property
-// Changed most single quotes to double quotes for consistency.
-// Changed placement of some opening curly brackets for consistency.
-// renderNavItem template literal now uses corresponding item's id property.
-// renderNavItem now calls itself to draw subnav items instead of renderSubnavItem (which has been removed)
-// addEventListeners now finds elements based on corresponding navItem's id property.
-// addNavItem has been reworked and now works with top level items or nested items (addSubnavItem has been removed)
-// editNavItem now uses new method findMatchingItem to search through the item list for the correct item to edit.
-// Added some additional css to make displaying items work properly.
-
 class NavItem {
 	constructor(id, name, link, isDisabled = false) {
 		this.id = id;
@@ -269,6 +258,37 @@ class NavBar {
 		forms.forEach(element => element.reset());
 	}
 
+	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
+	editNavItem(index) {
+		this.disableAll();
+		this.enableAll();
+
+		let matchingItem;
+
+		for (let i = 0; i < this.items.length; i++) {
+			let result = this.findMatchingItem(this.items[i], index);
+			if (result != undefined) {
+				matchingItem = result;
+			}
+		}
+
+		this.$editName.value = matchingItem.name;
+		this.$editLink.value = matchingItem.link;
+
+		if (matchingItem.isDisabled) {
+			this.$enableDisableButton.innerHTML = "Enable Link";
+		}
+		else {
+			this.$enableDisableButton.innerHTML = "Disable Link";
+		}
+
+		//Adds events to the buttons on each form.
+		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
+		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
+		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
+	}
+
 	findMatchingItem(item, index) {
 		let matchingItem;
 		if (item.id == index) {
@@ -309,59 +329,35 @@ class NavBar {
 		this.load();
 	}
 
-	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
-	editNavItem(index) {
-		this.disableAll();
-		this.enableAll();
-
-		let matchingItem;
-
-		for (let i = 0; i < this.items.length; i++) {
-			let result = this.findMatchingItem(this.items[i], index);
-			if (result != undefined) {
-				matchingItem = result;
-			}
-		}
-
-		this.$editName.value = matchingItem.name;
-		this.$editLink.value = matchingItem.link;
-
-		if (matchingItem.isDisabled) {
-			this.$enableDisableButton.innerHTML = "Enable Link";
-		}
-		else {
-			this.$enableDisableButton.innerHTML = "Disable Link";
-		}
-
-		//Adds events to the buttons on each form.
-		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
-		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
-		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
-	}
-
 	//Changes the name and/or link of an existing navbar item.
 	submitEdit(index, event) {
 		event.preventDefault();
 
-		let editHTML = document.getElementById("item"+this.items[index].name);
-		
-		//Change the current item's name and/or link.
-		this.items[index].name = this.$editName.value;
-		this.items[index].link = this.$editLink.value;
-
-		//Set the properties of the edited item's corresponding html element to match.
-		editHTML.href = this.items[index].link;
-		editHTML.id = "item"+this.items[index].name;
-		editHTML.innerHTML = this.items[index].name;
-		//Binds new event listener for the edited item.
-		editHTML.onclick = this.reload.bind(this, this.items[index].link);
-
-		//If the edited item is the currently active item, updates the hash so it matches the update.
-		if (editHTML.classList.contains("active")) {
-			window.location.hash = this.items[index].link;
+		let editHTML = document.getElementById("item"+index);
+		editHTML.innerHTML = this.$editName.value;
+		editHTML.href = this.$editLink.value;
+		editHTML.onclick = this.reload.bind(this, editHTML.href);
+		if(editHTML.classList.contains("active")) {
+			window.location.hash = editHTML.href;
 		}
+
+		let editedNav = this.createEditedItem(this.items, index);
+		this.items = editedNav;
+
 		this.reload();
+	}
+
+	createEditedItem(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].id == index) {
+				objectArray[i].name = this.$editName.value;
+				objectArray[i].link = this.$editLink.value;
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				objectArray[i].subnavItems = this.createEditedItem(objectArray[i].subnavItems, index);
+			}
+		}
+		return objectArray;
 	}
 
 	//Removes an existing navbar item from the list.
@@ -384,19 +380,6 @@ class NavBar {
 			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
 		}
 		this.reload();
-	}
-
-	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
-	editSubnavItem(index, parentindex) {
-		this.disableAll();
-		this.enableSub();
-		//Sets the text fields to what the subitem's name and link are currently.
-		this.$editName.value = this.items[parentindex].subnavItems[index].name;
-		this.$editLink.value = this.items[parentindex].subnavItems[index].link;
-		
-		//Adds events to the buttons on the edit form.
-		this.$editForm.onsubmit = this.submitSubEdit.bind(this, index, parentindex);
-		this.$deleteButton.onclick = this.deleteSubnavItem.bind(this, index, parentindex);
 	}
 
 	//Changes the name and/or link of an existing navbar subitem.
