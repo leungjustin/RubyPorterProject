@@ -263,14 +263,7 @@ class NavBar {
 		this.disableAll();
 		this.enableAll();
 
-		let matchingItem;
-
-		for (let i = 0; i < this.items.length; i++) {
-			let result = this.findMatchingItem(this.items[i], index);
-			if (result != undefined) {
-				matchingItem = result;
-			}
-		}
+		let matchingItem = this.findMatchingItem(this.items, index)
 
 		this.$editName.value = matchingItem.name;
 		this.$editLink.value = matchingItem.link;
@@ -283,22 +276,21 @@ class NavBar {
 		}
 
 		//Adds events to the buttons on each form.
-		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
-		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
+		this.$editForm.onsubmit = this.submitEdit.bind(this, matchingItem, index);
+		this.$deleteButton.onclick = this.deleteNavItem.bind(this, matchingItem, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
 		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
 	}
 
-	findMatchingItem(item, index) {
-		let matchingItem;
-		if (item.id == index) {
-			return item;
-		}
-		if (item.subnavItems.length > 1) {
-			for (let i = 0; i < item.subnavItems.length; i++) {
-				matchingItem = this.findMatchingItem(item.subnavItems[i], index);
-				if (matchingItem != undefined) {
-					return matchingItem;
+	findMatchingItem(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].id == index) {
+				return objectArray[i];
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				let matchingitem = this.findMatchingItem(objectArray[i].subnavItems, index);
+				if (matchingitem != undefined) {
+					return matchingitem;
 				}
 			}
 		}
@@ -330,6 +322,7 @@ class NavBar {
 	}
 
 	//Changes the name and/or link of an existing navbar item.
+	/*
 	submitEdit(index, event) {
 		event.preventDefault();
 
@@ -341,32 +334,81 @@ class NavBar {
 			window.location.hash = editHTML.href;
 		}
 
-		let editedNav = this.createEditedItem(this.items, index);
+		let editedNav = this.createEditedNav(this.items, index);
 		this.items = editedNav;
 
 		this.reload();
 	}
+	*/
 
-	createEditedItem(objectArray, index) {
+	submitEdit(item, index, event) {
+		event.preventDefault();
+
+		let editHTML = document.getElementById("item"+index);
+		editHTML.innerHTML = this.$editName.value;
+		editHTML.href = this.$editLink.value;
+		editHTML.onclick = this.reload.bind(this, editHTML.href);
+		if(editHTML.classList.contains("active")) {
+			window.location.hash = editHTML.href;
+		}
+
+		item.name = this.$editName.value;
+		item.link = this.$editLink.value;
+
+		this.reload();
+	}
+
+	/*
+	createEditedNav(objectArray, index) {
 		for (let i = 0; i < objectArray.length; i++) {
 			if (objectArray[i].id == index) {
 				objectArray[i].name = this.$editName.value;
 				objectArray[i].link = this.$editLink.value;
 			}
 			if (objectArray[i].subnavItems.length > 1) {
-				objectArray[i].subnavItems = this.createEditedItem(objectArray[i].subnavItems, index);
+				objectArray[i].subnavItems = this.createEditedNav(objectArray[i].subnavItems, index);
 			}
 		}
 		return objectArray;
 	}
+	*/
+
+	/*deleteSubnavItem(index, parentindex) {
+		//If the subitem being deleted is currently active, removes the hash from the URL.
+		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
+			window.location.hash = "";
+		}
+
+		//Removes the subitem's corresponding html from the navbar.
+		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
+
+		this.items[parentindex].subnavItems.splice(index, 1);
+
+		this.reload();
+	}*/
 
 	//Removes an existing navbar item from the list.
-	deleteNavItem(index) {
-		if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
+	deleteNavItem(item, index) {
+		/*if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
 			window.location.hash = "";
 		}
 		this.items.splice(index, 1);
-		this.load();
+		this.load();*/
+
+		let parentItem = this.findParentItem(this.items, index);
+	}
+
+	findParentItem(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].id == index) {
+				objectArray[i].name = this.$editName.value;
+				objectArray[i].link = this.$editLink.value;
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				objectArray[i].subnavItems = this.createEditedNav(objectArray[i].subnavItems, index);
+			}
+		}
+		return objectArray;
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -378,30 +420,6 @@ class NavBar {
 		else {
 			this.items[index].isDisabled = true;
 			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
-		}
-		this.reload();
-	}
-
-	//Changes the name and/or link of an existing navbar subitem.
-	submitSubEdit(index, parentindex, event) {
-		event.preventDefault();
-
-		let editHTML = document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name);
-
-		//Change the current subitem's name and/or link.
-		this.items[parentindex].subnavItems[index].name = this.$editName.value;
-		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-
-		//Set the properties of the edited subitem's corresponding html element to match.
-		editHTML.href = this.items[parentindex].subnavItems[index].link;
-		editHTML.id = "subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
-		editHTML.innerHTML = this.items[parentindex].subnavItems[index].name;
-		//Binds new event listener for the edited subitem.
-		editHTML.onclick = this.reload.bind(this, this.items[parentindex].subnavItems[index].link);
-
-		//If the edited subitem is the currently active subitem, updates the hash so it match the update.
-		if (editHTML.classList.contains("active")) {
-			window.location.hash = this.items[parentindex].subnavItems[index].link;
 		}
 		this.reload();
 	}
