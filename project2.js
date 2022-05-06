@@ -531,9 +531,14 @@ class NavBar {
 			if (data) {
 				this.items = data.items;
 				this.$navStyle.value = data.navStyle;
-				this.navStyle = data.navStyle;
-				this.changeNavStyle();
+				this.navStyle = data.navStyle;				
 			}
+			else {
+				this.items = [];
+				this.$navStyle.value = "";
+				this.navStyle = 'none';
+			}
+			this.changeNavStyle();
 			console.log(data);
 
 		})
