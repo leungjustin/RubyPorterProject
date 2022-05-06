@@ -625,7 +625,7 @@ class NavBar {
 
 			if (!isInvalid)
 			{
-				fetch('http://justin.navigation.test/edit' , {
+				fetch('http://justin.navigation.test/adduser' , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
