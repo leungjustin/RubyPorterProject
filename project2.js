@@ -537,6 +537,7 @@ class NavBar {
 				this.items = [];
 				this.$navStyle.value = "";
 				this.navStyle = 'none';
+				console.log("User doesn't exist");
 			}
 			this.changeNavStyle();
 			console.log(data);
