@@ -524,20 +524,22 @@ class NavBar {
 
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
-		event.preventDefault();
+		event.preventDefault();		
 		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
-			this.items = data.items;
-			this.$navStyle.value = data.navStyle;
-			this.navStyle = data.navStyle;
-			this.changeNavStyle();
-			
+			if (data != null) {
+				this.items = data.items;
+				this.$navStyle.value = data.navStyle;
+				this.navStyle = data.navStyle;
+				this.changeNavStyle();
+			}
 			console.log(data);
 
 		})
 		.catch(error => {
 			console.log("There was a problem getting user settings.");
+			this.disableAll();
 		})
 	}
 
