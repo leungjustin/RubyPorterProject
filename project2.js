@@ -129,7 +129,7 @@ class NavBar {
 	changeActive(objectArray, hash, layer = 1) {
 		objectArray.forEach(item => {
 			item.isActive = false;
-			let itemHTML = document.getElementById("item"+item.id);
+			let itemHTML = document.querySelector(`a[data-id="${item.id}"]`);
 			itemHTML.classList.remove("active");
 			if (item.link == hash) {
 				item.isActive = true;
@@ -169,9 +169,9 @@ class NavBar {
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item) {
 		let navString = `
-			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.id}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.id}">${item.name}</a>
-				<button id="edit${item.id}">E</button>
+			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav" data-id="${item.id}">
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item" data-id="${item.id}">${item.name}</a>
+				<button id="edit" data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
 		//Each call to renderSubnavItem adds a new subitem to the navbar string.
@@ -188,17 +188,17 @@ class NavBar {
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
 		for (let i = 0; i <= this.lastId; i++) {
-			let item = document.getElementById("item"+i);
+			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
-				item.onclick = this.reload.bind(this, item.href);
-				document.getElementById("edit"+i).onclick = this.editNavItem.bind(this, i);
+				item.onclick = this.reload.bind(this, item.hash);
+				document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
 				item.ondragstart = this.dragStart.bind(this);
 				item.ondragenter = this.dragEnter.bind(this);
 				item.ondragover = this.dragOver.bind(this);
 				item.ondragleave = this.dragLeave.bind(this);
 				item.ondragend = this.dragEnd.bind(this);
 				item.ondrop = this.drop.bind(this);
-				//item.parameters = i.toString();
+				item.parameters = i.toString();
 			}
 		}
 	}
@@ -326,7 +326,7 @@ class NavBar {
 	submitEdit(index, event) {
 		event.preventDefault();
 
-		let editHTML = document.getElementById("item"+index);
+		let editHTML =  document.querySelector(`a[data-id="${index}"]`);
 		editHTML.innerHTML = this.$editName.value;
 		editHTML.href = this.$editLink.value;
 		editHTML.onclick = this.reload.bind(this, editHTML.href);
@@ -344,7 +344,7 @@ class NavBar {
 	submitEdit(item, index, event) {
 		event.preventDefault();
 
-		let editHTML = document.getElementById("item"+index);
+		let editHTML = document.querySelector(`a[data-id="${index}"]`);
 		editHTML.innerHTML = this.$editName.value;
 		editHTML.href = this.$editLink.value;
 		editHTML.onclick = this.reload.bind(this, editHTML.href);
@@ -375,7 +375,7 @@ class NavBar {
 
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
-		if (document.getElementById("item"+index).classList.contains("active")) {
+		if (document.querySelector(`a[data-id="${index}"]`).classList.contains("active")) {
 			window.location.hash = "";
 		}
 
@@ -410,36 +410,43 @@ class NavBar {
 
 		if (matchingItem.isDisabled) {
 			matchingItem.isDisabled = false;
-			document.getElementById("item"+index).classList.remove("isDisabled");
+			document.querySelector(`a[data-id="${index}"]`).classList.remove("isDisabled");
 		}
 		else {
 			matchingItem.isDisabled = true;
-			document.getElementById("item"+index).classList.add("isDisabled");
+			document.querySelector(`a[data-id="${index}"]`).classList.add("isDisabled");
 		}
 
 		this.reload();
 	}
 
+	findParent(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
+				if (objectArray[i].subnavItems[j].id == index) {
+					return objectArray[i];
+				}
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				let parentItem = this.findParent(objectArray[i].subnavItems, index)
+				if (parentItem != undefined) {
+					return parentItem;
+				}
+			}
+		}
+	}
+
 	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
-		let dragIndex = event.target.parameters;
-		let dragArray = dragIndex.split(",");
+		let item = this.findMatchingItem(this.items, event.target.parameters);
+		let parentItem = this.findParent(this.items, event.target.parameters);
+
 		//This is called to work around a rendering bug in Chrome and Edge.
 		setTimeout(() => {
 			//If the drag item is a subitem, displays the moveToEnd item in the top level array.
-			if (dragArray.length != 1) {
-				document.getElementById("subnavMove to end").style.display = "block";
-			}
-			let subnavArray = document.getElementsByClassName("subnav-content");
-			//For each nav item...
-			for (let i = 0; i < subnavArray.length; i++) {
-				subnavArray[i].style.display = "block"; //Displays its subitems, and...
-				//If the item is not a moveToEnd item, display the item's moveToEnd subitem.
-				//Do not display the moveToEnd subitem if it is the item's own moveToEnd subitem, or if it is part of the same set of subitems.
-				if (this.items[i].name != "Move to end" && ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1]))) {
-					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
-				}
+			if (parentItem != undefined) {
+				document.querySelector(`div[data-id="${this.items[this.items.length-1].id}"]`).style.display = "block";
 			}
 		}, 0);
 	}
@@ -447,6 +454,13 @@ class NavBar {
 	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
+		let elements = document.getElementsByClassName("subnav-content");
+		for (let i = 0; i < elements.length; i++) {
+			elements[i].style.display = "none";
+		}
+		let test1 = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
+		test1.parentElement.style.display = "block";
+		test1.lastElementChild.style.display = "block";
 	}
 
 	//This must be called to allow an item to trigger the drop method when dropping onto an item.
