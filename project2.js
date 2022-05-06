@@ -528,7 +528,7 @@ class NavBar {
 		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
-			if (data != null) {
+			if (!data) {
 				this.items = data.items;
 				this.$navStyle.value = data.navStyle;
 				this.navStyle = data.navStyle;
