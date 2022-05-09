@@ -1,6 +1,7 @@
 class NavItem {
-	constructor(id, name, link, isDisabled = false) {
+	constructor(id, layer, name, link, isDisabled = false) {
 		this.id = id;
+		this.layer = layer;
 		this.name = name;
 		this.link = link;
 		this.isActive = false; //Currently not in use. May be implemented when using data storage method.
@@ -12,28 +13,26 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem(0, "Item1", "#item1"),
-			new NavItem(1, "Item2", "#item2"),
-			new NavItem(2, "Item3", "#item3"),
-			new NavItem(3, "Item4", "#item4"),
-			new NavItem(4, "Move to end", "#")
+			new NavItem(0, 1, "Item1", "#item1"),
+			new NavItem(1, 1, "Item2", "#item2"),
+			new NavItem(2, 1, "Item3", "#item3"),
+			new NavItem(3, 1, "Item4", "#item4"),
+			new NavItem(4, 1, "Move to end", "#")
 		]; //A list of objects of the NavItem class.
-		this.items[0].subnavItems.push(new NavItem(5, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(6, "Subitem1", "#subitem1"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, "Subsubitem1", "#subsubitem1"));
-		this.items[1].subnavItems[0].subnavItems[0].subnavItems.push(new NavItem(8, "Move to end", "#"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(9, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(10, "Subitem2", "#subitem2"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, "Subsubitem2", "#subsubitem2"));
-		this.items[1].subnavItems[1].subnavItems[0].subnavItems.push(new NavItem(12, "Move to end", "#"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(13, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(14, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(15, "Subitem3", "#subitem3"));
-		this.items[2].subnavItems[0].subnavItems.push(new NavItem(16, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(17, "Move to end", "#"));
-		this.items[3].subnavItems.push(new NavItem(18, "Move to end", "#"));
+		this.items[0].subnavItems.push(new NavItem(5, 2, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(6, 2, "Subitem1", "#subitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, 3, "Subsubitem1", "#subsubitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(8, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(9, 2, "Subitem2", "#subitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(10, 3, "Subsubitem2", "#subsubitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(12, 2, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(13, 2, "Subitem3", "#subitem3"));
+		this.items[2].subnavItems[0].subnavItems.push(new NavItem(14, 3, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(15, 2, "Move to end", "#"));
+		this.items[3].subnavItems.push(new NavItem(16, 2, "Move to end", "#"));
 
-		this.lastId = 18;
+		this.lastId = 16;
 
 		this.navStyle = "none";			
 		this.logo = "logoideas.jpg";
@@ -454,11 +453,13 @@ class NavBar {
 	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
+		let test1 = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
 		let elements = document.getElementsByClassName("subnav-content");
 		for (let i = 0; i < elements.length; i++) {
-			elements[i].style.display = "none";
+			if (elements[i] != test1.parentElement.parentElement.parentElement) {
+				elements[i].style.display = "none";
+			}
 		}
-		let test1 = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
 		test1.parentElement.style.display = "block";
 		test1.lastElementChild.style.display = "block";
 	}
