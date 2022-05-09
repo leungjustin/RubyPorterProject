@@ -615,7 +615,7 @@ class NavBar {
 		this.settings = {
 			user: this.$addUserInput.value,
 			navStyle: 'none',
-			items: [new NavItem("Move to end", "#")]
+			items: [new NavItem(0, 1,"Move to end", "#")]
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
