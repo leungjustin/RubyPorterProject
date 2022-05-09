@@ -35,7 +35,7 @@ class NavBar {
 		this.lastId = 16;
 
 		this.navStyle = "none";			
-		this.logo = "logoideas.jpg";
+		this.logo = "RubyPorterProject/logoideas.jpg";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -57,8 +57,11 @@ class NavBar {
 		this.$userForm = document.getElementById("userForm");
 		this.$userInput = document.getElementById("userInput");		
 		this.$editSettings = document.getElementById("editSettings");
+		this.$addUserForm = document.getElementById("addUserForm");
+		this.$addUserInput = document.getElementById("addUserInput");
+		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
-        this.settings = {
+    this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
 			items: this.items
@@ -83,6 +86,8 @@ class NavBar {
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
+		this.$addUserForm.onsubmit = this.addUser.bind(this);	
+		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
@@ -150,10 +155,10 @@ class NavBar {
 	//Fills the navbar with existing items and subitems.
 	fillItems() {
 		if (this.$navbar.classList.contains("vertical")) {
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = "RubyPorterProject/project1.css";
 		}
 		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "Horizontal Navbar/navbarstyles.css";
+			this.$cssId.href = "RubyPorterProject/Horizontal Navbar/navbarstyles.css";
 		}
 		else {
 			this.$cssId.href = "";
@@ -530,19 +535,27 @@ class NavBar {
 
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
-		event.preventDefault();
+		event.preventDefault();		
 		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
-			this.items = data.items;
-			this.$navStyle.value = data.navStyle;
-			this.navStyle = data.navStyle;
+			if (data) {
+				this.items = data.items;
+				this.$navStyle.value = data.navStyle;
+				this.navStyle = data.navStyle;				
+			}
+			else {
+				this.items = [];
+				this.$navStyle.value = "";
+				this.navStyle = 'none';
+				console.log("User doesn't exist");
+			}
 			this.changeNavStyle();
-			
 			console.log(data);
 		})
 		.catch(error => {
 			console.log("There was a problem getting user settings.");
+			this.disableAll();
 		})
 	}
 
@@ -552,7 +565,12 @@ class NavBar {
 		let users = [];
 		let isValid = false;
 		let userCounter = 0;
-		fetch("http://justin.navigation.test/users")
+		this.settings = {
+			user: this.$userInput.value,
+			navStyle: this.navStyle,
+			items: this.items
+		}
+		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
 		.then(data => {
 			users = data;
@@ -584,8 +602,113 @@ class NavBar {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
+		})				
+	}	
+
+	// Adds a user to the files on the webserver
+	addUser(event) {		
+		event.preventDefault();
+		console.log("addUser firing");
+		let users = [];
+		let isInvalid = false;
+		let userCounter = 0;
+		this.settings = {
+			user: this.$addUserInput.value,
+			navStyle: 'none',
+			items: [new NavItem("Move to end", "#")]
+		}
+		fetch('http://justin.navigation.test/users')
+		.then(response => response.json())
+		.then(data => {
+			users = data;
+			console.log(users);
+			//Check to make sure user in $addUserInput is not invalid
+			while(isInvalid == false && userCounter < users.length)
+			{
+				if (users[userCounter].user == this.$addUserInput.value)
+				{
+					isInvalid = true;
+					console.log("User already exists");
+				}
+				userCounter++;
+			}
+			if (this.$addUserInput.value == "")
+			{
+				isInvalid = true;
+				console.log("User is blank");
+			}
+
+			if (!isInvalid)
+			{
+				fetch('http://justin.navigation.test/adduser' , {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(this.settings),
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Success', data);
+				})
+				.catch(error => {
+					console.error('Error', error);
+				});
+			}
 		})
-				
+		.catch(error => {
+			console.log("Could not get user data.");
+		})		
+	}
+
+	// Deletes user from files on the webserver
+	deleteUser(event) {
+		event.preventDefault();
+		console.log("deleteUser firing");
+		let users = [];
+		let isValid = false;
+		let userCounter = 0;
+		this.settings = {
+			user: this.$addUserInput.value,
+			navStyle: 'none',
+			items: []
+		}
+		fetch('http://justin.navigation.test/users')
+		.then(response => response.json())
+		.then(data => {
+			users = data;
+			console.log(users);
+			//Check to make sure valid user is entered in $addUserInput
+			while(isValid == false && userCounter < users.length && this.$addUserInput.value != "")
+			{
+				if (users[userCounter].user == this.$addUserInput.value)
+				{
+					isValid = true;
+				}
+				userCounter++;
+			}
+
+			if (isValid)
+			{
+				fetch('http://justin.navigation.test/deleteuser' , {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(this.settings),
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Success', data);
+				})
+				.catch(error => {
+					console.error('Error', error);
+				});
+			}
+		})
+		.catch(error => {
+			console.log("Could not get user data.");
+		})				
 	}
 	
 }
