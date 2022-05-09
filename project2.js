@@ -64,7 +64,8 @@ class NavBar {
     this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
-			items: this.items
+			items: this.items,
+			lastId: this.lastId
 		}
 
 		let disabled = [
@@ -542,7 +543,8 @@ class NavBar {
 			if (data) {
 				this.items = data.items;
 				this.$navStyle.value = data.navStyle;
-				this.navStyle = data.navStyle;				
+				this.navStyle = data.navStyle;	
+				this.lastId = data.lastId;			
 			}
 			else {
 				this.items = [];
@@ -568,7 +570,8 @@ class NavBar {
 		this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
-			items: this.items
+			items: this.items,
+			lastId: this.lastId
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
@@ -615,7 +618,8 @@ class NavBar {
 		this.settings = {
 			user: this.$addUserInput.value,
 			navStyle: 'none',
-			items: [new NavItem(0, 1,"Move to end", "#")]
+			items: [new NavItem(0, 1,"Move to end", "#")],
+			lastId: 0
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
@@ -669,9 +673,7 @@ class NavBar {
 		let isValid = false;
 		let userCounter = 0;
 		this.settings = {
-			user: this.$addUserInput.value,
-			navStyle: 'none',
-			items: []
+			user: this.$addUserInput.value
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
