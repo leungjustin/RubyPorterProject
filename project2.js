@@ -1,9 +1,11 @@
 class NavItem {
-	constructor(name, link, isDisabled = false) {
-		this.name = name,
-		this.link = link,
-		this.isActive = false, //Currently not in use. May be implemented when using data storage method.
-		this.isDisabled = isDisabled, //Determines whether the item can be clicked on.
+	constructor(id, layer, name, link, isDisabled = false) {
+		this.id = id;
+		this.layer = layer;
+		this.name = name;
+		this.link = link;
+		this.isActive = false; //Currently not in use. May be implemented when using data storage method.
+		this.isDisabled = isDisabled; //Determines whether the item can be clicked on.
 		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
 }
@@ -11,19 +13,26 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem("Item1", "#item1"),
-			new NavItem("Item2", "#item2"),
-			new NavItem("Item3", "#item3"),
-			new NavItem("Item4", "#item4"),
-			new NavItem("Move to end", "#")
+			new NavItem(0, 1, "Item1", "#item1"),
+			new NavItem(1, 1, "Item2", "#item2"),
+			new NavItem(2, 1, "Item3", "#item3"),
+			new NavItem(3, 1, "Item4", "#item4"),
+			new NavItem(4, 1, "Move to end", "#")
 		]; //A list of objects of the NavItem class.
-		this.items[0].subnavItems.push(new NavItem("Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem("Subitem1", "#subitem1"));
-		this.items[1].subnavItems.push(new NavItem("Subitem2", "#subitem2"));
-		this.items[1].subnavItems.push(new NavItem("Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem("Subitem3", "#subitem3"));
-		this.items[2].subnavItems.push(new NavItem("Move to end", "#"));
-		this.items[3].subnavItems.push(new NavItem("Move to end", "#"));
+		this.items[0].subnavItems.push(new NavItem(5, 2, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(6, 2, "Subitem1", "#subitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, 3, "Subsubitem1", "#subsubitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(8, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(9, 2, "Subitem2", "#subitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(10, 3, "Subsubitem2", "#subsubitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(12, 2, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(13, 2, "Subitem3", "#subitem3"));
+		this.items[2].subnavItems[0].subnavItems.push(new NavItem(14, 3, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(15, 2, "Move to end", "#"));
+		this.items[3].subnavItems.push(new NavItem(16, 2, "Move to end", "#"));
+
+		this.lastId = 16;
 
 		this.navStyle = "none";			
 		this.logo = "RubyPorterProject/logoideas.jpg";
@@ -42,17 +51,17 @@ class NavBar {
 		this.$addSubName = document.getElementById("addSubName");
 		this.$addSubLink = document.getElementById("addSubLink");
 		this.$addSubButton = document.getElementById("addSubButton");
-		this.$navbar = document.getElementById('navbar');
-		this.$cssId = document.getElementById('cssId');
-		this.$navStyle = document.getElementById('navStyle');
-		this.$userForm = document.getElementById('userForm');
-		this.$userInput = document.getElementById('userInput');		
-		this.$editSettings = document.getElementById('editSettings');
-		this.$addUserForm = document.getElementById('addUserForm');
-		this.$addUserInput = document.getElementById('addUserInput');
-		this.$deleteUserButton = document.getElementById('deleteUserButton');
+		this.$navbar = document.getElementById("navbar");
+		this.$cssId = document.getElementById("cssId");
+		this.$navStyle = document.getElementById("navStyle");
+		this.$userForm = document.getElementById("userForm");
+		this.$userInput = document.getElementById("userInput");		
+		this.$editSettings = document.getElementById("editSettings");
+		this.$addUserForm = document.getElementById("addUserForm");
+		this.$addUserInput = document.getElementById("addUserInput");
+		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
-        this.settings = {
+    this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
 			items: this.items
@@ -73,8 +82,8 @@ class NavBar {
 		];
 		disabled.forEach(element => element.disabled = true);
 
-		this.$addForm.onsubmit = this.addNavItem.bind(this);		
-		this.$navStyle.onchange = this.changeNavStyle.bind(this);			
+		this.$addForm.onsubmit = this.addNavItem.bind(this, false, null);
+		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
@@ -83,20 +92,17 @@ class NavBar {
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
-		if (this.$navStyle.value == 'horizontal')
-		{
-			this.navStyle = 'horizontal';
-			this.$navbar.className = 'navbar horizontal';			
+		if (this.$navStyle.value == "horizontal") {
+			this.navStyle = "horizontal";
+			this.$navbar.className = "navbar horizontal";
 		}
-		else if (this.$navStyle.value == 'vertical')
-		{
-			this.navStyle = 'vertical';
-			this.$navbar.className = 'navbar vertical';
+		else if (this.$navStyle.value == "vertical") {
+			this.navStyle = "vertical";
+			this.$navbar.className = "navbar vertical";
 		}
-		else 
-		{
-			this.navStyle = 'none';
-			this.$navbar.className = 'navbar';
+		else {
+			this.navStyle = "none";
+			this.$navbar.className = "navbar";
 		}
 		this.enableAll();
 		this.load();
@@ -105,65 +111,59 @@ class NavBar {
 	//Renders the navbar, sets the active item if there is one, and disables all edit forms.
 	load() {		
 		this.fillItems();		
-		this.changeActive(window.location.hash);
-		this.addEventListeners(this.items);
+		this.changeActive(this.items, window.location.hash);
+		this.addEventListeners();
 		this.disableAll();
-		if (this.navStyle == 'none')
-		{
+		if (this.navStyle == "none") {
 			this.$navbar.innerHTML = "";
 			let disabled = [this.$name, this.$link, this.$addButton];
 			disabled.forEach(element => element.disabled = true);
-
 		}
 		this.resetForms();
 	}
 
 	//Same as load, expect without rendering the navbar or adding event listeners.
 	reload(hash = window.location.hash) {
-		this.changeActive(hash);		
+		this.changeActive(this.items, hash);		
 		this.disableAll();
 		this.resetForms();
 	}
 
 	//Changes which navbar link is active, changing its appearance.
-	changeActive(hash) {
-		//Removes active from all nav links, then makes the link with the matching hash active.
-		this.items.forEach(item => {
+	changeActive(objectArray, hash, layer = 1) {
+		objectArray.forEach(item => {
 			item.isActive = false;
-			document.getElementById("item"+item.name).classList.remove("active");
+			let itemHTML = document.querySelector(`a[data-id="${item.id}"]`);
+			itemHTML.classList.remove("active");
 			if (item.link == hash) {
 				item.isActive = true;
-				document.getElementById("item"+item.name).classList.add("active");
-			}
-			//Removes active from all subnav links as well, then makes the link with the matching hash and its parent item active.
-			item.subnavItems.forEach(subitem => {
-				subitem.isActive = false;
-				document.getElementById("subitem"+subitem.name+","+item.name).classList.remove("active");
-				if (subitem.link == hash) {
-					item.isActive = true;
-					subitem.isActive = true;
-					document.getElementById("item"+item.name).classList.add("active");
-					document.getElementById("subitem"+subitem.name+","+item.name).classList.add("active");
+				itemHTML.classList.add("active");
+				if (layer > 1) {
+					let parent = itemHTML;
+					for (let i = 1; i < layer; i++) {
+						parent = parent.parentElement.parentElement.parentElement.childNodes[1];
+						parent.classList.add("active");
+					}
 				}
-			});
+			}
+			if (item.subnavItems.length > 1) {
+				this.changeActive(item.subnavItems, hash, layer + 1);
+			}
 		});
 	}
 
 	//Fills the navbar with existing items and subitems.
 	fillItems() {
-		if (this.$navbar.classList.contains('vertical'))
-		{
-			this.$cssId.href = 'RubyPorterProject/project1.css';
+		if (this.$navbar.classList.contains("vertical")) {
+			this.$cssId.href = "RubyPorterProject/project1.css";
 		}
-		else if (this.$navbar.classList.contains('horizontal'))
-		{
-			this.$cssId.href = 'RubyPorterProject/Horizontal Navbar/navbarstyles.css';
+		else if (this.$navbar.classList.contains("horizontal")) {
+			this.$cssId.href = "RubyPorterProject/Horizontal Navbar/navbarstyles.css";
 		}
-		else
-		{
+		else {
 			this.$cssId.href = "";
 		}
-		let itemsHTML = this.items.map((item) => this.renderNavItem(item)).join('');
+		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
 			${itemsHTML}
@@ -173,14 +173,14 @@ class NavBar {
 	//Creates a navbar item and any of its subitems, if it has any, to be placed in the navbar.
 	renderNavItem(item) {
 		let navString = `
-			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav${item.name}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item${item.name}">${item.name}</a>
-				<button id="edit${item.name}">E</button>
-				<div class="subnav-content" id="subnavContent${item.name}">
+			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav" data-id="${item.id}">
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item" data-id="${item.id}">${item.name}</a>
+				<button id="edit" data-id="${item.id}">E</button>
+				<div class="subnav-content">
 		`;
 		//Each call to renderSubnavItem adds a new subitem to the navbar string.
 		for (let i = 0; i < item.subnavItems.length; i++) {
-			navString += this.renderSubnavItem(item, i);
+			navString += this.renderNavItem(item.subnavItems[i]);
 		}
 		navString += `
 				</div>
@@ -189,122 +189,90 @@ class NavBar {
 		return navString;
 	}
 
-	//Creates a subnav item to be placed within an item for the horizontal navigation bar.
-	renderSubnavItem(item, i) {
-		return `
-			<div ${item.subnavItems[i].name == "Move to end" ? "style='display: none;'" : ""} id="subnavContent${item.subnavItems[i].name},${item.name}">
-				<a href="${item.subnavItems[i].link}" ${item.subnavItems[i].isActive ? 'class="active"' : ''} draggable="true" id="subitem${item.subnavItems[i].name},${item.name}">${item.subnavItems[i].name}</a>
-				<button id="subedit${item.subnavItems[i].name},${item.name}">E</button>
-			</div>
-		`;
-	}
-
-
 	//Adds click and submit events for navbar items and buttons.
-	addEventListeners(objectArray, parentIndex = -1) {		
-		
-		//Adds events to each navbar item.
-		for (let i = 0; i < this.items.length; i++) {
-			//Adds events to each item's subitems, if it has any.			
-			for (let j = 0; j < this.items[i].subnavItems.length; j++) {
-				let subitem = document.getElementById("subitem"+this.items[i].subnavItems[j].name+","+this.items[i].name);
-				subitem.onclick = this.reload.bind(this, this.items[i].subnavItems[j].link);
-				document.getElementById("subedit"+this.items[i].subnavItems[j].name+","+this.items[i].name).onclick = this.editSubnavItem.bind(this, j, i);
-				subitem.ondragstart = this.dragStart.bind(this);
-				subitem.ondragenter = this.dragEnter;
-				subitem.ondragover = this.dragOver;
-				subitem.ondragleave = this.dragLeave.bind(this);
-				subitem.ondragend = this.dragEnd.bind(this);
-				subitem.ondrop = this.drop.bind(this);
-				subitem.parameters = (j+","+i);
+	addEventListeners() {
+		for (let i = 0; i <= this.lastId; i++) {
+			let item = document.querySelector(`a[data-id="${i}"]`);
+			if (item != null) {
+				item.onclick = this.reload.bind(this, item.hash);
+				document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
+				item.ondragstart = this.dragStart.bind(this);
+				item.ondragenter = this.dragEnter.bind(this);
+				item.ondragover = this.dragOver.bind(this);
+				item.ondragleave = this.dragLeave.bind(this);
+				item.ondragend = this.dragEnd.bind(this);
+				item.ondrop = this.drop.bind(this);
+				item.parameters = i.toString();
 			}
-			let item = document.getElementById("item"+this.items[i].name);
-			item.onclick = this.reload.bind(this, this.items[i].link);
-			document.getElementById("edit"+this.items[i].name).onclick = this.editNavItem.bind(this, i);
-			item.ondragstart = this.dragStart.bind(this);
-			item.ondragenter = this.dragEnter;
-			item.ondragover = this.dragOver;
-			item.ondragleave = this.dragLeave.bind(this);
-			item.ondragend = this.dragEnd.bind(this);
-			item.ondrop = this.drop.bind(this);
-			item.parameters = i.toString();
 		}
-		
-		/*
-		for (let i = 0; i < objectArray.length; i++) {
-			if (objectArray[i].subnavItems.length > 1) {
-				this.addEventListeners(objectArray[i].subnavItems, i);
-			}
-			let item;
-			if (parentIndex == -1) {
-				item = document.getElementById("item"+objectArray[i].name);
-				document.getElementById("edit"+objectArray[i].name).onclick = this.editNavItem.bind(this, i);
-			}
-			else {
-				item = document.getElementById("subitem"+objectArray[i].name+","+this.items[parentIndex].name);
-				document.getElementById("subedit"+objectArray[i].name+","+this.items[parentIndex].name).onclick = this.editSubnavItem.bind(this, i, parentIndex);
-			}
-			item.onclick = this.reload.bind(this, objectArray[i].link);
-			item.ondragstart = this.dragStart.bind(this);
-			item.ondragenter = this.dragEnter.bind(this);
-			item.ondragover = this.dragOver.bind(this);
-			item.ondragleave = this.dragLeave.bind(this);
-			item.ondragend = this.dragEnd.bind(this);
-			item.ondrop = this.drop.bind(this);
-			item.parameters = (i+`${parentIndex == -1 ? "" : ","+parentIndex}`);
-		}
-		*/
 	}
 
 	//Disables all fields and buttons in all forms.
 	disableAll() {
 		this.$enableDisableButton.innerHTML = "Enable/Disable Link";
-		let disabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let disabled = [
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton,
+			this.$enableDisableButton,
+			this.$addSubName,
+			this.$addSubLink,
+			this.$addSubButton
+		];
 		disabled.forEach(element => element.disabled = true);
 	}
 
 	//Enables all fields and buttons in all forms.
 	enableAll() {
-		let enabled = [this.$name, this.$link, this.$addButton, this.$editName, this.$editLink, this.$editButton, this.$deleteButton, this.$enableDisableButton, this.$addSubName, this.$addSubLink, this.$addSubButton];
+		let enabled = [
+			this.$name,
+			this.$link,
+			this.$addButton,
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton,
+			this.$enableDisableButton,
+			this.$addSubName,
+			this.$addSubLink,
+			this.$addSubButton
+		];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Enables all fields and buttons needed to edit a navbar subitem.
 	enableSub() {
-		let enabled = [this.$editName, this.$editLink, this.$editButton, this.$deleteButton];
+		let enabled = [
+			this.$editName,
+			this.$editLink,
+			this.$editButton,
+			this.$deleteButton
+		];
 		enabled.forEach(element => element.disabled = false);
 	}
 
 	//Sets all fields in all forms to blank.
 	resetForms() {
-		let forms = [this.$addForm, this.$editForm, this.$addSubForm];
+		let forms = [
+			this.$addForm,
+			this.$editForm,
+			this.$addSubForm
+		];
 		forms.forEach(element => element.reset());
-	}
-	
-	//Creates a new navbar item based on user input and then adds it to the item list.
-	addNavItem(event) {
-		event.preventDefault();
-
-		let item = new NavItem(this.$name.value, this.$link.value);
-		let moveToEnd = this.items.pop();
-		item.subnavItems.push(moveToEnd);
-		this.items.push(item);
-		this.items.push(moveToEnd);
-
-		//Renders the new item and adds it to the navbar.
-		this.load();
 	}
 
 	//Enables all fields and buttons and then allows to user to edit, delete, or add to an existing item.
 	editNavItem(index) {
 		this.disableAll();
 		this.enableAll();
-		//Sets the text fields to what the item's name and link are currently.
-		this.$editName.value = this.items[index].name;
-		this.$editLink.value = this.items[index].link;
 
-		//Changes the text of the enable/disable button depending on whether the current item is disabled.
-		if (this.items[index].isDisabled) {
+		let matchingItem = this.findMatchingItem(this.items, index);
+
+		this.$editName.value = matchingItem.name;
+		this.$editLink.value = matchingItem.link;
+
+		if (matchingItem.isDisabled) {
 			this.$enableDisableButton.innerHTML = "Enable Link";
 		}
 		else {
@@ -312,143 +280,177 @@ class NavBar {
 		}
 
 		//Adds events to the buttons on each form.
-		this.$editForm.onsubmit = this.submitEdit.bind(this, index);
+		this.$editForm.onsubmit = this.submitEdit.bind(this, matchingItem, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addSubnavItem.bind(this, index);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
+	}
+
+	findMatchingItem(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].id == index) {
+				return objectArray[i];
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				let matchingItem = this.findMatchingItem(objectArray[i].subnavItems, index);
+				if (matchingItem != undefined) {
+					return matchingItem;
+				}
+			}
+		}
+	}
+	
+	//Creates a new navbar item based on user input and then adds it to the item list.
+	addNavItem(isSub, parentItem, event) {
+		event.preventDefault();
+
+		if (isSub == true) {
+			let item = new NavItem(this.lastId+1, this.$addSubName.value, this.$addSubLink.value);
+			let moveToEnd = parentItem.subnavItems.pop();
+			item.subnavItems.push(new NavItem(this.lastId+2, "Move to end", "#"));
+			parentItem.subnavItems.push(item);
+			parentItem.subnavItems.push(moveToEnd);
+
+			this.lastId = this.lastId + 2;
+		}
+		else {
+			let item = new NavItem(this.lastId+1, this.$name.value, this.$link.value);
+			let moveToEnd = this.items.pop();
+			item.subnavItems.push(new NavItem(this.lastId+2, "Move to end", "#"));
+			this.items.push(item);
+			this.items.push(moveToEnd);
+
+			this.lastId = this.lastId + 2;
+		}
+		this.load();
 	}
 
 	//Changes the name and/or link of an existing navbar item.
+	/*
 	submitEdit(index, event) {
 		event.preventDefault();
 
-		let editHTML = document.getElementById("item"+this.items[index].name);
-		
-		//Change the current item's name and/or link.
-		this.items[index].name = this.$editName.value;
-		this.items[index].link = this.$editLink.value;
-
-		//Set the properties of the edited item's corresponding html element to match.
-		editHTML.href = this.items[index].link;
-		editHTML.id = "item"+this.items[index].name;
-		editHTML.innerHTML = this.items[index].name;
-		//Binds new event listener for the edited item.
-		editHTML.onclick = this.reload.bind(this, this.items[index].link);
-
-		//If the edited item is the currently active item, updates the hash so it matches the update.
-		if (editHTML.classList.contains("active")) {
-			window.location.hash = this.items[index].link;
+		let editHTML =  document.querySelector(`a[data-id="${index}"]`);
+		editHTML.innerHTML = this.$editName.value;
+		editHTML.href = this.$editLink.value;
+		editHTML.onclick = this.reload.bind(this, editHTML.href);
+		if(editHTML.classList.contains("active")) {
+			window.location.hash = editHTML.href;
 		}
+
+		let editedNav = this.createEditedNav(this.items, index);
+		this.items = editedNav;
+
+		this.reload();
+	}
+	*/
+
+	submitEdit(item, index, event) {
+		event.preventDefault();
+
+		let editHTML = document.querySelector(`a[data-id="${index}"]`);
+		editHTML.innerHTML = this.$editName.value;
+		editHTML.href = this.$editLink.value;
+		editHTML.onclick = this.reload.bind(this, editHTML.href);
+		if(editHTML.classList.contains("active")) {
+			window.location.hash = editHTML.href;
+		}
+
+		item.name = this.$editName.value;
+		item.link = this.$editLink.value;
+
 		this.reload();
 	}
 
+	/*
+	createEditedNav(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].id == index) {
+				objectArray[i].name = this.$editName.value;
+				objectArray[i].link = this.$editLink.value;
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				objectArray[i].subnavItems = this.createEditedNav(objectArray[i].subnavItems, index);
+			}
+		}
+		return objectArray;
+	}
+	*/
+
 	//Removes an existing navbar item from the list.
 	deleteNavItem(index) {
-		if (document.getElementById("item"+this.items[index].name).classList.contains("active")) {
+		if (document.querySelector(`a[data-id="${index}"]`).classList.contains("active")) {
 			window.location.hash = "";
 		}
-		this.items.splice(index, 1);
+
+		let isDeleted = this.deleteFromParent(this.items, index);
+		if (isDeleted == false) {
+			this.items.splice(index, 1);
+		}
 		this.load();
+	}
+
+	deleteFromParent(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
+				if (objectArray[i].subnavItems[j].id == index) {
+					objectArray[i].subnavItems.splice(j, 1);
+					return true;
+				}
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				let isDeleted = this.deleteFromParent(objectArray[i].subnavItems, index)
+				if (isDeleted == true) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	//Changes whether a navbar item is clickable or not.
 	enableOrDisableLink(index) {
-		if (this.items[index].isDisabled) {
-			this.items[index].isDisabled = false;
-			document.getElementById("item"+this.items[index].name).classList.remove("isDisabled");
+		let matchingItem = this.findMatchingItem(this.items, index)
+
+		if (matchingItem.isDisabled) {
+			matchingItem.isDisabled = false;
+			document.querySelector(`a[data-id="${index}"]`).classList.remove("isDisabled");
 		}
 		else {
-			this.items[index].isDisabled = true;
-			document.getElementById("item"+this.items[index].name).classList.add("isDisabled");
+			matchingItem.isDisabled = true;
+			document.querySelector(`a[data-id="${index}"]`).classList.add("isDisabled");
 		}
+
 		this.reload();
 	}
 
-	//Creates a new navbar subitem based on user input and then adds it to an existing item's subitem list.
-	addSubnavItem(index, event) {
-		event.preventDefault();
-
-		let subItem = new NavItem(this.$addSubName.value, this.$addSubLink.value)
-		let moveToEnd = this.items[index].subnavItems.pop();
-		this.items[index].subnavItems.push(subItem);
-		this.items[index].subnavItems.push(moveToEnd);
-
-		//Renders the new subitem and adds it to the navbar.
-		this.load();
-	}
-
-	//Enables certain fields and buttons and then allows to user to edit, delete, or add to an existing subitem.
-	editSubnavItem(index, parentindex) {
-		this.disableAll();
-		this.enableSub();
-		//Sets the text fields to what the subitem's name and link are currently.
-		this.$editName.value = this.items[parentindex].subnavItems[index].name;
-		this.$editLink.value = this.items[parentindex].subnavItems[index].link;
-		
-		//Adds events to the buttons on the edit form.
-		this.$editForm.onsubmit = this.submitSubEdit.bind(this, index, parentindex);
-		this.$deleteButton.onclick = this.deleteSubnavItem.bind(this, index, parentindex);
-	}
-
-	//Changes the name and/or link of an existing navbar subitem.
-	submitSubEdit(index, parentindex, event) {
-		event.preventDefault();
-
-		let editHTML = document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name);
-
-		//Change the current subitem's name and/or link.
-		this.items[parentindex].subnavItems[index].name = this.$editName.value;
-		this.items[parentindex].subnavItems[index].link = this.$editLink.value;
-
-		//Set the properties of the edited subitem's corresponding html element to match.
-		editHTML.href = this.items[parentindex].subnavItems[index].link;
-		editHTML.id = "subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name;
-		editHTML.innerHTML = this.items[parentindex].subnavItems[index].name;
-		//Binds new event listener for the edited subitem.
-		editHTML.onclick = this.reload.bind(this, this.items[parentindex].subnavItems[index].link);
-
-		//If the edited subitem is the currently active subitem, updates the hash so it match the update.
-		if (editHTML.classList.contains("active")) {
-			window.location.hash = this.items[parentindex].subnavItems[index].link;
+	findParent(objectArray, index) {
+		for (let i = 0; i < objectArray.length; i++) {
+			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
+				if (objectArray[i].subnavItems[j].id == index) {
+					return objectArray[i];
+				}
+			}
+			if (objectArray[i].subnavItems.length > 1) {
+				let parentItem = this.findParent(objectArray[i].subnavItems, index)
+				if (parentItem != undefined) {
+					return parentItem;
+				}
+			}
 		}
-		this.reload();
-	}
-
-	//Removes an existing navbar subitem from a item's list.
-	deleteSubnavItem(index, parentindex) {
-		//If the subitem being deleted is currently active, removes the hash from the URL.
-		if (document.getElementById("subitem"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).classList.contains("active")) {
-			window.location.hash = "";
-		}
-
-		//Removes the subitem's corresponding html from the navbar.
-		document.getElementById("subnavContent"+this.items[parentindex].subnavItems[index].name+","+this.items[parentindex].name).remove();
-
-		this.items[parentindex].subnavItems.splice(index, 1);
-
-		this.reload();
 	}
 
 	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
-		let dragIndex = event.target.parameters;
-		let dragArray = dragIndex.split(",");
+		let item = this.findMatchingItem(this.items, event.target.parameters);
+		let parentItem = this.findParent(this.items, event.target.parameters);
+
 		//This is called to work around a rendering bug in Chrome and Edge.
 		setTimeout(() => {
 			//If the drag item is a subitem, displays the moveToEnd item in the top level array.
-			if (dragArray.length != 1) {
-				document.getElementById("subnavMove to end").style.display = "block";
-			}
-			let subnavArray = document.getElementsByClassName("subnav-content");
-			//For each nav item...
-			for (let i = 0; i < subnavArray.length; i++) {
-				subnavArray[i].style.display = "block"; //Displays its subitems, and...
-				//If the item is not a moveToEnd item, display the item's moveToEnd subitem.
-				//Do not display the moveToEnd subitem if it is the item's own moveToEnd subitem, or if it is part of the same set of subitems.
-				if (this.items[i].name != "Move to end" && ((dragArray.length == 1 && i != dragArray[0]) || (dragArray.length != 1 && i != dragArray[1]))) {
-					document.getElementById("subnavContentMove to end,"+this.items[i].name).style.display = "block";
-				}
+			if (parentItem != undefined) {
+				document.querySelector(`div[data-id="${this.items[this.items.length-1].id}"]`).style.display = "block";
 			}
 		}, 0);
 	}
@@ -456,6 +458,15 @@ class NavBar {
 	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
+		let test1 = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
+		let elements = document.getElementsByClassName("subnav-content");
+		for (let i = 0; i < elements.length; i++) {
+			if (elements[i] != test1.parentElement.parentElement.parentElement) {
+				elements[i].style.display = "none";
+			}
+		}
+		test1.parentElement.style.display = "block";
+		test1.lastElementChild.style.display = "block";
 	}
 
 	//This must be called to allow an item to trigger the drop method when dropping onto an item.
@@ -541,7 +552,6 @@ class NavBar {
 			}
 			this.changeNavStyle();
 			console.log(data);
-
 		})
 		.catch(error => {
 			console.log("There was a problem getting user settings.");
@@ -566,30 +576,27 @@ class NavBar {
 			users = data;
 			console.log(users);
 			//Check to make sure valid user is entered in $userInput
-			while(isValid == false && userCounter < users.length)
-			{
-				if (users[userCounter].user == this.$userInput.value)
-				{
+			while(isValid == false && userCounter < users.length) {
+				if (users[userCounter].user == this.$userInput.value) {
 					isValid = true;
 				}
 				userCounter++;
 			}
 
-			if (isValid)
-			{
-				fetch('http://justin.navigation.test/edit' , {
-					method: 'POST',
+			if (isValid) {
+				fetch("http://justin.navigation.test/edit" , {
+					method: "POST",
 					headers: {
-						'Content-Type': 'application/json',
+						"Content-Type": "application/json",
 					},
 					body: JSON.stringify(this.settings),
 				})
 				.then(response => response.json())
 				.then(data => {
-					console.log('Success', data);
+					console.log("Success", data);
 				})
 				.catch(error => {
-					console.error('Error', error);
+					console.error("Error", error);
 				});
 			}
 		})
