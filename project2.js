@@ -420,27 +420,11 @@ class NavBar {
 		this.reload();
 	}
 
-	findParent(objectArray, index) {
-		for (let i = 0; i < objectArray.length; i++) {
-			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
-				if (objectArray[i].subnavItems[j].id == index) {
-					return objectArray[i];
-				}
-			}
-			if (objectArray[i].subnavItems.length > 1) {
-				let parentItem = this.findParent(objectArray[i].subnavItems, index)
-				if (parentItem != undefined) {
-					return parentItem;
-				}
-			}
-		}
-	}
-
 	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let item = this.findMatchingItem(this.items, event.target.parameters);
-		let parentItem = this.findParent(this.items, event.target.parameters);
+		let parentItem = this.findMatchingItem(this.items, item.parentId);
 
 		//This is called to work around a rendering bug in Chrome and Edge.
 		setTimeout(() => {
@@ -454,15 +438,23 @@ class NavBar {
 	//Add a red dashed box around the item being dragged over.
 	dragEnter(event) {
 		event.target.classList.add("drag-over");
-		let test1 = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
 		let elements = document.getElementsByClassName("subnav-content");
 		for (let i = 0; i < elements.length; i++) {
-			if (elements[i] != test1.parentElement.parentElement.parentElement) {
-				elements[i].style.display = "none";
-			}
+			elements[i].style.display = "none";
 		}
-		test1.parentElement.style.display = "block";
-		test1.lastElementChild.style.display = "block";
+		let itemHTML = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
+		let item = this.findMatchingItem(this.items, event.target.dataset.id);
+		itemHTML.lastElementChild.style.display = "block";
+		let moveToEndChild = itemHTML.lastElementChild.lastElementChild;
+		if (moveToEndChild != null) {
+			moveToEndChild.style.display = "block";
+		}
+		let parentHTML = itemHTML.parentElement;
+		parentHTML.style.display = "block";
+		for (let i = 2; i < item.layer; i++) {
+			parentHTML = parentHTML.parentElement.parentElement;
+			parentHTML.style.display = "block";
+		}
 	}
 
 	//This must be called to allow an item to trigger the drop method when dropping onto an item.
