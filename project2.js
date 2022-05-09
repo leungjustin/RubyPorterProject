@@ -1,6 +1,7 @@
 class NavItem {
-	constructor(id, layer, name, link, isDisabled = false) {
+	constructor(id, parentId, layer, name, link, isDisabled = false) {
 		this.id = id;
+		this.parentId = parentId;
 		this.layer = layer;
 		this.name = name;
 		this.link = link;
@@ -13,29 +14,29 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem(0, 1, "Item1", "#item1"),
-			new NavItem(1, 1, "Item2", "#item2"),
-			new NavItem(2, 1, "Item3", "#item3"),
-			new NavItem(3, 1, "Item4", "#item4"),
-			new NavItem(4, 1, "Move to end", "#")
+			new NavItem(0, -1, 1, "Item1", "#item1"),
+			new NavItem(1, -1, 1, "Item2", "#item2"),
+			new NavItem(2, -1, 1, "Item3", "#item3"),
+			new NavItem(3, -1, 1, "Item4", "#item4"),
+			new NavItem(4, -1, 1, "Move to end", "#")
 		]; //A list of objects of the NavItem class.
-		this.items[0].subnavItems.push(new NavItem(5, 2, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(6, 2, "Subitem1", "#subitem1"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, 3, "Subsubitem1", "#subsubitem1"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(8, 3, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(9, 2, "Subitem2", "#subitem2"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(10, 3, "Subsubitem2", "#subsubitem2"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, 3, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(12, 2, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(13, 2, "Subitem3", "#subitem3"));
-		this.items[2].subnavItems[0].subnavItems.push(new NavItem(14, 3, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(15, 2, "Move to end", "#"));
-		this.items[3].subnavItems.push(new NavItem(16, 2, "Move to end", "#"));
+		this.items[0].subnavItems.push(new NavItem(5, 0, 2, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(6, 1, 2, "Subitem1", "#subitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, 6, 3, "Subsubitem1", "#subsubitem1"));
+		this.items[1].subnavItems[0].subnavItems.push(new NavItem(8, 6, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(9, 1, 2, "Subitem2", "#subitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(10, 9, 3, "Subsubitem2", "#subsubitem2"));
+		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, 9, 3, "Move to end", "#"));
+		this.items[1].subnavItems.push(new NavItem(12, 1, 2, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(13, 2, 2, "Subitem3", "#subitem3"));
+		this.items[2].subnavItems[0].subnavItems.push(new NavItem(14, 13, 3, "Move to end", "#"));
+		this.items[2].subnavItems.push(new NavItem(15, 2, 2, "Move to end", "#"));
+		this.items[3].subnavItems.push(new NavItem(16, 3, 2, "Move to end", "#"));
 
 		this.lastId = 16;
 
 		this.navStyle = "none";			
-		this.logo = "RubyPorterProject/logoideas.jpg";
+		this.logo = "logoideas.jpg";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -61,25 +62,18 @@ class NavBar {
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
-    this.settings = {
+    	this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
 			items: this.items,
 			lastId: this.lastId
 		}
 
+		this.disableAll();
 		let disabled = [
-			this.$name, 
-			this.$link, 
-			this.$addButton, 
-			this.$editName, 
-			this.$editLink, 
-			this.$editButton, 
-			this.$deleteButton, 
-			this.$enableDisableButton, 
-			this.$addSubName, 
-			this.$addSubLink, 
-			this.$addSubButton
+			this.$name,
+			this.$link,
+			this.$addButton
 		];
 		disabled.forEach(element => element.disabled = true);
 
@@ -131,7 +125,7 @@ class NavBar {
 	}
 
 	//Changes which navbar link is active, changing its appearance.
-	changeActive(objectArray, hash, layer = 1) {
+	changeActive(objectArray, hash) {
 		objectArray.forEach(item => {
 			item.isActive = false;
 			let itemHTML = document.querySelector(`a[data-id="${item.id}"]`);
@@ -139,16 +133,16 @@ class NavBar {
 			if (item.link == hash) {
 				item.isActive = true;
 				itemHTML.classList.add("active");
-				if (layer > 1) {
+				if (item.parentId != -1) {
 					let parent = itemHTML;
-					for (let i = 1; i < layer; i++) {
+					for (let i = 1; i < item.layer; i++) {
 						parent = parent.parentElement.parentElement.parentElement.childNodes[1];
 						parent.classList.add("active");
 					}
 				}
 			}
 			if (item.subnavItems.length > 1) {
-				this.changeActive(item.subnavItems, hash, layer + 1);
+				this.changeActive(item.subnavItems, hash);
 			}
 		});
 	}
@@ -156,10 +150,10 @@ class NavBar {
 	//Fills the navbar with existing items and subitems.
 	fillItems() {
 		if (this.$navbar.classList.contains("vertical")) {
-			this.$cssId.href = "RubyPorterProject/project1.css";
+			this.$cssId.href = "project1.css";
 		}
 		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "RubyPorterProject/Horizontal Navbar/navbarstyles.css";
+			this.$cssId.href = "Horizontal Navbar/navbarstyles.css";
 		}
 		else {
 			this.$cssId.href = "";
@@ -242,17 +236,6 @@ class NavBar {
 		enabled.forEach(element => element.disabled = false);
 	}
 
-	//Enables all fields and buttons needed to edit a navbar subitem.
-	enableSub() {
-		let enabled = [
-			this.$editName,
-			this.$editLink,
-			this.$editButton,
-			this.$deleteButton
-		];
-		enabled.forEach(element => element.disabled = false);
-	}
-
 	//Sets all fields in all forms to blank.
 	resetForms() {
 		let forms = [
@@ -269,6 +252,14 @@ class NavBar {
 		this.enableAll();
 
 		let matchingItem = this.findMatchingItem(this.items, index);
+		if (matchingItem.layer == 3) {
+			let disabled = [
+				this.$addSubName,
+				this.$addSubLink,
+				this.$addSubButton
+			];
+			disabled.forEach(element => element.disabled = true);
+		}
 
 		this.$editName.value = matchingItem.name;
 		this.$editLink.value = matchingItem.link;
@@ -306,18 +297,22 @@ class NavBar {
 		event.preventDefault();
 
 		if (isSub == true) {
-			let item = new NavItem(this.lastId+1, this.$addSubName.value, this.$addSubLink.value);
+			let item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
+			if (item.layer == 2) {
+				item.subnavItems.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
+				this.lastId = this.lastId + 2;
+			}
+			else {
+				this.lastId = this.lastId + 1;
+			}
 			let moveToEnd = parentItem.subnavItems.pop();
-			item.subnavItems.push(new NavItem(this.lastId+2, "Move to end", "#"));
 			parentItem.subnavItems.push(item);
 			parentItem.subnavItems.push(moveToEnd);
-
-			this.lastId = this.lastId + 2;
 		}
 		else {
-			let item = new NavItem(this.lastId+1, this.$name.value, this.$link.value);
+			let item = new NavItem(this.lastId+1, -1, 1, this.$name.value, this.$link.value);
+			item.subnavItems.push(new NavItem(item.id+1, item.id, 2, "Move to end", "#"));
 			let moveToEnd = this.items.pop();
-			item.subnavItems.push(new NavItem(this.lastId+2, "Move to end", "#"));
 			this.items.push(item);
 			this.items.push(moveToEnd);
 
