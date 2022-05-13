@@ -1,3 +1,5 @@
+const MAX_LAYER = 3;
+
 class NavItem {
 	constructor(id, parentId, layer, name, link, isDisabled = false) {
 		this.id = id;
@@ -256,7 +258,7 @@ class NavBar {
 		this.enableAll();
 
 		let matchingItem = this.findMatchingItem(this.items, index);
-		if (matchingItem.layer == 3) {
+		if (matchingItem.layer == MAX_LAYER) {
 			let disabled = [
 				this.$addSubName,
 				this.$addSubLink,
@@ -304,12 +306,12 @@ class NavBar {
 
 		if (isSub == true) {
 			let item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
-			if (item.layer == 2) {
+			if (item.layer != MAX_LAYER) {
 				item.subnavItems.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
 				this.lastId = this.lastId + 2;
 			}
 			else {
-				this.lastId = this.lastId + 1;
+				this.lastId++;
 			}
 			let moveToEnd = parentItem.subnavItems.pop();
 			parentItem.subnavItems.push(item);
@@ -507,21 +509,47 @@ class NavBar {
 					console.log("Drop item is a valid drop target.");
 					let dragParent = this.findMatchingItem(this.items, dragItem.parentId);
 					let dropParent = this.findMatchingItem(this.items, dropItem.parentId);
-					let i, j;
-					for (i = 0; i < dragParent.subnavItems.length; i++) {
+					let dragCount;
+					for (let i = 0; i < dragParent.subnavItems.length; i++) {
 						if (dragParent.subnavItems[i].id == dragItem.id) {
 							dragParent.subnavItems.splice(i, 1);
+							dragCount = i;
 						}
 					}
-					for (j = 0; i < dropParent.subnavItems.length; i++) {
-						if (dropParent.subnavItems[i].id == dropItem.id) {
-							if (i > j) {
+					let inserted = false;
+					let j = 0;
+					while (inserted == false && j < dropParent.subnavItems.length) {
+						if (dropParent.subnavItems[j].id == dropItem.id) {
+							if (dragCount > j || dragItem.parentId != dropItem.parentId) {
 								dropParent.subnavItems.splice(j, 0, dragItem);
+								dragItem.parentId = dropItem.parentId;
+								let oldLayer = dragItem.layer;
+								dragItem.layer = dropItem.layer;
+								if (dragItem.layer == MAX_LAYER && oldLayer != MAX_LAYER) {
+									dragItem.subnavItems.pop();
+								}
+								if (dragItem.layer != MAX_LAYER && oldLayer == MAX_LAYER) {
+									dragItem.subnavItems.push(new NavItem(this.lastId+1, dragItem.id, dragItem.layer+1, "Move to end", "#"));
+									this.lastId++;
+								}
+								inserted = true;
 							}
 							else {
-								dropParent.subnavItems.splice(i, 0, dragItem);
+								dropParent.subnavItems.splice(j+1, 0, dragItem);
+								dragItem.parentId = dropItem.parentId;
+								let oldLayer = dragItem.layer;
+								dragItem.layer = dropItem.layer;
+								if (dragItem.layer == MAX_LAYER && oldLayer != MAX_LAYER) {
+									dragItem.subnavItems.pop();
+								}
+								if (dragItem.layer != MAX_LAYER && oldLayer == MAX_LAYER) {
+									dragItem.subnavItems.push(new NavItem(this.lastId+1, dragItem.id, dragItem.layer+1, "Move to end", "#"));
+									this.lastId++;
+								}
+								inserted = true;
 							}
 						}
+						j++;
 					}
 				}
 				else {
