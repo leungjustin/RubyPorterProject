@@ -171,9 +171,9 @@ class NavBar {
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
 	renderNavItem(item) {
 		let navString = `
-			<div class="subnav" ${item.name == "Move to end" ? "style='display: none;'" : ""} id="subnav" data-id="${item.id}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" id="item" data-id="${item.id}">${item.name}</a>
-				<button id="edit" data-id="${item.id}">E</button>
+			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
+				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
+				<button data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
 		//Each call to renderSubnavItem adds a new subitem to the navbar string.
@@ -327,26 +327,6 @@ class NavBar {
 		this.load();
 	}
 
-	//Changes the name and/or link of an existing navbar item.
-	/*
-	submitEdit(index, event) {
-		event.preventDefault();
-
-		let editHTML =  document.querySelector(`a[data-id="${index}"]`);
-		editHTML.innerHTML = this.$editName.value;
-		editHTML.href = this.$editLink.value;
-		editHTML.onclick = this.reload.bind(this, editHTML.href);
-		if(editHTML.classList.contains("active")) {
-			window.location.hash = editHTML.href;
-		}
-
-		let editedNav = this.createEditedNav(this.items, index);
-		this.items = editedNav;
-
-		this.reload();
-	}
-	*/
-
 	//Edits a navbar html element's properties based on user input. Also changes the matching item object's properties to match.
 	submitEdit(item, index, event) {
 		event.preventDefault();
@@ -364,21 +344,6 @@ class NavBar {
 
 		this.reload();
 	}
-
-	/*
-	createEditedNav(objectArray, index) {
-		for (let i = 0; i < objectArray.length; i++) {
-			if (objectArray[i].id == index) {
-				objectArray[i].name = this.$editName.value;
-				objectArray[i].link = this.$editLink.value;
-			}
-			if (objectArray[i].subnavItems.length > 1) {
-				objectArray[i].subnavItems = this.createEditedNav(objectArray[i].subnavItems, index);
-			}
-		}
-		return objectArray;
-	}
-	*/
 
 	//Removes an existing navbar item from the list.
 	//If the deleteFromParent method does not find an item to delete, then the item is a top level item and is deleted directly from this.items.
@@ -438,8 +403,9 @@ class NavBar {
 		let parentItem = this.findMatchingItem(this.items, item.parentId);
 
 		setTimeout(() => { //This function is called to work around a rendering bug in Chrome and Edge.
-			if (parentItem != undefined) { //If the dragged item is a subitem, displays the moveToEnd item in the top level array.
-				document.querySelector(`div[data-id="${this.items[this.items.length-1].id}"]`).style.display = "block";
+			let moveToEndElements = document.getElementsByClassName("move-to-end");
+			for (let i = 0; i < moveToEndElements.length; i++) {
+				moveToEndElements[i].style.display = "block";
 			}
 		}, 0);
 	}
@@ -456,11 +422,7 @@ class NavBar {
 		}
 		let itemHTML = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
 		let item = this.findMatchingItem(this.items, event.target.dataset.id);
-		let moveToEndChildHtml = itemHTML.lastElementChild.lastElementChild;
-		if (moveToEndChildHtml != null) {
-			itemHTML.lastElementChild.style.display = "block";
-			moveToEndChildHtml.style.display = "block";
-		}
+		itemHTML.lastElementChild.style.display = "block";
 		let parentHTML = itemHTML.parentElement;
 		parentHTML.style.display = "block";
 		for (let i = 2; i < item.layer; i++) {
@@ -536,10 +498,42 @@ class NavBar {
 		let dragItem = this.findMatchingItem(this.items, event.dataTransfer.getData("text/plain"));
 		let dropItem = this.findMatchingItem(this.items, event.target.parameters);
 
-		let isParent = this.checkParent(dragItem, dropItem)
+		let isParent = this.checkParent(dragItem, dropItem);
+		let isMoveToEndSibling = this.checkMoveToEndSibling(dragItem, dropItem);
 
 		if (isParent == false) {
-			console.log("good");
+			if (isMoveToEndSibling == false) {
+				if (dragItem.id != dropItem.id) {
+					console.log("Drop item is a valid drop target.");
+					let dragParent = this.findMatchingItem(this.items, dragItem.parentId);
+					let dropParent = this.findMatchingItem(this.items, dropItem.parentId);
+					let i, j;
+					for (i = 0; i < dragParent.subnavItems.length; i++) {
+						if (dragParent.subnavItems[i].id == dragItem.id) {
+							dragParent.subnavItems.splice(i, 1);
+						}
+					}
+					for (j = 0; i < dropParent.subnavItems.length; i++) {
+						if (dropParent.subnavItems[i].id == dropItem.id) {
+							if (i > j) {
+								dropParent.subnavItems.splice(j, 0, dragItem);
+							}
+							else {
+								dropParent.subnavItems.splice(i, 0, dragItem);
+							}
+						}
+					}
+				}
+				else {
+					console.log("Error: Item cannot be dropped on itself.");
+				}
+			}
+			else {
+				console.log("Error: Drag item is the sibling of the move to end drop item.")
+			}
+		}
+		else {
+			console.log("Error: Item cannot be placed into its own nested items.");
 		}
 		
 		this.load();
@@ -554,6 +548,15 @@ class NavBar {
 			return this.checkParent(parentItem, newChild);
 		}
 		return false;
+	}
+
+	checkMoveToEndSibling(dragItem, dropItem) {
+		if (dropItem.name == "Move to end" && dragItem.parentId == dropItem.parentId) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
