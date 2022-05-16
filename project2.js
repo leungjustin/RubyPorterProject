@@ -399,7 +399,6 @@ class NavBar {
 	//Saves the indices of a dragged nav item and displays all (most) subnav and moveToEnd items.
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
-		let item = this.findMatchingItem(this.items, event.target.parameters);
 
 		setTimeout(() => { //This function is called to work around a rendering bug in Chrome and Edge.
 			let moveToEndElements = document.getElementsByClassName("move-to-end");
