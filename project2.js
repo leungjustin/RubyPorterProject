@@ -83,7 +83,7 @@ class NavBar {
 		];
 		disabled.forEach(element => element.disabled = true);
 
-		this.$addForm.onsubmit = this.addNavItem.bind(this, false, null);
+		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
@@ -287,7 +287,7 @@ class NavBar {
 		this.$editForm.onsubmit = this.submitEdit.bind(this, matchingItem, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
-		this.$addSubForm.onsubmit = this.addNavItem.bind(this, true, matchingItem);
+		this.$addSubForm.onsubmit = this.addNavItem.bind(this, matchingItem);
 	}
 
 	//This method is called from various other methods in order to find the item with an id that matches the data-id of a specific navbar html element.
@@ -306,28 +306,23 @@ class NavBar {
 	}
 	
 	//Creates a new navbar item based on user input and then adds it to the item list.
-	//The new item is given a "Move to end" dummy item for drag and drop purposes, unless the item is in layer 3.
-	addNavItem(isSub, parentItem, event) {
+	//The new item is given a "Move to end" dummy item for drag and drop purposes.
+	addNavItem(parentItem, event) {
 		event.preventDefault();
 
-		if (isSub == true) {
-			let item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
-			item.items.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
-			let moveToEnd = parentItem.items.pop();
-			parentItem.items.push(item);
-			parentItem.items.push(moveToEnd);
-
-			this.lastId += 2;
+		let item;
+		if (parentItem == null) {
+			parentItem = this;
+			item = new NavItem(this.lastId+1, -1, 1, this.$name.value, this.$link.value);
 		}
 		else {
-			let item = new NavItem(this.lastId+1, -1, 1, this.$name.value, this.$link.value);
-			item.items.push(new NavItem(item.id+1, item.id, 2, "Move to end", "#"));
-			let moveToEnd = this.items.pop();
-			this.items.push(item);
-			this.items.push(moveToEnd);
-
-			this.lastId += 2;
+			item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
 		}
+		item.items.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
+		let moveToEnd = parentItem.items.pop();
+		parentItem.items.push(item);
+		parentItem.items.push(moveToEnd);
+		this.lastId += 2;
 
 		this.load();
 	}
