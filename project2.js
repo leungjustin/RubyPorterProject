@@ -73,7 +73,7 @@ class NavBar {
 			navStyle: this.navStyle,
 			items: this.items,
 			lastId: this.lastId
-		}
+		};
 
 		this.disableAll();
 		let disabled = [
@@ -117,7 +117,11 @@ class NavBar {
 		this.disableAll();
 		if (this.navStyle == "none") {
 			this.$navbar.innerHTML = "";
-			let disabled = [this.$name, this.$link, this.$addButton];
+			let disabled = [
+				this.$name,
+				this.$link,
+				this.$addButton
+			];
 			disabled.forEach(element => element.disabled = true);
 		}
 		this.resetForms();
@@ -171,7 +175,7 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
 			${itemsHTML}
-		`
+		`;
 	}
 
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
@@ -308,16 +312,12 @@ class NavBar {
 
 		if (isSub == true) {
 			let item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
-			if (item.layer != MAX_LAYER) {
-				item.items.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
-				this.lastId = this.lastId + 2;
-			}
-			else {
-				this.lastId++;
-			}
+			item.items.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
 			let moveToEnd = parentItem.items.pop();
 			parentItem.items.push(item);
 			parentItem.items.push(moveToEnd);
+
+			this.lastId += 2;
 		}
 		else {
 			let item = new NavItem(this.lastId+1, -1, 1, this.$name.value, this.$link.value);
@@ -326,8 +326,9 @@ class NavBar {
 			this.items.push(item);
 			this.items.push(moveToEnd);
 
-			this.lastId = this.lastId + 2;
+			this.lastId += 2;
 		}
+
 		this.load();
 	}
 
@@ -339,7 +340,7 @@ class NavBar {
 		editHTML.innerHTML = this.$editName.value;
 		editHTML.href = this.$editLink.value;
 		editHTML.onclick = this.reload.bind(this, editHTML.href);
-		if(editHTML.classList.contains("active")) {
+		if (editHTML.classList.contains("active")) {
 			window.location.hash = editHTML.href;
 		}
 
@@ -375,7 +376,7 @@ class NavBar {
 				}
 			}
 			if (objectArray[i].items.length > 1) {
-				let isDeleted = this.deleteFromParent(objectArray[i].items, index)
+				let isDeleted = this.deleteFromParent(objectArray[i].items, index);
 				if (isDeleted == true) {
 					return true;
 				}
@@ -386,7 +387,7 @@ class NavBar {
 
 	//Changes whether a navbar item is clickable or not.
 	enableOrDisableLink(index) {
-		let matchingItem = this.findMatchingItem(this.items, index)
+		let matchingItem = this.findMatchingItem(this.items, index);
 
 		if (matchingItem.isDisabled) {
 			matchingItem.isDisabled = false;
@@ -404,7 +405,6 @@ class NavBar {
 	dragStart(event) {				
 		event.dataTransfer.setData("text/plain", event.target.parameters);
 		let item = this.findMatchingItem(this.items, event.target.parameters);
-		let parentItem = this.findMatchingItem(this.items, item.parentId);
 
 		setTimeout(() => { //This function is called to work around a rendering bug in Chrome and Edge.
 			let moveToEndElements = document.getElementsByClassName("move-to-end");
