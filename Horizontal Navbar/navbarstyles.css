@@ -78,10 +78,6 @@
 	animation: fadeIn linear 0.1s;
 }
 
-/*.subnav:hover > .subnav-content > .subnav-content-content > .subnav-content{
-	display: none;
-}*/
-
 @keyframes fadeIn {
 	0% {opacity: 0;}
 	100% {opacity: 1;}
@@ -91,9 +87,9 @@
 	background-color: #ccc;
 }
 
-/*.subnav-content:hover > .subnav-content{
-	display: block;
-}*/
+.max-layer {
+	display: none;
+}
 
 .isDisabled {
 	pointer-events: none;

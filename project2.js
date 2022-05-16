@@ -9,7 +9,7 @@ class NavItem {
 		this.link = link;
 		this.isActive = false; //Currently not in use. May be implemented when using data storage method.
 		this.isDisabled = isDisabled; //Determines whether the item can be clicked on.
-		this.subnavItems = []; //Contains an item's subitems, which are also objects of the NavItem class.
+		this.items = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
 }
 
@@ -22,20 +22,24 @@ class NavBar {
 			new NavItem(3, -1, 1, "Item4", "#item4"),
 			new NavItem(4, -1, 1, "Move to end", "#")
 		];
-		this.items[0].subnavItems.push(new NavItem(5, 0, 2, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(6, 1, 2, "Subitem1", "#subitem1"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(7, 6, 3, "Subsubitem1", "#subsubitem1"));
-		this.items[1].subnavItems[0].subnavItems.push(new NavItem(8, 6, 3, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(9, 1, 2, "Subitem2", "#subitem2"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(10, 9, 3, "Subsubitem2", "#subsubitem2"));
-		this.items[1].subnavItems[1].subnavItems.push(new NavItem(11, 9, 3, "Move to end", "#"));
-		this.items[1].subnavItems.push(new NavItem(12, 1, 2, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(13, 2, 2, "Subitem3", "#subitem3"));
-		this.items[2].subnavItems[0].subnavItems.push(new NavItem(14, 13, 3, "Move to end", "#"));
-		this.items[2].subnavItems.push(new NavItem(15, 2, 2, "Move to end", "#"));
-		this.items[3].subnavItems.push(new NavItem(16, 3, 2, "Move to end", "#"));
+		this.items[0].items.push(new NavItem(5, 0, 2, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(6, 1, 2, "Subitem1", "#subitem1"));
+		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Subsubitem1", "#subsubitem1"));
+		this.items[1].items[0].items[0].items.push(new NavItem(8, 7, 4, "Move to end", "#"));
+		this.items[1].items[0].items.push(new NavItem(9, 6, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(10, 1, 2, "Subitem2", "#subitem2"));
+		this.items[1].items[1].items.push(new NavItem(11, 10, 3, "Subsubitem2", "#subsubitem2"));
+		this.items[1].items[1].items[0].items.push(new NavItem(12, 11, 4, "Move to end", "#"));
+		this.items[1].items[1].items.push(new NavItem(13, 10, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(14, 1, 2, "Subitem3", "#subitem3"));
+		this.items[1].items[2].items.push(new NavItem(15, 14, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(16, 1, 2, "Move to end", "#"));
+		this.items[2].items.push(new NavItem(17, 2, 2, "Subitem4", "#subitem4"));
+		this.items[2].items[0].items.push(new NavItem(18, 17, 3, "Move to end", "#"));
+		this.items[2].items.push(new NavItem(19, 2, 2, "Move to end", "#"));
+		this.items[3].items.push(new NavItem(20, 3, 2, "Move to end", "#"));
 
-		this.lastId = 16;
+		this.lastId = 20;
 
 		this.navStyle = "none";			
 		this.logo = "logoideas.jpg";
@@ -146,8 +150,8 @@ class NavBar {
 					}
 				}
 			}
-			if (item.subnavItems.length > 1) {
-				this.changeActive(item.subnavItems, hash);
+			if (item.items.length > 1) {
+				this.changeActive(item.items, hash);
 			}
 		});
 	}
@@ -173,14 +177,13 @@ class NavBar {
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
 	renderNavItem(item) {
 		let navString = `
-			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
+			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
 				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
 				<button data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
-		//Each call to renderSubnavItem adds a new subitem to the navbar string.
-		for (let i = 0; i < item.subnavItems.length; i++) {
-			navString += this.renderNavItem(item.subnavItems[i]);
+		for (let i = 0; i < item.items.length; i++) {
+			navString += this.renderNavItem(item.items[i]); //Each recursive call to this method adds a new subitem to the navbar string.
 		}
 		navString += `
 				</div>
@@ -277,7 +280,6 @@ class NavBar {
 			this.$enableDisableButton.innerHTML = "Disable Link";
 		}
 
-		//Adds events to the buttons on each form.
 		this.$editForm.onsubmit = this.submitEdit.bind(this, matchingItem, index);
 		this.$deleteButton.onclick = this.deleteNavItem.bind(this, index);
 		this.$enableDisableButton.onclick = this.enableOrDisableLink.bind(this, index);
@@ -292,7 +294,7 @@ class NavBar {
 			if (objectArray[i].id == index) {
 				return objectArray[i];
 			}
-			let matchingItem = this.findMatchingItem(objectArray[i].subnavItems, index);
+			let matchingItem = this.findMatchingItem(objectArray[i].items, index);
 			if (matchingItem != undefined) {
 				return matchingItem;
 			}
@@ -307,19 +309,19 @@ class NavBar {
 		if (isSub == true) {
 			let item = new NavItem(this.lastId+1, parentItem.id, parentItem.layer+1, this.$addSubName.value, this.$addSubLink.value);
 			if (item.layer != MAX_LAYER) {
-				item.subnavItems.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
+				item.items.push(new NavItem(item.id+1, item.id, item.layer+1, "Move to end", "#"));
 				this.lastId = this.lastId + 2;
 			}
 			else {
 				this.lastId++;
 			}
-			let moveToEnd = parentItem.subnavItems.pop();
-			parentItem.subnavItems.push(item);
-			parentItem.subnavItems.push(moveToEnd);
+			let moveToEnd = parentItem.items.pop();
+			parentItem.items.push(item);
+			parentItem.items.push(moveToEnd);
 		}
 		else {
 			let item = new NavItem(this.lastId+1, -1, 1, this.$name.value, this.$link.value);
-			item.subnavItems.push(new NavItem(item.id+1, item.id, 2, "Move to end", "#"));
+			item.items.push(new NavItem(item.id+1, item.id, 2, "Move to end", "#"));
 			let moveToEnd = this.items.pop();
 			this.items.push(item);
 			this.items.push(moveToEnd);
@@ -366,14 +368,14 @@ class NavBar {
 	//If the object is not found (persumably because it is a top level object), the method return false.
 	deleteFromParent(objectArray, index) {
 		for (let i = 0; i < objectArray.length; i++) {
-			for (let j = 0; j < objectArray[i].subnavItems.length; j++) {
-				if (objectArray[i].subnavItems[j].id == index) {
-					objectArray[i].subnavItems.splice(j, 1);
+			for (let j = 0; j < objectArray[i].items.length; j++) {
+				if (objectArray[i].items[j].id == index) {
+					objectArray[i].items.splice(j, 1);
 					return true;
 				}
 			}
-			if (objectArray[i].subnavItems.length > 1) {
-				let isDeleted = this.deleteFromParent(objectArray[i].subnavItems, index)
+			if (objectArray[i].items.length > 1) {
+				let isDeleted = this.deleteFromParent(objectArray[i].items, index)
 				if (isDeleted == true) {
 					return true;
 				}
@@ -424,10 +426,12 @@ class NavBar {
 		}
 		let itemHTML = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
 		let item = this.findMatchingItem(this.items, event.target.dataset.id);
-		itemHTML.lastElementChild.style.display = "block";
+		if (item.layer < MAX_LAYER) {
+			itemHTML.lastElementChild.style.display = "block";
+		}
 		let parentHTML = itemHTML.parentElement;
 		parentHTML.style.display = "block";
-		for (let i = 2; i < item.layer; i++) {
+		for (let i = MAX_LAYER-1; i < item.layer; i++) {
 			parentHTML = parentHTML.parentElement.parentElement;
 			parentHTML.style.display = "block";
 		}
@@ -450,53 +454,17 @@ class NavBar {
 	}
 
 	//Removes the drag item from where it is, then places it in the correct location.
+	//The bulk of the method is broken into three parts.
+	//First, find the parent items of both the drag item and the drop item.
+	//Then, find the drag item in the drag parent item's array and remove it.
+	//Finally, find the drop item in the drop parent item's array and insert the drag item into that spot.
+	//All of this code only runs if...
+		//The drag item isn't the parent of the drop item,
+		//The drop item isn't the move to end item that shares a parent with the drop item,
+		//And the item isn't being dropped onto itself.
 	drop(event) {
-		/*		
 		event.target.classList.remove("drag-over");
-		let dragIndex = event.dataTransfer.getData("text/plain");		
-		let dragArray = dragIndex.split(",");
-		let dropIndex = event.target.parameters;
-		let dropArray = dropIndex.split(",");
-		let dragVar;
 
-		//If the drop item is the child of the drag item, do nothing (e.g. An item can't be dropped onto one of its own subitems).
-		if (!(dragArray.length == 1 && dropArray.length == 2 && dragArray[0] == dropArray[1])) {
-			//If the drag item is a top level item, splice it from the items array.
-			if (dragArray.length == 1) {
-				dragVar = this.items[dragArray[0]];
-				this.items.splice(dragArray[0], 1);
-			}
-			//Otherwise (i.e. If the drag item is a subitem), splice it from the parent item's array.
-			else {
-				dragVar = this.items[dragArray[1]].subnavItems[dragArray[0]];
-				this.items[dragArray[1]].subnavItems.splice(dragArray[0], 1);
-			}
-
-			//If the drop item is a top level item, simply place the drag item back into the items array.
-			if (dropArray.length == 1) {
-				//Also if the drag item is a subitem, add a moveToEnd item to it before putting it back into the array.
-				if (dragArray.length != 1) {
-					dragVar.subnavItems.push(new NavItem("Move to end", "#"));
-				}
-				this.items.splice(dropArray[0], 0, dragVar);
-			}
-			//Otherwise (i.e. If the drop item is a subitem)...
-			else {
-				dragVar.subnavItems.pop();
-				//Both of the following statements are for if a top level item is being placed into another item's subitems.
-				//The first is for if the drag item was before the drop item's parent in the array.
-				if (dragArray.length == 1 && dragArray[0] < dropArray[1]) {
-					this.items[dropArray[1]-1].subnavItems.splice(dropArray[0], 0, dragVar);
-				}
-				//The second is for if the drag item was after the drop item's parent in the array.
-				else {
-					this.items[dropArray[1]].subnavItems.splice(dropArray[0], 0, dragVar);
-				}
-			}
-		}
-		*/
-
-		event.target.classList.remove("drag-over");
 		let dragItem = this.findMatchingItem(this.items, event.dataTransfer.getData("text/plain"));
 		let dropItem = this.findMatchingItem(this.items, event.target.parameters);
 
@@ -506,67 +474,60 @@ class NavBar {
 		if (isParent == false) {
 			if (isMoveToEndSibling == false) {
 				if (dragItem.id != dropItem.id) {
-					console.log("Drop item is a valid drop target.");
 					let dragParent = this.findMatchingItem(this.items, dragItem.parentId);
+					if (dragParent == undefined) {
+						dragParent = this;
+					}
 					let dropParent = this.findMatchingItem(this.items, dropItem.parentId);
-					let dragCount;
-					for (let i = 0; i < dragParent.subnavItems.length; i++) {
-						if (dragParent.subnavItems[i].id == dragItem.id) {
-							dragParent.subnavItems.splice(i, 1);
-							dragCount = i;
+					if (dropParent == undefined) {
+						dropParent = this;
+					}
+
+					let removed = false;
+					let i = 0;
+					while (removed == false && i < dragParent.items.length) {
+						if (dragParent.items[i].id == dragItem.id) {
+							dragParent.items.splice(i, 1);
+							removed = true;
+						}
+						else {
+							i++;
 						}
 					}
+
 					let inserted = false;
 					let j = 0;
-					while (inserted == false && j < dropParent.subnavItems.length) {
-						if (dropParent.subnavItems[j].id == dropItem.id) {
-							if (dragCount > j || dragItem.parentId != dropItem.parentId) {
-								dropParent.subnavItems.splice(j, 0, dragItem);
-								dragItem.parentId = dropItem.parentId;
-								let oldLayer = dragItem.layer;
-								dragItem.layer = dropItem.layer;
-								if (dragItem.layer == MAX_LAYER && oldLayer != MAX_LAYER) {
-									dragItem.subnavItems.pop();
-								}
-								if (dragItem.layer != MAX_LAYER && oldLayer == MAX_LAYER) {
-									dragItem.subnavItems.push(new NavItem(this.lastId+1, dragItem.id, dragItem.layer+1, "Move to end", "#"));
-									this.lastId++;
-								}
-								inserted = true;
+					while (inserted == false && j < dropParent.items.length) {
+						if (dropParent.items[j].id == dropItem.id) {
+							if (i > j || dragItem.parentId != dropItem.parentId) { //i and j are compared to make sure the drag item is inserted properly.
+								dropParent.items.splice(j, 0, dragItem);
 							}
 							else {
-								dropParent.subnavItems.splice(j+1, 0, dragItem);
-								dragItem.parentId = dropItem.parentId;
-								let oldLayer = dragItem.layer;
-								dragItem.layer = dropItem.layer;
-								if (dragItem.layer == MAX_LAYER && oldLayer != MAX_LAYER) {
-									dragItem.subnavItems.pop();
-								}
-								if (dragItem.layer != MAX_LAYER && oldLayer == MAX_LAYER) {
-									dragItem.subnavItems.push(new NavItem(this.lastId+1, dragItem.id, dragItem.layer+1, "Move to end", "#"));
-									this.lastId++;
-								}
-								inserted = true;
+								dropParent.items.splice(j+1, 0, dragItem);
 							}
+							dragItem.parentId = dropItem.parentId;
+							dragItem.layer = dropItem.layer;
+							this.changeChildrenLayers(dragItem.items, dragItem.layer+1);
+							inserted = true;
 						}
-						j++;
+						else {
+							j++;
+						}
 					}
-				}
-				else {
-					console.log("Error: Item cannot be dropped on itself.");
 				}
 			}
 			else {
-				console.log("Error: Drag item is the sibling of the move to end drop item.")
+				alert("Error: Drag item is the sibling of the move to end drop item.")
 			}
 		}
 		else {
-			console.log("Error: Item cannot be placed into its own nested items.");
+			alert("Error: Item cannot be placed into its own nested items.");
 		}
 		
 		this.load();
 	}
 
+	//Checks if an item is the parent of another item or any of its subitems, calling itself recursively until it reaches the lowest layer or returns true.
 	checkParent(parentItem, childItem) {
 		if (childItem.parentId == parentItem.id) {
 			return true;
@@ -578,6 +539,7 @@ class NavBar {
 		return false;
 	}
 
+	//Checks if an item has the same parent as another item and if said item is a move to end item.
 	checkMoveToEndSibling(dragItem, dropItem) {
 		if (dropItem.name == "Move to end" && dragItem.parentId == dropItem.parentId) {
 			return true;
@@ -585,6 +547,16 @@ class NavBar {
 		else {
 			return false;
 		}
+	}
+
+	//Changes a parent item's child items' layers to be what they should be based on the layer of the parent item.
+	changeChildrenLayers(objectArray, layer) {
+		objectArray.forEach(item => {
+			item.layer = layer;
+			if (item.items.length > 0) {
+				this.changeChildrenLayers(item.items, layer+1);
+			}
+		});
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
