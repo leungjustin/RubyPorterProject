@@ -35,7 +35,7 @@ class NavBar {
 		this.lastId = 14;
 
 		this.navStyle = "none";			
-		this.logo = "logoideas.jpg";
+		this.logo = "gates-of-fennario-logo.png";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");

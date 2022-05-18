@@ -4,12 +4,13 @@
 	overflow: hidden;
 	background-color: #bbb;
 	width: 100%;
-	height: 46px;
+	height: 100px;
 }
 
 .navbar img {
+	vertical-align: middle;
 	float: left;
-	height: 100%;
+	height: 50%;
 }
 
 .active {
