@@ -7,7 +7,6 @@ class NavItem {
 		this.layer = layer;
 		this.name = name;
 		this.link = link;
-		this.isActive = false; //Currently not in use. May be implemented when using data storage method.
 		this.isDisabled = isDisabled; //Determines whether the item can be clicked on.
 		this.items = []; //Contains an item's subitems, which are also objects of the NavItem class.
 	}
@@ -140,11 +139,9 @@ class NavBar {
 	//Finally, if the item has nested items in it, the method is called again on those items.
 	changeActive(objectArray, hash) {
 		objectArray.forEach(item => {
-			item.isActive = false;
 			let itemHTML = document.querySelector(`a[data-id="${item.id}"]`);
 			itemHTML.classList.remove("active");
 			if (item.link == hash) {
-				item.isActive = true;
 				itemHTML.classList.add("active");
 				if (item.parentId != -1) {
 					let parent = itemHTML;
@@ -182,7 +179,7 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
-				<a href="${item.link}" class="${item.isActive ? 'active' : ''} ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
+				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
 				<button data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
