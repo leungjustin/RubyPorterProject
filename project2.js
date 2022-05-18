@@ -163,7 +163,7 @@ class NavBar {
 			this.$cssId.href = "project1.css";
 		}
 		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "Horizontal Navbar/navbarstyles.css";
+			this.$cssId.href = "navbarstyles.css";
 		}
 		else {
 			this.$cssId.href = "";
