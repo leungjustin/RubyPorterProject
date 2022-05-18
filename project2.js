@@ -64,8 +64,7 @@ class NavBar {
     	this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
-			items: this.items,
-			lastId: this.lastId
+			items: this.items
 		};
 
 		this.disableAll();
@@ -554,7 +553,7 @@ class NavBar {
 				this.items = data.items;
 				this.$navStyle.value = data.navStyle;
 				this.navStyle = data.navStyle;	
-				this.lastId = data.lastId;			
+				this.findLastId(this.items);			
 			}
 			else {
 				this.items = [];
@@ -571,6 +570,17 @@ class NavBar {
 		})
 	}
 
+	findLastId(objectArray) {
+		objectArray.forEach(item => {
+			if (item.id > this.lastId) {
+				this.lastId = item.id;
+			}
+			if (item.items.length > 0) {
+				this.findLastId(item.items);
+			}
+		});
+	}
+
 	//Sets navigation items and navigation bar style	
 	setNavSettings(event) {
 		event.preventDefault();
@@ -580,8 +590,7 @@ class NavBar {
 		this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
-			items: this.items,
-			lastId: this.lastId
+			items: this.items
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
@@ -628,8 +637,7 @@ class NavBar {
 		this.settings = {
 			user: this.$addUserInput.value,
 			navStyle: 'none',
-			items: [new NavItem(0, 1,"Move to end", "#")],
-			lastId: 0
+			items: [new NavItem(0, 1,"Move to end", "#")]
 		}
 		fetch('http://justin.navigation.test/users')
 		.then(response => response.json())
