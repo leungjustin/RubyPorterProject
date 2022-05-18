@@ -15,18 +15,18 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem(0, -1, 1, "Products", "#products"),
-			new NavItem(1, -1, 1, "About", "#about"),
-			new NavItem(2, -1, 1, "Blog", "#blog"),
-			new NavItem(3, -1, 1, "Contact", "#contact"),
+			new NavItem(0, -1, 1, "PRODUCTS", "#products"),
+			new NavItem(1, -1, 1, "ABOUT", "#about"),
+			new NavItem(2, -1, 1, "BLOG", "#blog"),
+			new NavItem(3, -1, 1, "CONTACT", "#contact"),
 			new NavItem(4, -1, 1, "Move to end", "#")
 		];
 		this.items[0].items.push(new NavItem(5, 0, 2, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(6, 1, 2, "History", "#history"));
+		this.items[1].items.push(new NavItem(6, 1, 2, "HISTORY", "#history"));
 		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(8, 1, 2, "Our Process", "#our-process"));
+		this.items[1].items.push(new NavItem(8, 1, 2, "OUR PROCESS", "#our-process"));
 		this.items[1].items[1].items.push(new NavItem(9, 8, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(10, 1, 2, "Team", "#team"));
+		this.items[1].items.push(new NavItem(10, 1, 2, "TEAM", "#team"));
 		this.items[1].items[2].items.push(new NavItem(11, 10, 3, "Move to end", "#"));
 		this.items[1].items.push(new NavItem(12, 1, 2, "Move to end", "#"));
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
