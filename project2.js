@@ -1,4 +1,4 @@
-const MAX_LAYER = 3;
+const MAX_LAYER = 2;
 
 class NavItem {
 	constructor(id, parentId, layer, name, link, isDisabled = false) {
@@ -15,30 +15,24 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem(0, -1, 1, "Item1", "#item1"),
-			new NavItem(1, -1, 1, "Item2", "#item2"),
-			new NavItem(2, -1, 1, "Item3", "#item3"),
-			new NavItem(3, -1, 1, "Item4", "#item4"),
+			new NavItem(0, -1, 1, "Products", "#products"),
+			new NavItem(1, -1, 1, "About", "#about"),
+			new NavItem(2, -1, 1, "Blog", "#blog"),
+			new NavItem(3, -1, 1, "Contact", "#contact"),
 			new NavItem(4, -1, 1, "Move to end", "#")
 		];
 		this.items[0].items.push(new NavItem(5, 0, 2, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(6, 1, 2, "Subitem1", "#subitem1"));
-		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Subsubitem1", "#subsubitem1"));
-		this.items[1].items[0].items[0].items.push(new NavItem(8, 7, 4, "Move to end", "#"));
-		this.items[1].items[0].items.push(new NavItem(9, 6, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(10, 1, 2, "Subitem2", "#subitem2"));
-		this.items[1].items[1].items.push(new NavItem(11, 10, 3, "Subsubitem2", "#subsubitem2"));
-		this.items[1].items[1].items[0].items.push(new NavItem(12, 11, 4, "Move to end", "#"));
-		this.items[1].items[1].items.push(new NavItem(13, 10, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(14, 1, 2, "Subitem3", "#subitem3"));
-		this.items[1].items[2].items.push(new NavItem(15, 14, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(16, 1, 2, "Move to end", "#"));
-		this.items[2].items.push(new NavItem(17, 2, 2, "Subitem4", "#subitem4"));
-		this.items[2].items[0].items.push(new NavItem(18, 17, 3, "Move to end", "#"));
-		this.items[2].items.push(new NavItem(19, 2, 2, "Move to end", "#"));
-		this.items[3].items.push(new NavItem(20, 3, 2, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(6, 1, 2, "History", "#history"));
+		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(8, 1, 2, "Our Process", "#our-process"));
+		this.items[1].items[1].items.push(new NavItem(9, 8, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(10, 1, 2, "Team", "#team"));
+		this.items[1].items[2].items.push(new NavItem(11, 10, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(12, 1, 2, "Move to end", "#"));
+		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
+		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.lastId = 20;
+		this.lastId = 14;
 
 		this.navStyle = "none";			
 		this.logo = "logoideas.jpg";
