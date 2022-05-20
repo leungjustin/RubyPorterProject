@@ -8,6 +8,10 @@ body {
 	margin: 0px;
 }
 
+.container {
+	margin: 8px;
+}
+
 .navbar {
 	display: flex;
 	align-items: center;
@@ -15,6 +19,11 @@ body {
 	background-color: #ece5f0;
 	width: 100%;
 	height: 100px;
+}
+
+.navbarhr {
+	border: 3px solid #003b36;
+	margin: 0px;
 }
 
 .navbar img {
@@ -56,18 +65,13 @@ body {
 
 .subnav a:hover {
 	color: #e98a15;
-	animation: textFade1 linear 0.1s;
-}
-
-@keyframes textFade1 {
-	from {color: #003b36;}
-	to {color: #e98a15;}
+	transition: color 0.2s;
 }
 
 .subnav-content {
 	display: none;
 	position: absolute;
-	top: 100px;
+	top: 106px;
 	background-color: #34514e;
 }
 
@@ -87,7 +91,7 @@ body {
 
 .subnav:hover > .subnav-content {
 	display: block;
-	animation: fadeIn linear 0.1s;
+	animation: fadeIn linear 0.2s;
 }
 
 @keyframes fadeIn {
@@ -98,12 +102,11 @@ body {
 .subnav-content a:hover {
 	color: #e98a15;
 	background-color: #003b36;
-	animation: textFade2 linear 0.1s;
+	transition: color 0.2s, background-color 0.2s;
 }
 
-@keyframes textFade2 {
-	from {color: #fff; background-color: #34514e;}
-	to {color: #e98a15; background-color: #003b36;}
+i {
+	padding: 14px 16px;
 }
 
 .max-layer {

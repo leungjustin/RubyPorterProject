@@ -165,6 +165,8 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
 			${itemsHTML}
+			<i class="fa-brands fa-instagram fa-xl"></i>
+			<i class="fa-brands fa-facebook fa-xl"></i>
 		`;
 	}
 
