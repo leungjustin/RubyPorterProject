@@ -163,7 +163,9 @@ class NavBar {
 		}
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
-			<img src="${this.logo}" alt="Logo">
+			<div>
+				<img src="${this.logo}" alt="Logo">
+			</div>
 			${itemsHTML}
 		`;
 	}
