@@ -41,7 +41,7 @@ class NavBar {
 		this.lastId = 20;
 
 		this.navStyle = "none";			
-		this.logo = "logoideas.jpg";
+		this.logo = "RubyPorterProject/logoideas.jpg";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -159,10 +159,10 @@ class NavBar {
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
 		if (this.$navbar.classList.contains("vertical")) {
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = "RubyPorterProject/project1.css";
 		}
 		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "navbarstyles.css";
+			this.$cssId.href = "RubyPorterProject/navbarstyles.css";
 		}
 		else {
 			this.$cssId.href = "";
