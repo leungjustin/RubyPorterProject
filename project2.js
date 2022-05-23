@@ -99,6 +99,7 @@ class NavBar {
 		}
 		this.enableAll();
 		this.load();
+		window.onscroll = this.scroll.bind(this);
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -545,6 +546,18 @@ class NavBar {
 				this.changeChildrenLayers(item.items, layer+1);
 			}
 		});
+	}
+
+	scroll() {
+		let navbar = document.getElementById("navbar");
+		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+			navbar.style.height = "50px";
+			navbar.style.transition = "height 0.2s";
+		}
+		else {
+			navbar.style.height = "100px";
+			navbar.style.transition = "height 0.2s";
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
