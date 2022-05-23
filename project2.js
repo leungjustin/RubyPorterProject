@@ -165,8 +165,8 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
 			${itemsHTML}
-			<i class="fa-brands fa-instagram fa-xl"></i>
-			<i class="fa-brands fa-facebook fa-xl"></i>
+			<i class="fa-brands fa-instagram fa-xl social"></i>
+			<i class="fa-brands fa-facebook fa-xl social"></i>
 		`;
 	}
 
@@ -174,7 +174,7 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
-				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
+				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : ""}</a>
 				<button data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
