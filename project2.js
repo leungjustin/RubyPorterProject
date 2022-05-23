@@ -164,9 +164,11 @@ class NavBar {
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<img src="${this.logo}" alt="Logo">
-			${itemsHTML}
-			<i class="fa-brands fa-instagram fa-xl social"></i>
-			<i class="fa-brands fa-facebook fa-xl social"></i>
+			<div class="navbar-content">
+				${itemsHTML}
+				<i class="fa-brands fa-instagram fa-2xl social"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+			</div>
 		`;
 	}
 

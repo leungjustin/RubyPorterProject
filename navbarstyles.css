@@ -20,6 +20,10 @@ body {
 	border-bottom: 6px solid #003b36;
 }
 
+.navbar-content {
+	float: right;
+}
+
 .navbar > img {
 	float: left;
 	height: 50%;
@@ -101,6 +105,7 @@ body {
 }
 
 .social {
+	float: left;
 	padding: 49.5px 16px;
 }
 
