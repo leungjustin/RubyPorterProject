@@ -612,7 +612,7 @@ class NavBar {
 			}
 
 			if (isValid) {
-				fetch(`http://justin.navigation.test/${this.$userInput.value}/edit` , {
+				fetch(`http://justin.navigation.test/user/${this.$userInput.value}/edit` , {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -716,7 +716,7 @@ class NavBar {
 
 			if (isValid)
 			{
-				fetch(`http://justin.navigation.test/${this.$addUserInput.value}/delete` , {
+				fetch(`http://justin.navigation.test/user/${this.$addUserInput.value}/delete` , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
