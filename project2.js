@@ -99,6 +99,7 @@ class NavBar {
 		}
 		this.enableAll();
 		this.load();
+		window.onscroll = this.scroll.bind(this);
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -166,7 +167,11 @@ class NavBar {
 			<div>
 				<img src="${this.logo}" alt="Logo">
 			</div>
-			${itemsHTML}
+			<div class="navbar-content">
+				${itemsHTML}
+				<i class="fa-brands fa-instagram fa-2xl social"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+			</div>
 		`;
 	}
 
@@ -174,7 +179,7 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
-				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
+				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : ""}</a>
 				<button data-id="${item.id}">E</button>
 				<div class="subnav-content">
 		`;
@@ -543,6 +548,18 @@ class NavBar {
 				this.changeChildrenLayers(item.items, layer+1);
 			}
 		});
+	}
+
+	scroll() {
+		let navbar = document.getElementById("navbar");
+		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+			navbar.style.height = "50px";
+			navbar.style.transition = "height 0.2s";
+		}
+		else {
+			navbar.style.height = "100px";
+			navbar.style.transition = "height 0.2s";
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
