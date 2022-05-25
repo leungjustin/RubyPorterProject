@@ -552,7 +552,7 @@ class NavBar {
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
 		event.preventDefault();		
-		fetch(`http://justin.navigation.test/userdata/${this.$userInput.value}`)
+		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
