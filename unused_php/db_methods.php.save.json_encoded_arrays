@@ -1,0 +1,95 @@
+<?php
+
+$servername = "localhost";
+$username = "devintern";
+$password = "NavigationFun2233";
+$dbname = "navigation";
+
+// Open connection to database
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+}
+
+
+// Get a list of users as a JSON object
+function db_getUsers($conn) {
+        // Get list of users from database
+        $users = $conn->query("SELECT user FROM users");
+        // Assign list to variable as JSON object
+        $json = json_encode($users->fetch_all(MYSQLI_ASSOC));
+	// Return list as JSON object
+	return $json;
+}
+
+// Get a single user setting record as a JSON object
+function db_getUserRecord($user, $conn) {
+	// Prepared statement to SELECT user record
+        $stmt = $conn->prepare("SELECT * FROM userdata WHERE user = ?");
+        $stmt->bind_param("s", $user);
+        $stmt->execute();
+        $result = $stmt->get_result();
+	$result_array = $result->fetch_assoc();
+	if($result_array != null) {
+		$result_array['items'] = json_decode($result_array['items']);
+	}
+        $json = json_encode($result_array);
+	// Return JSON object with user record
+	return $json;
+
+}
+
+// Change settings for a single existing user
+function db_updateSettings($data, $conn) {
+        $is_updated = false;
+	if ($data['user'] != null) {
+		// Prepared statement to UPDATE user record
+      		$stmt = $conn->prepare("UPDATE userdata	SET navStyle = ?, items = ? WHERE user = ?");
+        	$stmt->bind_param("sss", $data['navStyle'], json_encode($data['items']), $data['user']);
+        	$stmtrue;
+		$is_updated = $stmt->execute();
+
+	}
+	return $is_updated;
+}
+
+// Add a user to user table and userdata table
+function db_addUser($data, $conn) {
+	$is_added = false;
+	if ($data['user'] != null){
+		// INSERT new record in users table
+		$stmt = $conn->prepare("INSERT INTO users (user) VALUES (?)");
+		$stmt->bind_param("s", $data['user']);
+		$is_addUser = $stmt->execute();
+
+		// INSERT new record into userdata table
+		$sql = "INSERT INTO userdata (user, navStyle, items) VALUES (?, ?, ?)";
+		$stmt2 = $conn->prepare($sql);
+		if($stmt2 != false) {
+			$stmt2->bind_param("sss", $data['user'], $data['navStyle'], json_encode($data['items']));
+			$is_addData = $stmt2->execute();
+		}
+		$is_added = $is_addUser && $is_addData;
+	}
+	return $is_added;
+}
+
+function db_deleteUser($conn, $data) {
+	$is_deleted = false;
+	if ($data['user'] != null) {
+		// Delete record from userdata table
+		$stmt = $conn->prepare("DELETE FROM userdata WHERE user = ?");
+		$stmt->bind_param("s", $data['user']);
+		$is_deleteUser = $stmt->execute();
+		// Delete record from users table
+		$stmt2 = $conn->prepare("DELETE FROM users WHERE user = ?");
+		$stmt2->bind_param("s", $data['user']);
+		$is_deleteData = $stmt2->execute();
+
+		$is_deleted = $is_deleteUser && $is_deleteData;
+	}
+
+	return $is_deleted;
+}
+
