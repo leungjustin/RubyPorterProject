@@ -12,7 +12,7 @@
 	overflow: visible;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: center;		
 }
 
 .navbar > :first-child {
@@ -28,18 +28,35 @@
 
 
 .subnav {
-	display: block;			
+	display: flex;
 	text-decoration: none;
-	height: 80px;
+	width: 100%;
+	padding: 30px 0px;		
+	border-top-color: #b3b3b3;
+	border-top-style: solid;
+	border-top-width: 1px;
+	flex-direction: column;
+	align-items: center;
+	
 }
 
+.subnav:nth-last-child(2) {
+	border-bottom-color: #b3b3b3;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+}
+
+
+
 .navbar a {	
-	padding: 5px;
+	
+	padding: 5px;	
 	text-decoration: none;
 	font-size: 24px;
 	font-family: agenda-one,sans-serif;
 	font-weight: 700;
 	color: #003b36;	
+
 }
 
 .navbar a:hover {
@@ -47,7 +64,6 @@
 }
 
 .navbar .active {
-	background-color: #04AA6D;
 	color: #e98a15; 
 }
 
@@ -75,4 +91,8 @@
 
 .drag-over {
 	border: dashed 2px #FF0000;
+}
+
+.social {
+	
 }
