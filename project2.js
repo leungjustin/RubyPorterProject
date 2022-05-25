@@ -555,15 +555,38 @@ class NavBar {
 	}
 
 	scroll() {
-		/*let navbar = document.getElementById("navbar");
+		let navbar = document.getElementById("navbar");
+		let logo = document.querySelector("img");
 		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-			navbar.style.height = "50px";
+			navbar.style.height = "70px";
 			navbar.style.transition = "height 0.2s";
+			this.logo = "gates-of-fennario-icon.png";
+			logo.src = this.logo;
+			logo.style.padding = "15px";
+			logo.style.height = "40px";
+			logo.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				subnavs[i].style.paddingTop = "15px";
+				subnavs[i].style.paddingBottom = "9px";
+				subnavs[i].style.transition = "padding 0.2s";
+			}
 		}
 		else {
 			navbar.style.height = "100px";
 			navbar.style.transition = "height 0.2s";
-		}*/
+			this.logo = "gates-of-fennario-logo.png";
+			logo.style.padding = "25px";
+			logo.src = this.logo;
+			logo.style.height = "50px";
+			logo.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				subnavs[i].style.paddingTop = "30px";
+				subnavs[i].style.paddingBottom = "24px";
+				subnavs[i].style.transition = "padding 0.2s";
+			}
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
