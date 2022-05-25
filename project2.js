@@ -88,14 +88,17 @@ class NavBar {
 		if (this.$navStyle.value == "horizontal") {
 			this.navStyle = "horizontal";
 			this.$navbar.className = "navbar horizontal";
+			window.onscroll = this.scroll.bind(this);
 		}
 		else if (this.$navStyle.value == "vertical") {
 			this.navStyle = "vertical";
 			this.$navbar.className = "navbar vertical";
+			window.onscroll = () => {};
 		}
 		else {
 			this.navStyle = "none";
 			this.$navbar.className = "navbar";
+			window.onscroll = () => {};
 		}
 		this.enableAll();
 		this.load();
@@ -421,8 +424,10 @@ class NavBar {
 			itemHTML.lastElementChild.style.display = "block";
 		}
 		let parentHTML = itemHTML.parentElement;
-		parentHTML.style.display = "block";
-		for (let i = MAX_LAYER-1; i < item.layer; i++) {
+		if (item.layer != 1) {
+			parentHTML.style.display = "block";
+		}
+		for (let i = 2; i < item.layer; i++) {
 			parentHTML = parentHTML.parentElement.parentElement;
 			parentHTML.style.display = "block";
 		}
@@ -551,7 +556,7 @@ class NavBar {
 	}
 
 	scroll() {
-		let navbar = document.getElementById("navbar");
+		/*let navbar = document.getElementById("navbar");
 		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
 			navbar.style.height = "50px";
 			navbar.style.transition = "height 0.2s";
@@ -559,7 +564,7 @@ class NavBar {
 		else {
 			navbar.style.height = "100px";
 			navbar.style.transition = "height 0.2s";
-		}
+		}*/
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
