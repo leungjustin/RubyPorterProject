@@ -105,8 +105,6 @@ class NavBar {
 		this.enableAll();
 		this.load();
 
-		window.onscroll = this.scroll.bind(this);
-
 		// Comment out below statement for editing
 		document.querySelector(".container").innerHTML = 
 		`<img src="hero image.jpg" alt="hero image" width="100%">
