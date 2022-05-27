@@ -36,6 +36,7 @@ class NavBar {
 
 		this.navStyle = "none";			
 		this.logo = "gates-of-fennario-logo.png";
+		this.icon = "gates-of-fennario-icon.png";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -102,7 +103,6 @@ class NavBar {
 		}
 		this.enableAll();
 		this.load();
-		window.onscroll = this.scroll.bind(this);
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -168,7 +168,8 @@ class NavBar {
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
-				<img src="${this.logo}" alt="Logo">
+				<img class="logo" src="${this.logo}" alt="Logo">
+				<img class="icon" src="${this.icon}" alt="icon">
 			</div>
 			<div class="navbar-content">
 				${itemsHTML}
@@ -556,15 +557,59 @@ class NavBar {
 	}
 
 	scroll() {
-		/*let navbar = document.getElementById("navbar");
+		let navbar = document.getElementById("navbar");
+		let logo = document.querySelector(".logo");
+		let icon = document.querySelector(".icon");
 		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-			navbar.style.height = "50px";
+			navbar.style.height = "70px";
 			navbar.style.transition = "height 0.2s";
+			logo.style.padding = "15px";
+			logo.style.height = "40px";
+			logo.style.opacity = 0;
+			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
+			icon.style.padding = "15px";
+			icon.style.height = "40px";
+			icon.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
+				if (item.layer == 1) {
+					subnavs[i].style.paddingTop = "15px";
+					subnavs[i].style.paddingBottom = "9px";
+					subnavs[i].style.transition = "padding 0.2s";
+				}
+			}
+			let subnavcontents = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < subnavcontents.length; i++) {
+				subnavcontents[i].style.top = "76px";
+				subnavcontents[i].style.transition = "top 0.2s";
+			}
 		}
 		else {
 			navbar.style.height = "100px";
 			navbar.style.transition = "height 0.2s";
-		}*/
+			logo.style.padding = "25px";
+			logo.style.height = "50px";
+			logo.style.opacity = 1;
+			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
+			icon.style.padding = "25px";
+			icon.style.height = "50px";
+			icon.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
+				if (item.layer == 1) {
+					subnavs[i].style.paddingTop = "30px";
+					subnavs[i].style.paddingBottom = "24px";
+					subnavs[i].style.transition = "padding 0.2s";
+				}
+			}
+			let subnavcontents = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < subnavcontents.length; i++) {
+				subnavcontents[i].style.top = "106px";
+				subnavcontents[i].style.transition = "top 0.2s";
+			}
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
