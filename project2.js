@@ -103,6 +103,22 @@ class NavBar {
 		this.enableAll();
 		this.load();
 		window.onscroll = this.scroll.bind(this);
+
+		// Comment out below statement for editing
+		document.querySelector(".container").innerHTML = 
+		`<img src="hero image.jpg" alt="hero image" width="100%">
+		 <div class="containerText">
+			<h2 style="letter-spacing: 5px;">WELCOME.</h2>
+			<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
+			In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
+			Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
+			In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
+			Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
+			Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
+			</p>
+		 </div>		
+		`;
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -183,7 +199,7 @@ class NavBar {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
 				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? this.navStyle == "horizontal" ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : "<i class='fa-solid fa-angle-right fa-xs'></i>" : ""}</a>
-				<button data-id="${item.id}">E</button>
+				<!-- <button data-id="${item.id}">E</button> -->
 				<div class="subnav-content">
 		`;
 		for (let i = 0; i < item.items.length; i++) {
@@ -202,6 +218,8 @@ class NavBar {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
 				item.onclick = this.reload.bind(this, item.hash);
+				// Uncomment below to edit
+				/*
 				document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
 				item.ondragstart = this.dragStart.bind(this);
 				item.ondragenter = this.dragEnter.bind(this);
@@ -210,6 +228,7 @@ class NavBar {
 				item.ondragend = this.dragEnd.bind(this);
 				item.ondrop = this.drop.bind(this);
 				item.parameters = i.toString();
+				*/
 			}
 		}
 	}

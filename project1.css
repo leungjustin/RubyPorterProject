@@ -89,7 +89,7 @@
 }
 
 .subnav .subnav-content .subnav {
-	padding: 9px 0px;
+	padding: 7px 0px;
 	border: none;
 }
 
@@ -105,6 +105,10 @@
 	color: #e98a15;
 }
 
+.subnav .subnav-content .subnav .active {
+	color: #e98a15; 	
+}
+
 .subnav:nth-last-child(4) {
 	border-bottom-color: #b3b3b3;
 	border-bottom-style: solid;
@@ -112,9 +116,26 @@
 }
 
 .container {
-	margin-left: 320px;
-	padding: 16px;
-	
+	margin-left: 320px;	
+	background-color: #34514e;
+	height: 100%;
+}
+
+.containerText {
+	margin-left: 60px;
+	margin-right: 60px;
+	margin-top: 20px;
+	color:#000000;	
+	font-family: agenda-one,sans-serif;
+	font-weight: 700;	
+}
+
+.containerText h2 {	
+	font-size: 32px;
+}
+
+.containerText p {
+	font-size: 24px;
 }
 
 .isDisabled {
@@ -129,5 +150,15 @@
 	position: relative;
 	padding: 20px;
 	left: 80px;
-	top: 20%;
+	top: 40%;
+}
+
+@media screen and (max-height: 760px) {
+	.social {
+		top: 5px;
+	}
+}
+
+@media screen and (max-width: 1024px) {
+
 }
