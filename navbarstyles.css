@@ -37,6 +37,9 @@ body {
 	float: left;
 	height: 50px;
 	padding: 25px;
+	position: absolute;
+	top: 25;
+	left: 25;
 }
 
 .subnav {
