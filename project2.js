@@ -82,7 +82,10 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+		window.addEventListener("resize", this.load.bind(this));		
+
 	}
+
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
@@ -106,26 +109,33 @@ class NavBar {
 		this.load();
 
 		// Comment out below statement for editing
-		document.querySelector(".container").innerHTML = 
-		`<img src="hero image.jpg" alt="hero image" width="100%">
-		 <div class="containerText">
-			<h2 style="letter-spacing: 5px;">WELCOME.</h2>
-			<p>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
-			In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
-			Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
-			In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
-			Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
-			Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
-			</p>
-		 </div>		
-		`;
+		if (this.navStyle != "none") {
+			document.querySelector(".container").innerHTML = 
+			`<img src="hero image.jpg" alt="hero image" width="100%">
+			<div class="containerText">
+				<h2 style="letter-spacing: 5px;">WELCOME.</h2>
+				<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
+				In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
+				Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
+				In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
+				Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
+				Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
+				</p>
+			</div>		
+			`;
+		}
 
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
 	load() {		
-		this.fillItems();		
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
 		this.changeActive(this.items, window.location.hash);
 		this.addEventListeners();
 		this.disableAll();
@@ -173,6 +183,7 @@ class NavBar {
 	}
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
+
 	fillItems() {
 		if (this.$navbar.classList.contains("vertical")) {
 			this.$cssId.href = "project1.css";
@@ -193,6 +204,21 @@ class NavBar {
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
+			</div>
+		`;
+	}
+
+	fillItemsMobile() {
+		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
+		this.$navbar.innerHTML = `
+			<div>
+				<img class="logo" src="${this.logo}" alt="Logo">
+			</div>
+			<div class="navbar-content">			
+				<i class="fa-brands fa-instagram fa-2xl social"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+				<i class="fa-solid fa-bars" style="float: right"></i>
+				${itemsHTML}
 			</div>
 		`;
 	}
@@ -825,3 +851,4 @@ class NavBar {
 
 let navbar;
 window.onload = () => navbar = new NavBar();
+
