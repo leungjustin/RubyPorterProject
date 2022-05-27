@@ -1,4 +1,4 @@
-const MAX_LAYER = 3;
+const MAX_LAYER = 2;
 
 class NavItem {
 	constructor(id, parentId, layer, name, link, isDisabled = false) {
@@ -15,33 +15,28 @@ class NavItem {
 class NavBar {
 	constructor() {
 		this.items = [
-			new NavItem(0, -1, 1, "Item1", "#item1"),
-			new NavItem(1, -1, 1, "Item2", "#item2"),
-			new NavItem(2, -1, 1, "Item3", "#item3"),
-			new NavItem(3, -1, 1, "Item4", "#item4"),
+			new NavItem(0, -1, 1, "PRODUCTS", "#products"),
+			new NavItem(1, -1, 1, "ABOUT", "#about"),
+			new NavItem(2, -1, 1, "BLOG", "#blog"),
+			new NavItem(3, -1, 1, "CONTACT", "#contact"),
 			new NavItem(4, -1, 1, "Move to end", "#")
 		];
 		this.items[0].items.push(new NavItem(5, 0, 2, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(6, 1, 2, "Subitem1", "#subitem1"));
-		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Subsubitem1", "#subsubitem1"));
-		this.items[1].items[0].items[0].items.push(new NavItem(8, 7, 4, "Move to end", "#"));
-		this.items[1].items[0].items.push(new NavItem(9, 6, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(10, 1, 2, "Subitem2", "#subitem2"));
-		this.items[1].items[1].items.push(new NavItem(11, 10, 3, "Subsubitem2", "#subsubitem2"));
-		this.items[1].items[1].items[0].items.push(new NavItem(12, 11, 4, "Move to end", "#"));
-		this.items[1].items[1].items.push(new NavItem(13, 10, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(14, 1, 2, "Subitem3", "#subitem3"));
-		this.items[1].items[2].items.push(new NavItem(15, 14, 3, "Move to end", "#"));
-		this.items[1].items.push(new NavItem(16, 1, 2, "Move to end", "#"));
-		this.items[2].items.push(new NavItem(17, 2, 2, "Subitem4", "#subitem4"));
-		this.items[2].items[0].items.push(new NavItem(18, 17, 3, "Move to end", "#"));
-		this.items[2].items.push(new NavItem(19, 2, 2, "Move to end", "#"));
-		this.items[3].items.push(new NavItem(20, 3, 2, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(6, 1, 2, "HISTORY", "#history"));
+		this.items[1].items[0].items.push(new NavItem(7, 6, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(8, 1, 2, "OUR PROCESS", "#our-process"));
+		this.items[1].items[1].items.push(new NavItem(9, 8, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(10, 1, 2, "TEAM", "#team"));
+		this.items[1].items[2].items.push(new NavItem(11, 10, 3, "Move to end", "#"));
+		this.items[1].items.push(new NavItem(12, 1, 2, "Move to end", "#"));
+		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
+		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.lastId = 20;
+		this.lastId = 14;
 
 		this.navStyle = "none";			
-		this.logo = "logoideas.jpg";
+		this.logo = "gates-of-fennario-logo.png";
+		this.icon = "gates-of-fennario-icon.png";
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -91,20 +86,41 @@ class NavBar {
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
+		this.$navbar.removeAttribute("style");
 		if (this.$navStyle.value == "horizontal") {
 			this.navStyle = "horizontal";
 			this.$navbar.className = "navbar horizontal";
+			window.onscroll = this.scroll.bind(this);
 		}
 		else if (this.$navStyle.value == "vertical") {
 			this.navStyle = "vertical";
 			this.$navbar.className = "navbar vertical";
+			window.onscroll = () => {};
 		}
 		else {
 			this.navStyle = "none";
 			this.$navbar.className = "navbar";
+			window.onscroll = () => {};
 		}
 		this.enableAll();
 		this.load();
+
+		// Comment out below statement for editing
+		document.querySelector(".container").innerHTML = 
+		`<img src="hero image.jpg" alt="hero image" width="100%">
+		 <div class="containerText">
+			<h2 style="letter-spacing: 5px;">WELCOME.</h2>
+			<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
+			In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
+			Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
+			In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
+			Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
+			Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
+			</p>
+		 </div>		
+		`;
+
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -169,8 +185,15 @@ class NavBar {
 		}
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
-			<img src="${this.logo}" alt="Logo">
-			${itemsHTML}
+			<div>
+				<img class="logo" src="${this.logo}" alt="Logo">
+				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
+			</div>
+			<div class="navbar-content">
+				${itemsHTML}
+				<i class="fa-brands fa-instagram fa-2xl social"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+			</div>
 		`;
 	}
 
@@ -178,8 +201,8 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
-				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name}</a>
-				<button data-id="${item.id}">E</button>
+				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? this.navStyle == "horizontal" ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : "<i class='fa-solid fa-angle-right fa-xs'></i>" : ""}</a>
+				<!-- <button data-id="${item.id}">E</button> -->
 				<div class="subnav-content">
 		`;
 		for (let i = 0; i < item.items.length; i++) {
@@ -198,6 +221,8 @@ class NavBar {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
 				item.onclick = this.reload.bind(this, item.hash);
+				// Uncomment below to edit
+				/*
 				document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
 				item.ondragstart = this.dragStart.bind(this);
 				item.ondragenter = this.dragEnter.bind(this);
@@ -206,6 +231,7 @@ class NavBar {
 				item.ondragend = this.dragEnd.bind(this);
 				item.ondrop = this.drop.bind(this);
 				item.parameters = i.toString();
+				*/
 			}
 		}
 	}
@@ -420,8 +446,10 @@ class NavBar {
 			itemHTML.lastElementChild.style.display = "block";
 		}
 		let parentHTML = itemHTML.parentElement;
-		parentHTML.style.display = "block";
-		for (let i = MAX_LAYER-1; i < item.layer; i++) {
+		if (item.layer != 1) {
+			parentHTML.style.display = "block";
+		}
+		for (let i = 2; i < item.layer; i++) {
 			parentHTML = parentHTML.parentElement.parentElement;
 			parentHTML.style.display = "block";
 		}
@@ -547,6 +575,62 @@ class NavBar {
 				this.changeChildrenLayers(item.items, layer+1);
 			}
 		});
+	}
+
+	scroll() {
+		let navbar = document.getElementById("navbar");
+		let logo = document.querySelector(".logo");
+		let icon = document.querySelector(".icon");
+		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+			navbar.style.height = "70px";
+			navbar.style.transition = "height 0.2s";
+			logo.style.padding = "15px";
+			logo.style.height = "40px";
+			logo.style.opacity = 0;
+			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
+			icon.style.padding = "15px";
+			icon.style.height = "40px";
+			icon.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
+				if (item.layer == 1) {
+					subnavs[i].style.paddingTop = "15px";
+					subnavs[i].style.paddingBottom = "9px";
+					subnavs[i].style.transition = "padding 0.2s";
+				}
+			}
+			let subnavcontents = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < subnavcontents.length; i++) {
+				subnavcontents[i].style.top = "76px";
+				subnavcontents[i].style.transition = "top 0.2s";
+			}
+		}
+		else {
+			navbar.style.height = "100px";
+			navbar.style.transition = "height 0.2s";
+			logo.style.padding = "25px";
+			logo.style.height = "50px";
+			logo.style.opacity = 1;
+			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
+			icon.style.padding = "25px";
+			icon.style.height = "50px";
+			icon.style.transition = "height 0.2s";
+			let subnavs = document.getElementsByClassName("subnav");
+			for (let i = 0; i < subnavs.length; i++) {
+				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
+				if (item.layer == 1) {
+					subnavs[i].style.paddingTop = "30px";
+					subnavs[i].style.paddingBottom = "24px";
+					subnavs[i].style.transition = "padding 0.2s";
+				}
+			}
+			let subnavcontents = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < subnavcontents.length; i++) {
+				subnavcontents[i].style.top = "106px";
+				subnavcontents[i].style.transition = "top 0.2s";
+			}
+		}
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
