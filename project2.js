@@ -86,6 +86,7 @@ class NavBar {
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
+		this.$navbar.removeAttribute("style");
 		if (this.$navStyle.value == "horizontal") {
 			this.navStyle = "horizontal";
 			this.$navbar.className = "navbar horizontal";
@@ -169,7 +170,7 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
-				<img class="icon" src="${this.icon}" alt="icon">
+				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
 				${itemsHTML}
