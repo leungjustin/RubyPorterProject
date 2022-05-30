@@ -84,3 +84,14 @@ body {
 	color: #e98a15; 
 }
 
+.container {
+    background-color: #34514e;
+}
+
+.containerText h2 {	
+	font-size: 32px;
+}
+
+.containerText p {
+	font-size: 24px;
+}
