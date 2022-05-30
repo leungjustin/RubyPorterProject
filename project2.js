@@ -82,7 +82,10 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+		window.addEventListener("resize", this.changeNavStyle.bind(this));		
+
 	}
+
 
 	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
 	changeNavStyle() {
@@ -106,26 +109,33 @@ class NavBar {
 		this.load();
 
 		// Comment out below statement for editing
-		document.querySelector(".container").innerHTML = 
-		`<img src="hero image.jpg" alt="hero image" width="100%">
-		 <div class="containerText">
-			<h2 style="letter-spacing: 5px;">WELCOME.</h2>
-			<p>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
-			In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
-			Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
-			In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
-			Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
-			Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
-			</p>
-		 </div>		
-		`;
+		if (this.navStyle != "none") {
+			document.querySelector(".container").innerHTML = 
+			`<img src="hero image.jpg" alt="hero image" width="100%">
+			<div class="containerText">
+				<h2 style="letter-spacing: 5px;">WELCOME.</h2>
+				<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
+				In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
+				Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
+				In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
+				Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
+				Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
+				</p>
+			</div>		
+			`;
+		}
 
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
 	load() {		
-		this.fillItems();		
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
 		this.changeActive(this.items, window.location.hash);
 		this.addEventListeners();
 		this.disableAll();
@@ -173,7 +183,8 @@ class NavBar {
 	}
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
-	fillItems() {
+
+	fillItems() {		
 		if (this.$navbar.classList.contains("vertical")) {
 			this.$cssId.href = "project1.css";
 		}
@@ -197,6 +208,25 @@ class NavBar {
 		`;
 	}
 
+	fillItemsMobile() {
+		this.$cssId.href = "mobilestyle.css";
+		window.onscroll = () => {};
+		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
+		this.$navbar.innerHTML = `
+			<div>
+				<img class="logo" src="${this.logo}" alt="Logo">
+								
+				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+				<i class="fa-solid fa-bars" id="bars"></i>
+			</div>
+			<div class="navbar-content">
+				${itemsHTML}
+			</div>
+		`;
+		document.querySelector("#bars").addEventListener('click', this.toggleMobileMenu.bind(this));
+	}
+
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
 	renderNavItem(item) {
 		let navString = `
@@ -213,6 +243,16 @@ class NavBar {
 			</div>
 		`;
 		return navString;
+	}
+
+	toggleMobileMenu() {
+		if (!document.querySelector(".navbar-content").classList.contains("active")) {
+			document.querySelector(".navbar-content").classList.add("active");
+		}
+		else {
+			document.querySelector(".navbar-content").classList.remove("active");
+		}
+		
 	}
 
 	//Adds click and submit events for navbar items and buttons.
@@ -588,9 +628,11 @@ class NavBar {
 			logo.style.height = "40px";
 			logo.style.opacity = 0;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "15px";
-			icon.style.height = "40px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null) {
+				icon.style.padding = "15px";
+				icon.style.height = "40px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -613,9 +655,12 @@ class NavBar {
 			logo.style.height = "50px";
 			logo.style.opacity = 1;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "25px";
-			icon.style.height = "50px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null)
+			{
+				icon.style.padding = "25px";
+				icon.style.height = "50px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -825,3 +870,4 @@ class NavBar {
 
 let navbar;
 window.onload = () => navbar = new NavBar();
+
