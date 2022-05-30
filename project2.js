@@ -82,7 +82,7 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-		window.addEventListener("resize", this.load.bind(this));		
+		window.addEventListener("resize", this.changeNavStyle.bind(this));		
 
 	}
 
@@ -184,7 +184,7 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 
-	fillItems() {
+	fillItems() {		
 		if (this.$navbar.classList.contains("vertical")) {
 			this.$cssId.href = "project1.css";
 		}
@@ -209,18 +209,22 @@ class NavBar {
 	}
 
 	fillItemsMobile() {
+		this.$cssId.href = "mobilestyle.css";
+		window.onscroll = () => {};
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
-			</div>
-			<div class="navbar-content">			
-				<i class="fa-brands fa-instagram fa-2xl social"></i>
+								
+				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
-				<i class="fa-solid fa-bars" style="float: right"></i>
+				<i class="fa-solid fa-bars" id="bars"></i>
+			</div>
+			<div class="navbar-content">
 				${itemsHTML}
 			</div>
 		`;
+		document.querySelector("#bars").addEventListener('click', this.toggleMobileMenu.bind(this));
 	}
 
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
@@ -239,6 +243,16 @@ class NavBar {
 			</div>
 		`;
 		return navString;
+	}
+
+	toggleMobileMenu() {
+		if (!document.querySelector(".navbar-content").classList.contains("active")) {
+			document.querySelector(".navbar-content").classList.add("active");
+		}
+		else {
+			document.querySelector(".navbar-content").classList.remove("active");
+		}
+		
 	}
 
 	//Adds click and submit events for navbar items and buttons.
@@ -614,9 +628,11 @@ class NavBar {
 			logo.style.height = "40px";
 			logo.style.opacity = 0;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "15px";
-			icon.style.height = "40px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null) {
+				icon.style.padding = "15px";
+				icon.style.height = "40px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -639,9 +655,12 @@ class NavBar {
 			logo.style.height = "50px";
 			logo.style.opacity = 1;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "25px";
-			icon.style.height = "50px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null)
+			{
+				icon.style.padding = "25px";
+				icon.style.height = "50px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
