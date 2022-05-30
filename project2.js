@@ -32,11 +32,12 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.lastId = 14;
-
-		this.navStyle = "none";			
 		this.logo = "gates-of-fennario-logo.png";
 		this.icon = "gates-of-fennario-icon.png";
+
+		this.lastId = 14;
+		this.navStyle = "none";	
+		this.editMode = true;
 		
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
@@ -84,43 +85,27 @@ class NavBar {
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 	}
 
-	//This method runs when the navigation style is chosen and adds a vertical or horizontal class to the navbar div.
+	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
 		if (this.$navStyle.value == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$navbar.className = "navbar horizontal";
+			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
 		else if (this.$navStyle.value == "vertical") {
+			this.$cssId.href = "project1.css";
 			this.navStyle = "vertical";
-			this.$navbar.className = "navbar vertical";
 			window.onscroll = () => {};
 		}
 		else {
+			this.$cssId.href = "";
 			this.navStyle = "none";
-			this.$navbar.className = "navbar";
 			window.onscroll = () => {};
 		}
 		this.enableAll();
 		this.load();
-
-		// Comment out below statement for editing
-		document.querySelector(".container").innerHTML = 
-		`<img src="hero image.jpg" alt="hero image" width="100%">
-		 <div class="containerText">
-			<h2 style="letter-spacing: 5px;">WELCOME.</h2>
-			<p>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
-			In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
-			Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
-			In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
-			Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
-			Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
-			</p>
-		 </div>		
-		`;
-
+		this.changeContainer();
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -129,6 +114,19 @@ class NavBar {
 		this.changeActive(this.items, window.location.hash);
 		this.addEventListeners();
 		this.disableAll();
+		this.checkNone();
+		this.resetForms();
+	}
+
+	//Same as load, expect without rendering the navbar or adding event listeners.
+	reload(hash = window.location.hash) {
+		this.changeActive(this.items, hash);		
+		this.disableAll();
+		this.resetForms();
+	}
+
+	//Removes the navbar html if there is no style selected.
+	checkNone() {
 		if (this.navStyle == "none") {
 			this.$navbar.innerHTML = "";
 			let disabled = [
@@ -138,14 +136,6 @@ class NavBar {
 			];
 			disabled.forEach(element => element.disabled = true);
 		}
-		this.resetForms();
-	}
-
-	//Same as load, expect without rendering the navbar or adding event listeners.
-	reload(hash = window.location.hash) {
-		this.changeActive(this.items, hash);		
-		this.disableAll();
-		this.resetForms();
 	}
 
 	//Changes which navbar link is active, which changes its appearance.
@@ -174,15 +164,6 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
-		if (this.$navbar.classList.contains("vertical")) {
-			this.$cssId.href = "project1.css";
-		}
-		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "navbarstyles.css";
-		}
-		else {
-			this.$cssId.href = "";
-		}
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -190,6 +171,7 @@ class NavBar {
 				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
+				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
@@ -202,7 +184,7 @@ class NavBar {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
 				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? this.navStyle == "horizontal" ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : "<i class='fa-solid fa-angle-right fa-xs'></i>" : ""}</a>
-				<!-- <button data-id="${item.id}">E</button> -->
+				${this.editMode == true ? "<button data-id='" + item.id + "'>E</button>" : ""}
 				<div class="subnav-content">
 		`;
 		for (let i = 0; i < item.items.length; i++) {
@@ -217,23 +199,148 @@ class NavBar {
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
+		document.getElementById("editing").onclick = this.toggleEditing.bind(this);
 		for (let i = 0; i <= this.lastId; i++) {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
 				item.onclick = this.reload.bind(this, item.hash);
-				// Uncomment below to edit
-				/*
-				document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
-				item.ondragstart = this.dragStart.bind(this);
-				item.ondragenter = this.dragEnter.bind(this);
-				item.ondragover = this.dragOver.bind(this);
-				item.ondragleave = this.dragLeave.bind(this);
-				item.ondragend = this.dragEnd.bind(this);
-				item.ondrop = this.drop.bind(this);
-				item.parameters = i.toString();
-				*/
+				if (this.editMode == true) {
+					document.querySelector(`button[data-id="${i}"]`).onclick = this.editNavItem.bind(this, i);
+					item.ondragstart = this.dragStart.bind(this);
+					item.ondragenter = this.dragEnter.bind(this);
+					item.ondragover = this.dragOver.bind(this);
+					item.ondragleave = this.dragLeave.bind(this);
+					item.ondragend = this.dragEnd.bind(this);
+					item.ondrop = this.drop.bind(this);
+					item.parameters = i.toString();
+				}
 			}
 		}
+	}
+
+	//Changes the bulk of the page's html depending on if edit mode is on or off.
+	changeContainer() {
+		if (this.editMode == false) {
+			document.querySelector(".container").innerHTML = `
+				<img src="hero image.jpg" alt="hero image" width="100%">
+				<div class="containerText">
+					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce convallis vel orci a sagittis. 
+						In diam nisl, auctor rhoncus placerat vitae, facilisis quis tellus. Praesent fringilla lectus sit amet justo tristique vestibulum. 
+						Mauris elit mi, pulvinar vitae metus eget, scelerisque malesuada nisi. Suspendisse ut euismod tellus. Etiam gravida felis risus. 
+						In nisl sapien, bibendum quis velit fermentum, facilisis suscipit dui. Fusce vel urna enim. Morbi quis condimentum dui. 
+						Sed pulvinar hendrerit volutpat. In ornare ac enim nec tempus. Curabitur suscipit tempor ullamcorper. 
+						Nunc pretium risus in consectetur aliquam. Donec in nibh eget velit bibendum feugiat.
+					</p>
+				</div>		
+			`;
+		}
+		else {
+			document.querySelector(".container").innerHTML = `
+				<!-- For adding a new navbar item -->
+				<h2>Add Navbar Item</h2>
+				<form action="#" method="post" id="addForm">
+					<label for="name">Name:</label>
+					<input type="text" name="name" id="name"><br>
+					<label for="link">Link:</label>
+					<input type="text" name="link" id="link"><br>
+					<button type="submit" id="addButton">Add</button>
+				</form>
+		
+				<!-- For editing an existing navbar item or subitem -->
+				<h2>Edit Item</h2>
+				<form action="#" method="post" id="editForm">
+					<label for="name">Name:</label>
+					<input type="text" name="name" id="editName" value=""><br>
+					<label for="link">Link:</label>
+					<input type="text" name="link" id="editLink" value=""><br>
+					<button type="submit" id="editButton">Edit</button>
+				</form>
+				<button id="deleteButton">Delete Item</button>
+				<button id="enableDisableButton">Enable/Disable Link</button>
+		
+				<!-- For adding a navbar subitem to an existing item -->
+				<h2>Add Subnav Item</h2>
+				<form action="#" method="post" id="addSubForm">
+					<label for="name">Name:</label>
+					<input type="text" name="name" id="addSubName"><br>
+					<label for="link">Link:</label>
+					<input type="text" name="link" id="addSubLink"><br>
+					<button type="submit" id="addSubButton">Add</button>
+				</form>
+		
+				<label for="navStyle"><h2>Navigation Bar Style</h2></label>
+				<select name="navStyle" id="navStyle">
+					<option value="blank" disabled selected></option>
+					<option value="horizontal">Horizontal</option>
+					<option value="vertical">Vertical</option>
+				</select>
+		
+				<h2>Select User</h2>
+				<form action="#" method="post" id="userForm">
+					<label for="user"></label>
+					<input type="text" name="user" id="userInput"><br>
+					<button type="submit" id="userButton">Select</button>			
+				</form>
+				<button id="editSettings">Save Settings</button>
+		
+				<h2>Add/Remove User</h2>
+				<form action="#" method="post" id="addUserForm">
+					<label for="addUser">Username:</label>
+					<input type="text" name="addUser" id="addUserInput"><br>
+					<button type="submit" id="addUserButton">Add User</button>
+				</form>
+				<button id="deleteUserButton">Remove User</button>
+			`;
+			this.rebindElements();
+			this.disableAll();
+			this.$addForm.onsubmit = this.addNavItem.bind(this, null);
+			this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
+			this.$editSettings.onclick = this.setNavSettings.bind(this);
+			this.$addUserForm.onsubmit = this.addUser.bind(this);	
+			this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+		}
+	}
+
+	//Enables or disables editing of the navbar.
+	toggleEditing() {
+		if (this.editMode == false) {
+			this.editMode = true;
+		}
+		else {
+			this.editMode = false;
+		}
+		this.load();
+		this.changeContainer();
+	}
+
+	//Rebinds all class properties to their corresponding html elements.
+	//This must be called after enabling edit mode because the properties are unbound when the html elements were previously removed.
+	rebindElements() {
+		this.$addForm = document.getElementById("addForm");
+		this.$name = document.getElementById("name");
+		this.$link = document.getElementById("link");
+		this.$addButton = document.getElementById("addButton");
+		this.$editForm = document.getElementById("editForm");
+		this.$editName = document.getElementById("editName");
+		this.$editLink = document.getElementById("editLink");
+		this.$editButton = document.getElementById("editButton");
+		this.$deleteButton = document.getElementById("deleteButton");
+		this.$enableDisableButton = document.getElementById("enableDisableButton");
+		this.$addSubForm = document.getElementById("addSubForm");
+		this.$addSubName = document.getElementById("addSubName");
+		this.$addSubLink = document.getElementById("addSubLink");
+		this.$addSubButton = document.getElementById("addSubButton");
+		this.$navbar = document.getElementById("navbar");
+		this.$cssId = document.getElementById("cssId");
+		this.$navStyle = document.getElementById("navStyle");
+		this.$userForm = document.getElementById("userForm");
+		this.$userInput = document.getElementById("userInput");		
+		this.$editSettings = document.getElementById("editSettings");
+		this.$addUserForm = document.getElementById("addUserForm");
+		this.$addUserInput = document.getElementById("addUserInput");
+		this.$deleteUserButton = document.getElementById("deleteUserButton");
 	}
 
 	//Disables all fields and buttons in all forms, except the add form.
@@ -374,32 +481,21 @@ class NavBar {
 			window.location.hash = "";
 		}
 
-		let isDeleted = this.deleteFromParent(this.items, index);
-		if (isDeleted == false) {
-			this.items.splice(index, 1);
-		}
+		this.deleteRecurse(this.items, index);
 		this.load();
 	}
 
 	//Deletes an item by searching through an array to find it.
-	//Checks all the nested items of each item in the array (starting with this.items). If a nested itself has nested items, the method is called again on those items.
-	//If the object is not found (persumably because it is a top level object), the method return false.
-	deleteFromParent(objectArray, index) {
+	//Checks each item in the array (starting with this.items). If an item has nested items of its own, the method is called again on those items.
+	deleteRecurse(objectArray, index) {
 		for (let i = 0; i < objectArray.length; i++) {
-			for (let j = 0; j < objectArray[i].items.length; j++) {
-				if (objectArray[i].items[j].id == index) {
-					objectArray[i].items.splice(j, 1);
-					return true;
-				}
-			}
 			if (objectArray[i].items.length > 1) {
-				let isDeleted = this.deleteFromParent(objectArray[i].items, index);
-				if (isDeleted == true) {
-					return true;
-				}
+				this.deleteRecurse(objectArray[i].items, index);
+			}
+			if (objectArray[i].id == index) {
+				objectArray.splice(i, 1);
 			}
 		}
-		return false;
 	}
 
 	//Changes whether a navbar item is clickable or not.
@@ -577,6 +673,7 @@ class NavBar {
 		});
 	}
 
+	//Expands or shrinks the horizontal navbar depending on if the page is scrolled.
 	scroll() {
 		let navbar = document.getElementById("navbar");
 		let logo = document.querySelector(".logo");
