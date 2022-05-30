@@ -183,7 +183,10 @@ class NavBar {
 	renderNavItem(item) {
 		let navString = `
 			<div class="subnav ${item.name == 'Move to end' ? 'move-to-end' : ''} ${item.layer > MAX_LAYER ? 'max-layer' : ''}" ${item.name == "Move to end" ? "style='display: none;'" : ""} data-id="${item.id}">
-				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">${item.name} ${item.items.length > 1 ? this.navStyle == "horizontal" ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : "<i class='fa-solid fa-angle-right fa-xs'></i>" : ""}</a>
+				<a href="${item.link}" ${item.isDisabled ? 'isDisabled' : ''}" draggable="true" data-id="${item.id}">
+					${item.name}
+					${item.items.length > 1 ? this.navStyle == "horizontal" ? "<i class='fa-solid fa-angle-down fa-xs'></i>" : "<i class='fa-solid fa-angle-right fa-xs'></i>" : ""}
+				</a>
 				${this.editMode == true ? "<button data-id='" + item.id + "'>E</button>" : ""}
 				<div class="subnav-content">
 		`;
@@ -531,29 +534,33 @@ class NavBar {
 	//Last, the subnav that the item is nested in is unhidden, in case the target itself is nested.
 	//The end result is that whenever an item is dragged over another item, that item's nested items are all displayed properly.
 	dragEnter(event) {
-		event.target.classList.add("drag-over");
-		let elements = document.getElementsByClassName("subnav-content");
-		for (let i = 0; i < elements.length; i++) {
-			elements[i].style.display = "none";
-		}
-		let itemHTML = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
-		let item = this.findMatchingItem(this.items, event.target.dataset.id);
-		if (item.layer < MAX_LAYER) {
-			itemHTML.lastElementChild.style.display = "block";
-		}
-		let parentHTML = itemHTML.parentElement;
-		if (item.layer != 1) {
-			parentHTML.style.display = "block";
-		}
-		for (let i = 2; i < item.layer; i++) {
-			parentHTML = parentHTML.parentElement.parentElement;
-			parentHTML.style.display = "block";
+		if (event.target.tagName != "I") {
+			event.target.classList.add("drag-over");
+			let elements = document.getElementsByClassName("subnav-content");
+			for (let i = 0; i < elements.length; i++) {
+				elements[i].style.display = "none";
+			}
+			let itemHTML = document.querySelector(`div[data-id="${event.target.dataset.id}"]`);
+			let item = this.findMatchingItem(this.items, event.target.dataset.id);
+			if (item.layer < MAX_LAYER) {
+				itemHTML.lastElementChild.style.display = "block";
+			}
+			let parentHTML = itemHTML.parentElement;
+			if (item.layer != 1) {
+				parentHTML.style.display = "block";
+			}
+			for (let i = 2; i < item.layer; i++) {
+				parentHTML = parentHTML.parentElement.parentElement;
+				parentHTML.style.display = "block";
+			}
 		}
 	}
 
 	//This must be called to allow an item to trigger the drop method when dropping onto an item.
 	dragOver(event) {
-		event.preventDefault();
+		if (event.target.tagName != "I") {
+			event.preventDefault();
+		}
 	}
 
 	//Remove the box when item is not longer being dragged over.
