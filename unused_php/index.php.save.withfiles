@@ -1,0 +1,153 @@
+<?php
+
+//echo "Justin Test";
+//echo $_SERVER['QUERY_STRING'];
+
+//echo PHP_EOL;
+//echo ("1" === 1);
+//echo PHP_EOL;
+/*
+
+$foo = "STRING";
+$bar = "foo";
+echo $$bar;
+$a = array();
+$b = [
+'a' => 'value',
+'b' => 'value',
+];
+*/
+$path = $_SERVER['REQUEST_URI'];
+$file_menu_data = 'data/data_array.json';
+$file_users = 'data/users.json';
+
+$users = json_decode(file_get_contents($file_users), true);
+$userdata = json_decode(file_get_contents($file_menu_data), true);
+
+function getUserIndex($userdata) {
+	$indexOfUser = -1;
+	for($i = 0; $i < count($userdata); $i++) {
+		if($userdata[$i]['user']== $_SERVER['QUERY_STRING']) {
+			$indexOfUser = $i;
+		}
+	}
+	return $indexOfUser;
+}
+
+function editSettings($users,$userdata) {
+
+	$indexOfUser = -1;
+	$json = file_get_contents('php://input');
+	$data = json_decode($json, true);
+	for($i = 0; $i < count($userdata); $i++) {
+		if($userdata[$i]['user']==$data['user']) {
+			$indexOfUser = $i;
+		}
+	}
+
+	if($indexOfUser==-1) {
+		array_push($userdata, $data);
+		array_push($users, ['user' => $data['user']]);
+	}
+	else {
+		array_splice($userdata,$indexOfUser,1);
+		array_push($userdata, $data);
+	}
+	return array($users,$userdata);
+}
+
+function deleteUser($users,$userdata) {
+	$indexUsers = -1;
+	$indexUserdata = -1;
+	$json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+	for($i = 0; $i < count($userdata); $i++) {
+                if($userdata[$i]['user']==$data['user']) {
+                        $indexUserdata = $i;
+                }
+        }
+	for($i = 0; $i < count($users); $i++) {
+		if($users[$i]['user']==$data['user']) {
+			$indexUsers = $i;
+		}
+	}
+
+	if($indexUsers == -1 && $indexUserdata == -1) {
+		return -1;
+	}
+	if($indexUsers != -1) {
+		array_splice($users,$indexUsers,1);
+	}
+	if($indexUserdata != -1) {
+		array_splice($userdata,$indexUserdata,1);
+	}
+	return array($users,$userdata);
+}
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Content-Type: application/json; charset=utf-8');
+
+
+$uriArray = explode('?',$path);
+
+/*
+echo "<pre>";
+print_r($userdata[$indexOfUser]);
+editSettings($userdata);
+try {
+*/
+switch($uriArray[0]){
+	case '/users':
+		echo json_encode($users);
+		break;
+	case '/userdata':
+		$indexOfUser = getUserIndex($userdata);
+		echo json_encode($userdata[$indexOfUser]);
+		break;
+	case '/edit':
+		$data = editSettings($users,$userdata);
+		$users = $data[0];
+		$userdata = $data[1];
+		echo json_encode($userdata);
+		file_put_contents($file_menu_data, json_encode($userdata));
+		file_put_contents($file_users, json_encode($users));
+		break;
+	case '/deleteuser':
+		$data = deleteUser($users,$userdata);		
+		if($data != -1) {
+			$users = $data[0];
+			$userdata = $data[1];
+			file_put_contents($file_menu_data, json_encode($userdata));
+	                file_put_contents($file_users, json_encode($users));
+			echo json_encode("user deleted");
+		}
+		else {
+			echo json_encode("no matching user");
+		}
+		break;
+	default:
+		echo 'no data';
+		break;
+}
+/*
+} catch(\Exception $e) {
+var_dump($e);
+}
+/*
+if($path == "/users")
+{
+	echo json_encode($userpass);
+};
+
+if($uriArray[0] == "/userdata")
+{
+	$indexOfUser = -1;
+	for($i = 0; $i < count($userdata); $i++) {
+		if($userdata[$i]['user']== $_SERVER['QUERY_STRING']) {
+			$indexOfUser = $i;
+		}
+	} 
+	echo json_encode($userdata[$indexOfUser]);
+}
+*/

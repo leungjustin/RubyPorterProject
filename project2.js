@@ -35,6 +35,7 @@ class NavBar {
 		this.lastId = 14;
 
 		this.navStyle = "none";			
+
 		this.logo = "gates-of-fennario-logo.png";
 		this.icon = "gates-of-fennario-icon.png";
 		
@@ -186,10 +187,10 @@ class NavBar {
 
 	fillItems() {		
 		if (this.$navbar.classList.contains("vertical")) {
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = "RubyPorterProject/project1.css";
 		}
 		else if (this.$navbar.classList.contains("horizontal")) {
-			this.$cssId.href = "navbarstyles.css";
+			this.$cssId.href = "RubyPorterProject/navbarstyles.css";
 		}
 		else {
 			this.$cssId.href = "";
@@ -681,7 +682,7 @@ class NavBar {
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
 		event.preventDefault();		
-		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
+		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
@@ -741,7 +742,7 @@ class NavBar {
 			}
 
 			if (isValid) {
-				fetch("http://justin.navigation.test/edit" , {
+				fetch(`http://justin.navigation.test/user/${this.$userInput.value}/edit` , {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -797,7 +798,7 @@ class NavBar {
 
 			if (!isInvalid)
 			{
-				fetch('http://justin.navigation.test/adduser' , {
+				fetch('http://justin.navigation.test/user' , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -845,7 +846,7 @@ class NavBar {
 
 			if (isValid)
 			{
-				fetch('http://justin.navigation.test/deleteuser' , {
+				fetch(`http://justin.navigation.test/user/${this.$addUserInput.value}/delete` , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
