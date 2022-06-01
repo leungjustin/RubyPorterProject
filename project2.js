@@ -32,8 +32,8 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.logo = "gates-of-fennario-logo.png";
-		this.icon = "gates-of-fennario-icon.png";
+		this.logo = "RubyPorterProject/gates-of-fennario-logo.png";
+		this.icon = "RubyPorterProject/gates-of-fennario-icon.png";
 
 		this.lastId = 14;
 		this.navStyle = "none";	
@@ -176,10 +176,10 @@ class NavBar {
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
 		if (this.navStyle == "horizontal") {
-			this.$cssId.href = "navbarstyles.css";
+			this.$cssId.href = "RubyPorterProject/navbarstyles.css";
 		}
 		if (this.navStyle == "vertical") {
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = "RubyPorterProject/project1.css";
 		}
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
@@ -197,7 +197,7 @@ class NavBar {
 	}
 
 	fillItemsMobile() {
-		this.$cssId.href = "mobilestyle.css";
+		this.$cssId.href = "RubyPorterProject/mobilestyle.css";
 		window.onscroll = () => {};
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
