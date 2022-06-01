@@ -32,8 +32,8 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.logo = "RubyPorterProject/gates-of-fennario-logo.png";
-		this.icon = "RubyPorterProject/gates-of-fennario-icon.png";
+		this.logo = "gates-of-fennario-logo.png";
+		this.icon = "gates-of-fennario-icon.png";
 
 		this.lastId = 14;
 		this.navStyle = "none";	
@@ -279,7 +279,7 @@ class NavBar {
 	changeContainer() {
 		if (this.editMode == false) {
 			document.querySelector(".container").innerHTML = `
-				<img src="RubyPorterProject/hero image.jpg" alt="hero image" width="100%">
+				<img src="hero image.jpg" alt="hero image" width="100%">
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
 					<p>
