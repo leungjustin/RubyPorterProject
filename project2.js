@@ -39,6 +39,26 @@ class NavBar {
 		this.navStyle = "none";	
 		this.editMode = true;
 		
+		this.bindElements();
+
+    	this.settings = {
+			user: this.$userInput.value,
+			navStyle: this.navStyle,
+			items: this.items
+		};
+
+		this.disableAll();
+		let disabled = [
+			this.$name,
+			this.$link,
+			this.$addButton
+		];
+		disabled.forEach(element => element.disabled = true);
+	}
+
+	//Binds all class properties to their corresponding html elements.
+	//This must be called after enabling edit mode because the properties are unbound when the html elements were previously removed.
+	bindElements() {
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -62,20 +82,6 @@ class NavBar {
 		this.$addUserForm = document.getElementById("addUserForm");
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
-
-    	this.settings = {
-			user: this.$userInput.value,
-			navStyle: this.navStyle,
-			items: this.items
-		};
-
-		this.disableAll();
-		let disabled = [
-			this.$name,
-			this.$link,
-			this.$addButton
-		];
-		disabled.forEach(element => element.disabled = true);
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
@@ -296,54 +302,16 @@ class NavBar {
 				</form>
 				<button id="deleteUserButton">Remove User</button>
 			`;
-			this.rebindElements();
+			this.bindElements();
 			this.disableAll();
-			this.$addForm.onsubmit = this.addNavItem.bind(this, null);
-			this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
-			this.$editSettings.onclick = this.setNavSettings.bind(this);
-			this.$addUserForm.onsubmit = this.addUser.bind(this);	
-			this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 		}
 	}
 
 	//Enables or disables editing of the navbar.
 	toggleEditing() {
-		if (this.editMode == false) {
-			this.editMode = true;
-		}
-		else {
-			this.editMode = false;
-		}
+		this.editMode = !this.editMode;
 		this.load();
 		this.changeContainer();
-	}
-
-	//Rebinds all class properties to their corresponding html elements.
-	//This must be called after enabling edit mode because the properties are unbound when the html elements were previously removed.
-	rebindElements() {
-		this.$addForm = document.getElementById("addForm");
-		this.$name = document.getElementById("name");
-		this.$link = document.getElementById("link");
-		this.$addButton = document.getElementById("addButton");
-		this.$editForm = document.getElementById("editForm");
-		this.$editName = document.getElementById("editName");
-		this.$editLink = document.getElementById("editLink");
-		this.$editButton = document.getElementById("editButton");
-		this.$deleteButton = document.getElementById("deleteButton");
-		this.$enableDisableButton = document.getElementById("enableDisableButton");
-		this.$addSubForm = document.getElementById("addSubForm");
-		this.$addSubName = document.getElementById("addSubName");
-		this.$addSubLink = document.getElementById("addSubLink");
-		this.$addSubButton = document.getElementById("addSubButton");
-		this.$navbar = document.getElementById("navbar");
-		this.$cssId = document.getElementById("cssId");
-		this.$navStyle = document.getElementById("navStyle");
-		this.$userForm = document.getElementById("userForm");
-		this.$userInput = document.getElementById("userInput");		
-		this.$editSettings = document.getElementById("editSettings");
-		this.$addUserForm = document.getElementById("addUserForm");
-		this.$addUserInput = document.getElementById("addUserInput");
-		this.$deleteUserButton = document.getElementById("deleteUserButton");
 	}
 
 	//Disables all fields and buttons in all forms, except the add form.
