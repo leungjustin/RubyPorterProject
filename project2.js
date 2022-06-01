@@ -41,7 +41,7 @@ class NavBar {
 		
 		this.bindElements();
 
-    	this.settings = {
+    this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
 			items: this.items
@@ -89,6 +89,7 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+    window.onresize = this.changeNavStyle.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -116,7 +117,12 @@ class NavBar {
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
 	load() {		
-		this.fillItems();		
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
 		this.changeActive(this.items, window.location.hash);
 		this.addEventListeners();
 		this.disableAll();
@@ -185,6 +191,24 @@ class NavBar {
 		`;
 	}
 
+	fillItemsMobile() {
+		this.$cssId.href = "mobilestyle.css";
+		window.onscroll = () => {};
+		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
+		this.$navbar.innerHTML = `
+			<div>
+				<img class="logo" src="${this.logo}" alt="Logo">
+				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
+				<i class="fa-brands fa-facebook fa-2xl social"></i>
+				<i class="fa-solid fa-bars" id="bars"></i>
+			</div>
+			<div class="navbar-content">
+				${itemsHTML}
+			</div>
+		`;
+    document.querySelector("#bars").onclick = this.toggleMobileMenu.bind(this);
+	}
+
 	//Creates the html for a single navbar item. If the item has nested item in it, the method is called again on each of the nested items.
 	renderNavItem(item) {
 		let navString = `
@@ -204,6 +228,15 @@ class NavBar {
 			</div>
 		`;
 		return navString;
+	}
+
+	toggleMobileMenu() {
+		if (!document.querySelector(".navbar-content").classList.contains("active")) {
+			document.querySelector(".navbar-content").classList.add("active");
+		}
+		else {
+			document.querySelector(".navbar-content").classList.remove("active");
+		}
 	}
 
 	//Adds click and submit events for navbar items and buttons.
@@ -660,9 +693,11 @@ class NavBar {
 			logo.style.height = "40px";
 			logo.style.opacity = 0;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "15px";
-			icon.style.height = "40px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null) {
+				icon.style.padding = "15px";
+				icon.style.height = "40px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -685,9 +720,12 @@ class NavBar {
 			logo.style.height = "50px";
 			logo.style.opacity = 1;
 			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			icon.style.padding = "25px";
-			icon.style.height = "50px";
-			icon.style.transition = "height 0.2s";
+			if (icon != null)
+			{
+				icon.style.padding = "25px";
+				icon.style.height = "50px";
+				icon.style.transition = "height 0.2s";
+			}
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -708,7 +746,7 @@ class NavBar {
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
 		event.preventDefault();		
-		fetch(`http://justin.navigation.test/userdata?${this.$userInput.value}`)
+		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
@@ -768,7 +806,7 @@ class NavBar {
 			}
 
 			if (isValid) {
-				fetch("http://justin.navigation.test/edit" , {
+				fetch(`http://justin.navigation.test/user/${this.$userInput.value}/edit` , {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -824,7 +862,7 @@ class NavBar {
 
 			if (!isInvalid)
 			{
-				fetch('http://justin.navigation.test/adduser' , {
+				fetch('http://justin.navigation.test/user' , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -872,7 +910,7 @@ class NavBar {
 
 			if (isValid)
 			{
-				fetch('http://justin.navigation.test/deleteuser' , {
+				fetch(`http://justin.navigation.test/user/${this.$addUserInput.value}/delete` , {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -897,3 +935,4 @@ class NavBar {
 
 let navbar;
 window.onload = () => navbar = new NavBar();
+
