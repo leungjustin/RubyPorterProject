@@ -59,6 +59,7 @@ class NavBar {
 	//Binds all class properties to their corresponding html elements.
 	//This must be called after enabling edit mode because the properties are unbound when the html elements were previously removed.
 	bindElements() {
+		this.$container = document.querySelector(".container");
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -89,23 +90,29 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-    	window.onresize = this.load.bind(this);
+    	window.onresize = this.changeNavStyle.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
-		if (this.$navStyle.value == "horizontal") {
+		this.$container.removeAttribute("style");
+		if (this.$navStyle.value == "horizontal" || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
+			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
-		else if (this.$navStyle.value == "vertical") {
+		if (this.$navStyle.value == "vertical" || this.navStyle == "vertical") {
 			this.navStyle = "vertical";
+			this.$cssId.href = "project1.css";
 			window.onscroll = () => {};
 		}
-		else {
+		if (this.navStyle == "none") {
 			this.$cssId.href = "";
-			this.navStyle = "none";
+			window.onscroll = () => {};
+		}
+		if (window.innerWidth < 1024) {
+			this.$cssId.href = "mobilestyle.css";
 			window.onscroll = () => {};
 		}
 
@@ -175,16 +182,6 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
-		if (this.navStyle == "horizontal") {
-
-			this.$cssId.href = "navbarstyles.css";
-			document.querySelector(".container").style.paddingTop = "106px";
-		}
-		if (this.navStyle == "vertical") {
-			this.$cssId.href = "project1.css";
-			document.querySelector(".container").style.paddingTop = "0px";
-		}		
-
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -201,11 +198,6 @@ class NavBar {
 	}
 
 	fillItemsMobile() {
-
-		this.$cssId.href = "mobilestyle.css";
-		document.querySelector(".container").style.paddingTop = "106px";
-
-		window.onscroll = () => {};
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<div>
@@ -246,11 +238,11 @@ class NavBar {
 	toggleMobileMenu() {
 		if (!document.querySelector(".navbar-content").classList.contains("active")) {
 			document.querySelector(".navbar-content").classList.add("active");
-			document.querySelector(".container").style.paddingTop = "0px";
+			this.$container.style.paddingTop = "0px";
 		}
 		else {
 			document.querySelector(".navbar-content").classList.remove("active");
-			document.querySelector(".container").style.paddingTop = "106px";
+			this.$container.style.paddingTop = "106px";
 		}
 	}
 
@@ -278,7 +270,7 @@ class NavBar {
 	//Changes the bulk of the page's html depending on if edit mode is on or off.
 	changeContainer() {
 		if (this.editMode == false) {
-			document.querySelector(".container").innerHTML = `
+			this.$container.innerHTML = `
 				<img src="hero image.jpg" alt="hero image" width="100%">
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
@@ -294,7 +286,7 @@ class NavBar {
 			`;
 		}
 		else {
-			document.querySelector(".container").innerHTML = `
+			this.$container.innerHTML = `
 				<!-- For adding a new navbar item -->
 				<h2>Add Navbar Item</h2>
 				<form action="#" method="post" id="addForm">
@@ -766,9 +758,8 @@ class NavBar {
 		.then(data => {
 			if (data) {
 				this.items = data.items;
-				this.$navStyle.value = data.navStyle;
-				this.navStyle = data.navStyle;	
-				this.findLastId(this.items);			
+				this.navStyle = data.navStyle;
+				this.findLastId(this.items);
 			}
 			else {
 				this.items = [];
