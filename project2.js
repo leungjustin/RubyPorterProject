@@ -177,10 +177,12 @@ class NavBar {
 	fillItems() {
 		if (this.navStyle == "horizontal") {
 			this.$cssId.href = "navbarstyles.css";
+			document.querySelector(".container").style.paddingTop = "106px";
 		}
 		if (this.navStyle == "vertical") {
 			this.$cssId.href = "project1.css";
-		}
+			document.querySelector(".container").style.paddingTop = "0px";
+		}		
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -198,6 +200,7 @@ class NavBar {
 
 	fillItemsMobile() {
 		this.$cssId.href = "mobilestyle.css";
+		document.querySelector(".container").style.paddingTop = "106px";
 		window.onscroll = () => {};
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
