@@ -89,7 +89,7 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-    window.onresize = this.changeNavStyle.bind(this);
+    	window.onresize = this.load.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -97,11 +97,9 @@ class NavBar {
 		this.$navbar.removeAttribute("style");
 		if (this.$navStyle.value == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
 		else if (this.$navStyle.value == "vertical") {
-			this.$cssId.href = "project1.css";
 			this.navStyle = "vertical";
 			window.onscroll = () => {};
 		}
@@ -110,6 +108,7 @@ class NavBar {
 			this.navStyle = "none";
 			window.onscroll = () => {};
 		}
+
 		this.enableAll();
 		this.load();
 		this.changeContainer();
@@ -176,6 +175,12 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
+		if (this.navStyle == "horizontal") {
+			this.$cssId.href = "navbarstyles.css";
+		}
+		if (this.navStyle == "vertical") {
+			this.$cssId.href = "project1.css";
+		}
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -198,6 +203,7 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
+				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
 				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
 				<i class="fa-solid fa-bars" id="bars"></i>
@@ -233,9 +239,11 @@ class NavBar {
 	toggleMobileMenu() {
 		if (!document.querySelector(".navbar-content").classList.contains("active")) {
 			document.querySelector(".navbar-content").classList.add("active");
+			document.querySelector(".container").style.paddingTop = "0px";
 		}
 		else {
 			document.querySelector(".navbar-content").classList.remove("active");
+			document.querySelector(".container").style.paddingTop = "106px";
 		}
 	}
 
