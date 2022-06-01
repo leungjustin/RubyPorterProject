@@ -272,7 +272,7 @@ class NavBar {
 	changeContainer() {
 		if (this.editMode == false) {
 			document.querySelector(".container").innerHTML = `
-				<img src="hero image.jpg" alt="hero image" width="100%">
+				<img src="RubyPorterProject/hero image.jpg" alt="hero image" width="100%">
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
 					<p>
