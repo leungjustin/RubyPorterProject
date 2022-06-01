@@ -23,7 +23,7 @@ body {
     float: left;
 	height: 50px;
 	padding: 25px;
-	position: absolute;
+	position: relative;
 	top: 25;
 	left: 25; 
 }
@@ -85,6 +85,7 @@ body {
 }
 
 .container {
+    padding-top: 106px;
     background-color: #34514e;
 }
 
