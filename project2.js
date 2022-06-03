@@ -1,3 +1,4 @@
+
 const MAX_LAYER = 2;
 
 class NavItem {
@@ -36,24 +37,36 @@ class NavBar {
 		this.icon = "gates-of-fennario-icon.png";
 
 		this.lastId = 14;
-		this.navStyle = "none";	
-		this.editMode = true;
-		
-		this.bindElements();
 
-    this.settings = {
-			user: this.$userInput.value,
-			navStyle: this.navStyle,
-			items: this.items
-		};
+		this.editingPage = window.location.pathname.includes("project1.html");
+		if (this.editingPage) {
+			this.navStyle = "none";	
+			this.editMode = true;			
+			
+			this.bindElements();
 
-		this.disableAll();
-		let disabled = [
-			this.$name,
-			this.$link,
-			this.$addButton
-		];
-		disabled.forEach(element => element.disabled = true);
+			this.settings = {
+				user: this.$userInput.value,
+				navStyle: this.navStyle,
+				items: this.items
+			};
+
+			this.retrieveNavSettings(new Event('submit'), "megan");
+
+			this.disableAll();
+			let disabled = [
+				this.$name,
+				this.$link,
+				this.$addButton
+			];
+			disabled.forEach(element => element.disabled = true);
+		}
+		else {
+			this.bindElementsStaticMenu();
+			this.retrieveNavSettings(new Event('submit'), "megan");
+
+			this.loadStaticMenu();
+		}
 	}
 
 	//Binds all class properties to their corresponding html elements.
@@ -85,21 +98,30 @@ class NavBar {
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
-		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this, this.$userInput.value);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
     	window.onresize = this.load.bind(this);
 	}
 
+	bindElementsStaticMenu() {
+		
+		this.$navbar = document.getElementById("navbar");
+		this.$cssId = document.getElementById("cssId");
+		this.$navStyle = document.getElementById("navStyle");
+
+    	window.onresize = this.loadStaticMenu.bind(this);
+	}
+
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
-		if (this.$navStyle.value == "horizontal") {
+		if (this.$navStyle.value == "horizontal" || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
 			window.onscroll = this.scroll.bind(this);
 		}
-		else if (this.$navStyle.value == "vertical") {
+		else if (this.$navStyle.value == "vertical" || this.navStyle == "vertical") {
 			this.navStyle = "vertical";
 			window.onscroll = () => {};
 		}
@@ -127,6 +149,17 @@ class NavBar {
 		this.disableAll();
 		this.checkNone();
 		this.resetForms();
+	}
+
+	loadStaticMenu() {
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
+		this.changeActive(this.items, window.location.hash);
+		this.addEventListeners();
 	}
 
 	//Same as load, expect without rendering the navbar or adding event listeners.
@@ -192,7 +225,7 @@ class NavBar {
 				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
+				${this.editingPage ? `<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"} </button>` : ''}
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
@@ -210,7 +243,7 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
+				${this.editingPage ? `<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"} </button>` : ''}
 				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
 				<i class="fa-solid fa-bars" id="bars"></i>
@@ -256,7 +289,9 @@ class NavBar {
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
-		document.getElementById("editing").onclick = this.toggleEditing.bind(this);
+		if (document.getElementById("editing") != null){
+			document.getElementById("editing").onclick = this.toggleEditing.bind(this);
+		}
 		for (let i = 0; i <= this.lastId; i++) {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
@@ -759,20 +794,26 @@ class NavBar {
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
-	retrieveNavSettings(event) {
-		event.preventDefault();		
-		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
+	retrieveNavSettings(event, username) {
+		if(event && event.preventDefault) {
+			event.preventDefault();
+		}	
+		fetch(`http://justin.navigation.test/user/${username}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
 				this.items = data.items;
-				this.$navStyle.value = data.navStyle;
+				if(this.$navStyle != null){
+					this.$navStyle.value = data.navStyle;
+				}
 				this.navStyle = data.navStyle;	
 				this.findLastId(this.items);			
 			}
 			else {
 				this.items = [];
-				this.$navStyle.value = "";
+				if(this.$navStyle != null){
+					this.$navStyle.value = "";
+				}
 				this.navStyle = 'none';
 				console.log("User doesn't exist");
 			}
