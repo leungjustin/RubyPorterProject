@@ -1,79 +1,82 @@
 <!doctype html>
 
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link id="cssId" rel="stylesheet">
-	<link rel="stylesheet" href="https://use.typekit.net/xim1riv.css">
-</head> 
-<body>
-	<div class="navbar" id="navbar">	
-	</div>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link id="cssId" rel="stylesheet">
+		<link rel="stylesheet" href="https://use.typekit.net/xim1riv.css">
+	</head>
+	<body>
+		<div class="navbar" id="navbar">
+		</div>
 
-	<div class="container">
-		<!-- For adding a new navbar item -->
-		<h2>Add Navbar Item</h2>
-		<form action="#" method="post" id="addForm">
-			<label for="name">Name:</label>
-			<input type="text" name="name" id="name"><br>
-			<label for="link">Link:</label>
-			<input type="text" name="link" id="link"><br>
-			<button type="submit" id="addButton">Add</button>
-		</form>
+		<div class="container">
+			<!-- For adding a new navbar item -->
+			<h2>Add Navbar Item</h2>
+			<form action="#" method="post" id="addForm">
+				<label for="name">Name:</label>
+				<input type="text" name="name" id="name"><br>
+				<label for="link">Link:</label>
+				<input type="text" name="link" id="link"><br>
+				<button type="submit" id="addButton">Add</button>
+			</form>
 
-		<!-- For editing an existing navbar item or subitem -->
-		<h2>Edit Item</h2>
-		<form action="#" method="post" id="editForm">
-			<label for="name">Name:</label>
-			<input type="text" name="name" id="editName" value=""><br>
-			<label for="link">Link:</label>
-			<input type="text" name="link" id="editLink" value=""><br>
-			<button type="submit" id="editButton">Edit</button>
-		</form>
-		<button id="deleteButton">Delete Item</button>
-		<button id="enableDisableButton">Enable/Disable Link</button>
+			<!-- For editing an existing navbar item or subitem -->
+			<h2>Edit Item</h2>
+			<form action="#" method="post" id="editForm">
+				<label for="name">Name:</label>
+				<input type="text" name="name" id="editName" value=""><br>
+				<label for="link">Link:</label>
+				<input type="text" name="link" id="editLink" value=""><br>
+				<button type="submit" id="editButton">Edit</button>
+			</form>
+			<button id="deleteButton">Delete Item</button>
+			<button id="enableDisableButton">Enable/Disable Link</button>
 
-		<!-- For adding a navbar subitem to an existing item -->
-		<h2>Add Subnav Item</h2>
-		<form action="#" method="post" id="addSubForm">
-			<label for="name">Name:</label>
-			<input type="text" name="name" id="addSubName"><br>
-			<label for="link">Link:</label>
-			<input type="text" name="link" id="addSubLink"><br>
-			<button type="submit" id="addSubButton">Add</button>
-		</form>
+			<!-- For adding a navbar subitem to an existing item -->
+			<h2>Add Subnav Item</h2>
+			<form action="#" method="post" id="addSubForm">
+				<label for="name">Name:</label>
+				<input type="text" name="name" id="addSubName"><br>
+				<label for="link">Link:</label>
+				<input type="text" name="link" id="addSubLink"><br>
+				<button type="submit" id="addSubButton">Add</button>
+			</form>
 
-		<label for="navStyle"><h2>Navigation Bar Style</h2></label>
-		<select name="navStyle" id="navStyle">
-			<option value="blank" disabled selected></option>
-			<option value="horizontal">Horizontal</option>
-			<option value="vertical">Vertical</option>
-		</select>
+			<label for="navStyle"><h2>Navigation Bar Style</h2></label>
+			<select name="navStyle" id="navStyle">
+				<option value="blank" disabled selected></option>
+				<option value="horizontal">Horizontal</option>
+				<option value="vertical">Vertical</option>
+			</select>
 
-		<h2>Select User</h2>
-        <form action="#" method="post" id="userForm">
-            <label for="user"></label>
-            <input type="text" name="user" id="userInput"><br>
-            <button type="submit" id="userButton">Select</button>			
-        </form>
-		<button id="editSettings">Save Settings</button>
+			<h2>Select User</h2>
+			<form action="#" method="post" id="userForm">
+				<label for="user"></label>
+				<input type="text" name="user" id="userInput"><br>
+				<button type="submit" id="userButton">Select</button>
+			</form>
+			<button id="editSettings">Save Settings</button>
 
-		<h2>Add/Remove User</h2>
-		<form action="#" method="post" id="addUserForm">
-			<label for="addUser">Username:</label>
-			<input type="text" name="addUser" id="addUserInput"><br>
-			<button type="submit" id="addUserButton">Add User</button>
-		</form>
-		<button id="deleteUserButton">Remove User</button>
-	</div>	
+			<h2>Add/Remove User</h2>
+			<form action="#" method="post" id="addUserForm">
+				<label for="addUser">Username:</label>
+				<input type="text" name="addUser" id="addUserInput"><br>
+				<button type="submit" id="addUserButton">Add User</button>
+			</form>
+			<button id="deleteUserButton">Remove User</button>
 
-	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-	<p>Press ctrl+/ to toggle editing.</p>
-</body>
+			<h2>Generate Text File:</h2>
+			<label for="navbar-background-color">Navbar Background Color:</label>
+			<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+			<button type="submit" id="generateTextFileButton">Generate</button>
+			<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+		</div>
 
-
-<script src="project2.js"></script>
-<script src="https://kit.fontawesome.com/dc5446663c.js" crossorigin="anonymous"></script>
-
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<p>Press ctrl+/ to toggle editing.</p>
+	</body>
+	<script src="project2.js"></script>
+	<script src="https://kit.fontawesome.com/dc5446663c.js" crossorigin="anonymous"></script>
 </html>

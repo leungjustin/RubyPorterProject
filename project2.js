@@ -41,7 +41,7 @@ class NavBar {
 		
 		this.bindElements();
 
-    this.settings = {
+    	this.settings = {
 			user: this.$userInput.value,
 			navStyle: this.navStyle,
 			items: this.items
@@ -83,6 +83,9 @@ class NavBar {
 		this.$addUserForm = document.getElementById("addUserForm");
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
+		this.$generateTextFileButton = document.getElementById("generateTextFileButton");
+		this.$downloadTextFileButton = document.getElementById("downloadTextFileButton");
+		this.$navbarBackgroundColor = document.getElementById("navbar-background-color");
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
@@ -90,7 +93,191 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+		this.$generateTextFileButton.onclick = this.generateTextFile.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
+	}
+
+	generateTextFile() {
+		let text = `
+/* Custom Horizontal Navbar CSS */
+
+body {
+	margin: 0px;
+}
+
+.container {
+	padding-top: 106px;
+	margin: 8px;
+}
+
+.navbar {
+	overflow: visible;
+	background-color: ${this.$navbarBackgroundColor.value != "" ? this.$navbarBackgroundColor.value : "#ece5f0"};
+	width: 100%;
+	height: 100px;
+	border-bottom: 6px solid #003b36;
+	position: fixed;
+	top: 0;
+	transition: height 0.2s;
+}
+
+.navbar-scroll {
+	overflow: visible;
+	background-color: #ece5f0;
+	width: 100%;
+	height: 70px;
+	border-bottom: 6px solid #003b36;
+	position: fixed;
+	top: 0;
+	transition: height 0.2s;
+}
+
+.navbar-content {
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-content: center;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.logo {
+	float: left;
+	height: 50px;
+	padding: 25px;
+	position: absolute;
+	opacity: 1;
+	transition: height 0.2s, opacity 0.2s ease-in-out;
+}
+
+.icon {
+	float: left;
+	height: 50px;
+	padding: 25px;
+	position: absolute;
+	transition: height 0.2s;
+}
+
+.logo-scroll {
+	float: left;
+	height: 40px;
+	padding: 15px;
+	position: absolute;
+	opacity: 0;
+	transition: height 0.2s, opacity 0.2s ease-in-out;
+}
+
+.icon-scroll {
+	float: left;
+	height: 40px;
+	padding: 15px;
+	position: absolute;
+	transition: height 0.2s;
+}
+
+.subnav {
+	padding-top: 30px;
+	padding-bottom: 24px;
+	border-bottom: 6px solid #003b36;
+}
+
+.subnav .active {
+	color: #e98a15;
+}
+
+.subnav > a {
+	float: left;
+	font-size: 24px;
+	font-family: agenda-one, sans-serif;
+	font-weight: 700;
+	letter-spacing: 2px;
+	color: #003b36;
+	padding: 14px 16px;
+	background-color: inherit;
+	text-decoration: none;
+}
+
+.subnav > button {
+	float: left;
+	color: #003b36;
+	margin-top: 14px;
+	margin-bottom: 14px;
+	text-decoration: none;
+}
+
+.subnav > a:hover {
+	color: #e98a15;
+	transition: color 0.2s;
+}
+
+.subnav-content {
+	display: none;
+	position: absolute;
+	top: 106px;
+	background-color: #34514e;
+}
+
+.subnav-content > .subnav {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	border-bottom: 0px;
+}
+
+.subnav-content a {
+	font-size: 24px;
+	font-family: agenda-one, sans-serif;
+	font-weight: 700;
+	letter-spacing: 2px;
+	color: #fff;
+	text-decoration: none;
+}
+
+.subnav:hover > .subnav-content {
+	display: grid;
+	animation: fadeIn linear 0.2s;
+}
+
+@keyframes fadeIn {
+	0% {opacity: 0;}
+	100% {opacity: 1;}
+}
+
+.subnav-content > .subnav:hover {
+	color: #e98a15;
+	background-color: #003b36;
+	transition: color 0.2s, background-color 0.2s;
+}
+
+.social {
+	float: left;
+	padding: 49.5px 16px;
+}
+
+.max-layer {
+	display: none;
+}
+
+.isDisabled {
+	pointer-events: none;
+}
+
+.drag-over {
+	border: dashed 2px red;
+}
+		`;
+		this.$downloadTextFileButton.href = this.downloadTextFile(text);
+		this.$downloadTextFileButton.style.display = "inline-block";
+	}
+
+	downloadTextFile(text) {
+		let textFile = null;
+		let data = new Blob([text], { type: "text/plain" });
+		if (textFile !== null) {
+			window.URL.revokeObjectURL(data);
+		}
+		textFile = window.URL.createObjectURL(data);
+		return textFile;
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -339,6 +526,12 @@ class NavBar {
 					<button type="submit" id="addUserButton">Add User</button>
 				</form>
 				<button id="deleteUserButton">Remove User</button>
+
+				<h2>Generate Text File:</h2>
+				<label for="navbar-background-color">Navbar Background Color:</label>
+				<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+				<button type="submit" id="generateTextFileButton">Generate</button>
+				<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
 			`;
 			this.bindElements();
 			this.disableAll();
