@@ -185,11 +185,10 @@ class NavBar {
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
-				<img class="logo" src="${this.logo}" alt="Logo">
-				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
+				<img class="logo" id="logo" src="${this.logo}" alt="Logo">
+				${this.navStyle == "horizontal" ? "<img class='icon' id='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
@@ -202,7 +201,6 @@ class NavBar {
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
 				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
 				<i class="fa-solid fa-bars" id="bars"></i>
@@ -248,7 +246,7 @@ class NavBar {
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
-		document.getElementById("editing").onclick = this.toggleEditing.bind(this);
+		document.onkeydown = this.toggleEditing.bind(this);
 		for (let i = 0; i <= this.lastId; i++) {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
@@ -348,10 +346,15 @@ class NavBar {
 	}
 
 	//Enables or disables editing of the navbar.
-	toggleEditing() {
-		this.editMode = !this.editMode;
-		this.load();
-		this.changeContainer();
+	toggleEditing(event) {
+		if (event.repeat) {
+			return;
+		}
+		if ((event.ctrlKey || event.metaKey) && event.key === "/") {
+			this.editMode = !this.editMode;
+			this.load();
+			this.changeContainer();
+		}
 	}
 
 	//Disables all fields and buttons in all forms, except the add form.
@@ -691,20 +694,15 @@ class NavBar {
 	//Expands or shrinks the horizontal navbar depending on if the page is scrolled.
 	scroll() {
 		let navbar = document.getElementById("navbar");
-		let logo = document.querySelector(".logo");
-		let icon = document.querySelector(".icon");
+		let logo = document.getElementById("logo");
+		let icon = document.getElementById("icon");
 		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-			navbar.style.height = "70px";
-			navbar.style.transition = "height 0.2s";
-			logo.style.padding = "15px";
-			logo.style.height = "40px";
-			logo.style.opacity = 0;
-			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			if (icon != null) {
-				icon.style.padding = "15px";
-				icon.style.height = "40px";
-				icon.style.transition = "height 0.2s";
-			}
+			navbar.classList.remove("navbar");
+			navbar.classList.add("navbar-scroll");
+			logo.classList.remove("logo");
+			logo.classList.add("logo-scroll");
+			icon.classList.remove("icon");
+			icon.classList.add("icon-scroll");
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -721,18 +719,12 @@ class NavBar {
 			}
 		}
 		else {
-			navbar.style.height = "100px";
-			navbar.style.transition = "height 0.2s";
-			logo.style.padding = "25px";
-			logo.style.height = "50px";
-			logo.style.opacity = 1;
-			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			if (icon != null)
-			{
-				icon.style.padding = "25px";
-				icon.style.height = "50px";
-				icon.style.transition = "height 0.2s";
-			}
+			navbar.classList.remove("navbar-scroll");
+			navbar.classList.add("navbar");
+			logo.classList.remove("logo-scroll");
+			logo.classList.add("logo");
+			icon.classList.remove("icon-scroll");
+			icon.classList.add("icon");
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
