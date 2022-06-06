@@ -67,11 +67,24 @@
 			</form>
 			<button id="deleteUserButton">Remove User</button>
 
-			<h2>Generate Text File:</h2>
-			<label for="navbar-background-color">Navbar Background Color:</label>
-			<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
-			<button type="submit" id="generateTextFileButton">Generate</button>
-			<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+			<div style="position: absolute; top: 0; left: 400px;">
+				<h2>Edit Navbar Style:</h2>
+				<label for="navbar-background-color">Navbar Background Color:</label>
+				<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+				<label for="navbar-border-color">Navbar Border Color (Leave blank for no border):</label>
+				<input type="text" name="navbar-border-color" id="navbar-border-color"><br>
+				<label for="subnav-link-font">Link Font (Leave blank for default):</label>
+				<input type="text" name="subnav-link-font" id="subnav-link-font"><br>
+				<label for="subnav-link-color">Link Color (Leave blank for default):</label>
+				<input type="text" name="subnav-link-color" id="subnav-link-color"><br>
+				<label for="subnav-active-color">Active Link Color (Leave blank for same as link color):</label>
+				<input type="text" name="subnav-active-color" id="subnav-active-color"><br>
+				<label for="subnav-hover-color">Link Hover Color (Leave blank for same as active color):</label>
+				<input type="text" name="subnav-hover-color" id="subnav-hover-color"><br>
+
+				<button type="submit" id="generateTextFileButton">Generate</button>
+				<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+			</div>		
 		</div>
 
 		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

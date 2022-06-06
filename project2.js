@@ -83,9 +83,15 @@ class NavBar {
 		this.$addUserForm = document.getElementById("addUserForm");
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
+
 		this.$generateTextFileButton = document.getElementById("generateTextFileButton");
 		this.$downloadTextFileButton = document.getElementById("downloadTextFileButton");
 		this.$navbarBackgroundColor = document.getElementById("navbar-background-color");
+		this.$navbarBorderColor = document.getElementById("navbar-border-color");
+		this.$subnavLinkFont = document.getElementById("subnav-link-font");
+		this.$subnavLinkColor = document.getElementById("subnav-link-color");
+		this.$subnavActiveColor = document.getElementById("subnav-active-color");
+		this.$subnavHoverColor = document.getElementById("subnav-hover-color");
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
@@ -112,10 +118,10 @@ body {
 
 .navbar {
 	overflow: visible;
-	background-color: ${this.$navbarBackgroundColor.value != "" ? this.$navbarBackgroundColor.value : "#ece5f0"};
+	${this.$navbarBackgroundColor.value != "" ? "background-color: " + this.$navbarBackgroundColor.value + ";" : ""}
 	width: 100%;
 	height: 100px;
-	border-bottom: 6px solid #003b36;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
 	position: fixed;
 	top: 0;
 	transition: height 0.2s;
@@ -123,10 +129,10 @@ body {
 
 .navbar-scroll {
 	overflow: visible;
-	background-color: #ece5f0;
+	${this.$navbarBackgroundColor.value != "" ? "background-color: " + this.$navbarBackgroundColor.value + ";" : ""}
 	width: 100%;
 	height: 70px;
-	border-bottom: 6px solid #003b36;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
 	position: fixed;
 	top: 0;
 	transition: height 0.2s;
@@ -179,20 +185,20 @@ body {
 .subnav {
 	padding-top: 30px;
 	padding-bottom: 24px;
-	border-bottom: 6px solid #003b36;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
 }
 
 .subnav .active {
-	color: #e98a15;
+	${this.$subnavActiveColor.value != "" ? "color: " + this.$subnavActiveColor.value + ";" : this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
 }
 
 .subnav > a {
 	float: left;
 	font-size: 24px;
-	font-family: agenda-one, sans-serif;
+	${this.$subnavLinkFont.value != "" ? "font-family: " + this.$subnavLinkFont.value + ";" : ""}
 	font-weight: 700;
 	letter-spacing: 2px;
-	color: #003b36;
+	${this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
 	padding: 14px 16px;
 	background-color: inherit;
 	text-decoration: none;
@@ -200,14 +206,14 @@ body {
 
 .subnav > button {
 	float: left;
-	color: #003b36;
+	${this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
 	margin-top: 14px;
 	margin-bottom: 14px;
 	text-decoration: none;
 }
 
 .subnav > a:hover {
-	color: #e98a15;
+	${this.$subnavHoverColor.value != "" ? "color: " + this.$subnavHoverColor.value + ";" : this.$subnavActiveColor.value != "" ? "color :" + this.$subnavActiveColor.value + ";" : ""}
 	transition: color 0.2s;
 }
 
@@ -284,12 +290,12 @@ body {
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
 		this.$container.removeAttribute("style");
-		if (this.$navStyle.value == "horizontal" || this.navStyle == "horizontal") {
+		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
 			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
-		if (this.$navStyle.value == "vertical" || this.navStyle == "vertical") {
+		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
 			this.navStyle = "vertical";
 			this.$cssId.href = "project1.css";
 			window.onscroll = () => {};
@@ -527,11 +533,13 @@ body {
 				</form>
 				<button id="deleteUserButton">Remove User</button>
 
-				<h2>Generate Text File:</h2>
-				<label for="navbar-background-color">Navbar Background Color:</label>
-				<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
-				<button type="submit" id="generateTextFileButton">Generate</button>
-				<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+				<div class="right-column">
+					<h2>Edit Navbar Style:</h2>
+					<label for="navbar-background-color">Navbar Background Color:</label>
+					<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+					<button type="submit" id="generateTextFileButton">Generate</button>
+					<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+				</div>
 			`;
 			this.bindElements();
 			this.disableAll();
