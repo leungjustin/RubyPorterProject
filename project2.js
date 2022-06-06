@@ -132,8 +132,14 @@ class NavBar {
 		}
 
 		this.enableAll();
-		this.load();
-		this.changeContainer();
+		if (this.editingPage) {
+			this.load();
+			this.changeContainer();
+		}
+		else {
+			this.loadStaticMenu();
+		}
+		
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
