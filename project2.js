@@ -109,24 +109,25 @@ class NavBar {
 	bindElementsStaticMenu() {
 		
 		this.$navbar = document.getElementById("navbar");
-		this.$cssId = document.getElementById("cssId");
-		this.$navStyle = document.getElementById("navStyle");
+		this.$cssId = document.getElementById("cssId");		
 
-    	window.onresize = this.loadStaticMenu.bind(this);
+    	window.onresize = this.changeNavStyle.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
-		this.$container.removeAttribute("style");
+		if (this.$container != null) {
+			this.$container.removeAttribute("style");
+		}
 
-		if (this.$navStyle.value == "horizontal" || this.navStyle == "horizontal") {
+		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
 			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
-
-		if (this.$navStyle.value == "vertical" || this.navStyle == "vertical") {
+		
+		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
 
 			this.navStyle = "vertical";
 			this.$cssId.href = "project1.css";
@@ -141,8 +142,9 @@ class NavBar {
 			window.onscroll = () => {};
 		}
 
-		this.enableAll();
+		
 		if (this.editingPage) {
+			this.enableAll();
 			this.load();
 			this.changeContainer();
 		}
