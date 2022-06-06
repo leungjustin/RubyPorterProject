@@ -1,13 +1,13 @@
 
 const MAX_LAYER = 2;
-const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
-const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
-const BKGD_IMAGE_PATH = "RubyPorterProject/hero image.jpg";
+const LOGO_PATH = "gates-of-fennario-logo.png";
+const ICON_PATH = "gates-of-fennario-icon.png";
+const BKGD_IMAGE_PATH = "hero image.jpg";
 const EDIT_PATH = "project1.html";
 const MENU_USER = "megan";
-const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
-const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
-const MOBILE_CSS_PATH = "RubyPorterProject/mobilestyle.css";
+const HORIZONTAL_CSS_PATH = "navbarstyles.css";
+const VERTICAL_CSS_PATH = "project1.css";
+const MOBILE_CSS_PATH = "mobilestyle.css";
 
 
 class NavItem {
