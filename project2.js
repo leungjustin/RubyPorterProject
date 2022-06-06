@@ -1,3 +1,4 @@
+
 const MAX_LAYER = 2;
 
 class NavItem {
@@ -36,29 +37,42 @@ class NavBar {
 		this.icon = "RubyPorterProject/gates-of-fennario-icon.png";
 
 		this.lastId = 14;
-		this.navStyle = "none";	
-		this.editMode = true;
-		
-		this.bindElements();
 
-    this.settings = {
-			user: this.$userInput.value,
-			navStyle: this.navStyle,
-			items: this.items
-		};
+		this.editingPage = window.location.pathname.includes("project1.html");
+		if (this.editingPage) {
+			this.navStyle = "none";	
+			this.editMode = true;			
+			
+			this.bindElements();
 
-		this.disableAll();
-		let disabled = [
-			this.$name,
-			this.$link,
-			this.$addButton
-		];
-		disabled.forEach(element => element.disabled = true);
+			this.settings = {
+				user: this.$userInput.value,
+				navStyle: this.navStyle,
+				items: this.items
+			};
+
+			this.retrieveNavSettings(new Event('submit'), "megan");
+
+			this.disableAll();
+			let disabled = [
+				this.$name,
+				this.$link,
+				this.$addButton
+			];
+			disabled.forEach(element => element.disabled = true);
+		}
+		else {
+			this.bindElementsStaticMenu();
+			this.retrieveNavSettings(new Event('submit'), "megan");
+
+			this.loadStaticMenu();
+		}
 	}
 
 	//Binds all class properties to their corresponding html elements.
 	//This must be called after enabling edit mode because the properties are unbound when the html elements were previously removed.
 	bindElements() {
+		this.$container = document.querySelector(".container");
 		this.$addForm = document.getElementById("addForm");
 		this.$name = document.getElementById("name");
 		this.$link = document.getElementById("link");
@@ -85,33 +99,59 @@ class NavBar {
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
-		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this, this.$userInput.value);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-    	window.onresize = this.load.bind(this);
+    	window.onresize = this.changeNavStyle.bind(this);
+	}
+
+	bindElementsStaticMenu() {
+		
+		this.$navbar = document.getElementById("navbar");
+		this.$cssId = document.getElementById("cssId");		
+
+    	window.onresize = this.changeNavStyle.bind(this);
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
-		if (this.$navStyle.value == "horizontal") {
+		if (this.$container != null) {
+			this.$container.removeAttribute("style");
+		}
+
+		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
+			this.$cssId.href = "navbarstyles.css";
 			window.onscroll = this.scroll.bind(this);
 		}
-		else if (this.$navStyle.value == "vertical") {
+		
+		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
+
 			this.navStyle = "vertical";
+			this.$cssId.href = "project1.css";
 			window.onscroll = () => {};
 		}
-		else {
+		if (this.navStyle == "none") {
 			this.$cssId.href = "";
-			this.navStyle = "none";
+			window.onscroll = () => {};
+		}
+		if (window.innerWidth < 1024) {
+			this.$cssId.href = "mobilestyle.css";
 			window.onscroll = () => {};
 		}
 
-		this.enableAll();
-		this.load();
-		this.changeContainer();
+		
+		if (this.editingPage) {
+			this.enableAll();
+			this.load();
+			this.changeContainer();
+		}
+		else {
+			this.loadStaticMenu();
+		}
+		
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -127,6 +167,17 @@ class NavBar {
 		this.disableAll();
 		this.checkNone();
 		this.resetForms();
+	}
+
+	loadStaticMenu() {
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
+		this.changeActive(this.items, window.location.hash);
+		this.addEventListeners();
 	}
 
 	//Same as load, expect without rendering the navbar or adding event listeners.
@@ -175,24 +226,15 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
-		if (this.navStyle == "horizontal") {
-
-			this.$cssId.href = "RubyPorterProject/navbarstyles.css";
-			document.querySelector(".container").style.paddingTop = "106px";
-		}
-		if (this.navStyle == "vertical") {
-			this.$cssId.href = "RubyPorterProject/project1.css";
-			document.querySelector(".container").style.paddingTop = "0px";
-		}		
 
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
-				<img class="logo" src="${this.logo}" alt="Logo">
-				${this.navStyle == "horizontal" ? "<img class='icon' src='" + this.icon + "' alt='icon'>" : ""}
+				<img class="logo" id="logo" src="${this.logo}" alt="Logo">
+				${this.navStyle == "horizontal" ? "<img class='icon' id='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
+
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
@@ -202,15 +244,11 @@ class NavBar {
 
 	fillItemsMobile() {
 
-		this.$cssId.href = "RubyPorterProject/mobilestyle.css";
-		document.querySelector(".container").style.paddingTop = "106px";
-
-		window.onscroll = () => {};
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
-				<button id="editing">${this.editMode == true ? "Disable Edit Mode" : "Enable Edit Mode"}</button>
+
 				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
 				<i class="fa-solid fa-bars" id="bars"></i>
@@ -246,17 +284,19 @@ class NavBar {
 	toggleMobileMenu() {
 		if (!document.querySelector(".navbar-content").classList.contains("active")) {
 			document.querySelector(".navbar-content").classList.add("active");
-			document.querySelector(".container").style.paddingTop = "0px";
+			this.$container.style.paddingTop = "0px";
 		}
 		else {
 			document.querySelector(".navbar-content").classList.remove("active");
-			document.querySelector(".container").style.paddingTop = "106px";
+			this.$container.style.paddingTop = "106px";
 		}
 	}
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
-		document.getElementById("editing").onclick = this.toggleEditing.bind(this);
+
+		document.onkeydown = this.toggleEditing.bind(this);
+
 		for (let i = 0; i <= this.lastId; i++) {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
@@ -278,8 +318,10 @@ class NavBar {
 	//Changes the bulk of the page's html depending on if edit mode is on or off.
 	changeContainer() {
 		if (this.editMode == false) {
+
 			document.querySelector(".container").innerHTML = `
 				<img src="RubyPorterProject/hero image.jpg" alt="hero image" width="100%">
+
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
 					<p>
@@ -294,7 +336,7 @@ class NavBar {
 			`;
 		}
 		else {
-			document.querySelector(".container").innerHTML = `
+			this.$container.innerHTML = `
 				<!-- For adding a new navbar item -->
 				<h2>Add Navbar Item</h2>
 				<form action="#" method="post" id="addForm">
@@ -356,10 +398,15 @@ class NavBar {
 	}
 
 	//Enables or disables editing of the navbar.
-	toggleEditing() {
-		this.editMode = !this.editMode;
-		this.load();
-		this.changeContainer();
+	toggleEditing(event) {
+		if (event.repeat) {
+			return;
+		}
+		if ((event.ctrlKey || event.metaKey) && event.key === "/") {
+			this.editMode = !this.editMode;
+			this.load();
+			this.changeContainer();
+		}
 	}
 
 	//Disables all fields and buttons in all forms, except the add form.
@@ -699,20 +746,15 @@ class NavBar {
 	//Expands or shrinks the horizontal navbar depending on if the page is scrolled.
 	scroll() {
 		let navbar = document.getElementById("navbar");
-		let logo = document.querySelector(".logo");
-		let icon = document.querySelector(".icon");
+		let logo = document.getElementById("logo");
+		let icon = document.getElementById("icon");
 		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-			navbar.style.height = "70px";
-			navbar.style.transition = "height 0.2s";
-			logo.style.padding = "15px";
-			logo.style.height = "40px";
-			logo.style.opacity = 0;
-			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			if (icon != null) {
-				icon.style.padding = "15px";
-				icon.style.height = "40px";
-				icon.style.transition = "height 0.2s";
-			}
+			navbar.classList.remove("navbar");
+			navbar.classList.add("navbar-scroll");
+			logo.classList.remove("logo");
+			logo.classList.add("logo-scroll");
+			icon.classList.remove("icon");
+			icon.classList.add("icon-scroll");
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -729,18 +771,12 @@ class NavBar {
 			}
 		}
 		else {
-			navbar.style.height = "100px";
-			navbar.style.transition = "height 0.2s";
-			logo.style.padding = "25px";
-			logo.style.height = "50px";
-			logo.style.opacity = 1;
-			logo.style.transition = "height 0.2s, opacity 0.2s ease-in-out";
-			if (icon != null)
-			{
-				icon.style.padding = "25px";
-				icon.style.height = "50px";
-				icon.style.transition = "height 0.2s";
-			}
+			navbar.classList.remove("navbar-scroll");
+			navbar.classList.add("navbar");
+			logo.classList.remove("logo-scroll");
+			logo.classList.add("logo");
+			icon.classList.remove("icon-scroll");
+			icon.classList.add("icon");
 			let subnavs = document.getElementsByClassName("subnav");
 			for (let i = 0; i < subnavs.length; i++) {
 				let item = this.findMatchingItem(this.items, subnavs[i].dataset.id);
@@ -759,20 +795,25 @@ class NavBar {
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
-	retrieveNavSettings(event) {
-		event.preventDefault();		
-		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
+	retrieveNavSettings(event, username) {
+		if(event && event.preventDefault) {
+			event.preventDefault();
+		}	
+		fetch(`http://justin.navigation.test/user/${username}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
 				this.items = data.items;
-				this.$navStyle.value = data.navStyle;
-				this.navStyle = data.navStyle;	
-				this.findLastId(this.items);			
+
+				this.navStyle = data.navStyle;
+				this.findLastId(this.items);
+
 			}
 			else {
 				this.items = [];
-				this.$navStyle.value = "";
+				if(this.$navStyle != null){
+					this.$navStyle.value = "";
+				}
 				this.navStyle = 'none';
 				console.log("User doesn't exist");
 			}
