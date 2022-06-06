@@ -1,5 +1,14 @@
 
 const MAX_LAYER = 2;
+const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
+const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
+const BKGD_IMAGE_PATH = "RubyPorterProject/hero image.jpg";
+const EDIT_PATH = "project1.html";
+const MENU_USER = "megan";
+const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
+const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
+const MOBILE_CSS_PATH = "RubyPorterProject/mobilestyle.css";
+
 
 class NavItem {
 	constructor(id, parentId, layer, name, link, isDisabled = false) {
@@ -33,12 +42,12 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.logo = "RubyPorterProject/gates-of-fennario-logo.png";
-		this.icon = "RubyPorterProject/gates-of-fennario-icon.png";
+		this.logo = LOGO_PATH;
+		this.icon = ICON_PATH;
 
 		this.lastId = 14;
 
-		this.editingPage = window.location.pathname.includes("project1.html");
+		this.editingPage = window.location.pathname.includes(EDIT_PATH);
 		if (this.editingPage) {
 			this.navStyle = "none";	
 			this.editMode = true;			
@@ -51,7 +60,7 @@ class NavBar {
 				items: this.items
 			};
 
-			this.retrieveNavSettings(new Event('submit'), "megan");
+			this.retrieveNavSettings(new Event('submit'), MENU_USER);
 
 			this.disableAll();
 			let disabled = [
@@ -63,7 +72,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(new Event('submit'), "megan");			
+			this.retrieveNavSettings(new Event('submit'), MENU_USER);			
 		}
 	}
 
@@ -122,14 +131,14 @@ class NavBar {
 
 		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$cssId.href = "navbarstyles.css";
+			this.$cssId.href = HORIZONTAL_CSS_PATH;
 			window.onscroll = this.scroll.bind(this);
 		}
 		
 		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
 
 			this.navStyle = "vertical";
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = VERTICAL_CSS_PATH;
 			window.onscroll = () => {};
 		}
 		if (this.navStyle == "none") {
@@ -137,7 +146,7 @@ class NavBar {
 			window.onscroll = () => {};
 		}
 		if (window.innerWidth < 1024) {
-			this.$cssId.href = "mobilestyle.css";
+			this.$cssId.href = MOBILE_CSS_PATH;
 			window.onscroll = () => {};
 		}
 
@@ -319,7 +328,7 @@ class NavBar {
 		if (this.editMode == false) {
 
 			document.querySelector(".container").innerHTML = `
-				<img src="RubyPorterProject/hero image.jpg" alt="hero image" width="100%">
+				<img src=${BKGD_IMAGE_PATH} alt="hero image" width="100%">
 
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
