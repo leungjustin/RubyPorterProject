@@ -33,8 +33,8 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.logo = "gates-of-fennario-logo.png";
-		this.icon = "gates-of-fennario-icon.png";
+		this.logo = "RubyPorterProject/gates-of-fennario-logo.png";
+		this.icon = "RubyPorterProject/gates-of-fennario-icon.png";
 
 		this.lastId = 14;
 
@@ -226,6 +226,7 @@ class NavBar {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
+
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -242,6 +243,7 @@ class NavBar {
 	}
 
 	fillItemsMobile() {
+
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<div>
@@ -316,8 +318,10 @@ class NavBar {
 	//Changes the bulk of the page's html depending on if edit mode is on or off.
 	changeContainer() {
 		if (this.editMode == false) {
-			this.$container.innerHTML = `
-				<img src="hero image.jpg" alt="hero image" width="100%">
+
+			document.querySelector(".container").innerHTML = `
+				<img src="RubyPorterProject/hero image.jpg" alt="hero image" width="100%">
+
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
 					<p>

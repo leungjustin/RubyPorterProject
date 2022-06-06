@@ -76,6 +76,7 @@ function dbGetUserMenuItems($settingsArray, $conn){
 function dbGetUserMenuSubItems($parentId, $conn){
 	// SELECT next level menu items and add them to itemArray
 
+	$itemsArray = [];
 	$stmt = $conn->prepare("SELECT * FROM items WHERE parent = ? ORDER BY sortOrder");
 	$stmt->bind_param("i", $parentId);
 	$stmt->execute();
@@ -97,8 +98,9 @@ function dbGetUserMenuSubItems($parentId, $conn){
 			'isDisabled' => $disabled,
 			'items' => dbGetUserMenuSubItems($result2['itemId'], $conn),
 		 ]; 
+		array_push($itemsArray, $itemArray);
 	}
-	 return $itemArray;
+	 return $itemsArray;
 	}
 
 // Change settings and delete all menu items and insert new menu items for existing user
