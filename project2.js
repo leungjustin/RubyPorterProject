@@ -63,9 +63,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(new Event('submit'), "megan");
-
-			this.loadStaticMenu();
+			this.retrieveNavSettings(new Event('submit'), "megan");			
 		}
 	}
 
@@ -109,7 +107,8 @@ class NavBar {
 	bindElementsStaticMenu() {
 		
 		this.$navbar = document.getElementById("navbar");
-		this.$cssId = document.getElementById("cssId");		
+		this.$cssId = document.getElementById("cssId");	
+		this.$container = document.querySelector(".container");	
 
     	window.onresize = this.changeNavStyle.bind(this);
 	}
