@@ -2,7 +2,7 @@
 const MAX_LAYER = 2;
 const LOGO_PATH = "gates-of-fennario-logo.png";
 const ICON_PATH = "gates-of-fennario-icon.png";
-const BKGD_IMAGE_PATH = "hero image.jpg";
+const BKGD_IMAGE_PATH = "hero-image.jpg";
 const EDIT_PATH = "project1.html";
 const MENU_USER = "megan";
 const HORIZONTAL_CSS_PATH = "navbarstyles.css";
