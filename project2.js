@@ -106,7 +106,7 @@ class NavBar {
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
-		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this, $userInput.value);
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this, this.$userInput.value);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
