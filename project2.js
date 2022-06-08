@@ -52,7 +52,7 @@ class NavBar {
 			this.navStyle = "none";	
 			this.editMode = true;			
 			
-			this.bindElements();
+			this.bindElements.bind(this);
 
 			this.settings = {
 				user: this.$userInput.value,
