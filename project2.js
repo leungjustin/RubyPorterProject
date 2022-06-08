@@ -38,6 +38,7 @@ class NavBar {
 		this.lastId = 14;
 		this.navStyle = "none";	
 		this.editMode = true;
+		this.stylesAreSet = false;
 		
 		this.bindElements();
 
@@ -104,8 +105,12 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-		this.$generateTextFileButton.onclick = this.generateTextFile.bind(this);
+		this.$generateTextFileButton.onclick = this.toggleSetStyles.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
+	}
+
+	toggleSetStyles() {
+		this.stylesAreSet = !this.stylesAreSet;
 	}
 
 	generateTextFile() {
@@ -283,8 +288,9 @@ body {
 	border: dashed 2px red;
 }
 		`;
-		this.$downloadTextFileButton.href = this.downloadTextFile(text);
-		this.$downloadTextFileButton.style.display = "inline-block";
+		//this.$downloadTextFileButton.href = this.downloadTextFile(text);
+		//this.$downloadTextFileButton.style.display = "inline-block";
+		return text;
 	}
 
 	downloadTextFile(text) {
@@ -1058,6 +1064,24 @@ body {
 				.catch(error => {
 					console.error("Error", error);
 				});
+
+				if (this.stylesAreSet == true) {
+					let styles = this.generateTextFile();
+					fetch(`http://justin.navigation.test/user/${this.$userInput.value}/setStyles`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(styles)
+					})
+					.then(response => response.json())
+					.then(data => {
+						console.log("Success", data);
+					})
+					.catch(error => {
+						console.error("Error", error);
+					});
+				}
 			}
 		})
 		.catch(error => {
