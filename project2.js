@@ -60,7 +60,7 @@ class NavBar {
 				items: this.items
 			};
 
-			this.retrieveNavSettings( MENU_USER,new Event('submit'));
+			this.retrieveNavSettings(new Event('submit'), MENU_USER);
 
 			this.disableAll();
 			let disabled = [
@@ -72,7 +72,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(MENU_USER, new Event('submit'));			
+			this.retrieveNavSettings(new Event('submit'), MENU_USER);			
 		}
 	}
 
@@ -803,7 +803,7 @@ class NavBar {
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
-	retrieveNavSettings(username, event) {
+	retrieveNavSettings(event, username) {
 		if(event && event.preventDefault) {
 			event.preventDefault();
 		}	
