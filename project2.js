@@ -112,7 +112,7 @@ class NavBar {
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
 
-		console.log(this.$userInput.value, this.$userInput)
+		console.log(this.$userInput.value, "string", this.$userInput)
 	}
 
 	bindElementsStaticMenu() {
