@@ -809,7 +809,7 @@ class NavBar {
 			event.preventDefault();
 		}	
 		let username = "";
-		if (this.$userInput != null){
+		if (this.$userInput != null && this.$userInput.value != "") {
 			username = this.$userInput.value;
 		}
 		else {
