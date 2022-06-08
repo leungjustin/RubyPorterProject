@@ -60,7 +60,7 @@ class NavBar {
 				items: this.items
 			};
 
-			this.retrieveNavSettings(MENU_USER, new Event('submit'));
+			this.retrieveNavSettings(new Event('submit'));
 
 			this.disableAll();
 			let disabled = [
@@ -72,7 +72,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(MENU_USER, new Event('submit'));			
+			this.retrieveNavSettings(new Event('submit'));			
 		}
 	}
 
@@ -106,13 +106,12 @@ class NavBar {
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
-		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this, document.getElementById("userInput").value);
+		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
 
-		console.log(this.$userInput.value, "string", this.$userInput)
 	}
 
 	bindElementsStaticMenu() {
@@ -805,10 +804,18 @@ class NavBar {
 	}
 
 	//Retrieve navigation items and navigation bar style based on user
-	retrieveNavSettings(username, event) {
+	retrieveNavSettings(event) {
 		if(event && event.preventDefault) {
 			event.preventDefault();
 		}	
+		let username = "";
+		if (this.$userInput != null){
+			username = this.$userInput.value;
+		}
+		else {
+			username = MENU_USER;
+		}
+
 		fetch(`http://justin.navigation.test/user/${username}`)
 		.then(response => response.json())
 		.then(data => {
