@@ -92,6 +92,11 @@ class NavBar {
 		this.$subnavLinkColor = document.getElementById("subnav-link-color");
 		this.$subnavActiveColor = document.getElementById("subnav-active-color");
 		this.$subnavHoverColor = document.getElementById("subnav-hover-color");
+		this.$subnavContentBackgroundColor = document.getElementById("subnav-content-background-color");
+		this.$subnavContentLinkFont = document.getElementById("subnav-content-link-font");
+		this.$subnavContentLinkColor = document.getElementById("subnav-content-link-color");
+		this.$subnavContentHoverColor = document.getElementById("subnav-content-hover-color");
+		this.$subnavContentHoverBackgroundColor = document.getElementById("subnav-content-hover-background-color");
 
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
@@ -114,6 +119,12 @@ body {
 .container {
 	padding-top: 106px;
 	margin: 8px;
+}
+
+.right-column {
+	position: absolute;
+	top: 114px;
+	left: 400px;
 }
 
 .navbar {
@@ -221,7 +232,7 @@ body {
 	display: none;
 	position: absolute;
 	top: 106px;
-	background-color: #34514e;
+	${this.$subnavContentBackgroundColor.value != "" ? "background-color: " + this.$subnavContentBackgroundColor.value + ";" : ""}
 }
 
 .subnav-content > .subnav {
@@ -232,10 +243,10 @@ body {
 
 .subnav-content a {
 	font-size: 24px;
-	font-family: agenda-one, sans-serif;
+	${this.$subnavContentLinkFont.value != "" ? "font-family: " + this.$subnavContentLinkFont.value + ";" : this.$subnavLinkFont.value != "" ? "font-family: " + this.$subnavLinkFont.value + ";" : ""}
 	font-weight: 700;
 	letter-spacing: 2px;
-	color: #fff;
+	${this.$subnavContentLinkColor.value != "" ? "color: " + this.$subnavContentLinkColor.value + ";" : this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
 	text-decoration: none;
 }
 
@@ -250,8 +261,8 @@ body {
 }
 
 .subnav-content > .subnav:hover {
-	color: #e98a15;
-	background-color: #003b36;
+	${this.$subnavContentHoverColor.value != "" ? "color: " + this.$subnavContentHoverColor.value + ";" : ""}
+	${this.$subnavContentHoverBackgroundColor.value != "" ? "background-color: " + this.$subnavContentHoverBackgroundColor.value + ";" : ""}
 	transition: color 0.2s, background-color 0.2s;
 }
 
@@ -277,13 +288,21 @@ body {
 	}
 
 	downloadTextFile(text) {
-		let textFile = null;
-		let data = new Blob([text], { type: "text/plain" });
-		if (textFile !== null) {
+		let file = null;
+		let fileName = "";
+		if (this.settings.user == "") {
+			fileName = "CustomStyles.css";
+		}
+		else {
+			fileName = this.settings.user + ".css";
+		}
+		let data = new File([text], fileName, { type: "text/css" });
+		this.$downloadTextFileButton.download = fileName;
+		if (file !== null) {
 			window.URL.revokeObjectURL(data);
 		}
-		textFile = window.URL.createObjectURL(data);
-		return textFile;
+		file = window.URL.createObjectURL(data);
+		return file;
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -537,6 +556,26 @@ body {
 					<h2>Edit Navbar Style:</h2>
 					<label for="navbar-background-color">Navbar Background Color:</label>
 					<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+					<label for="navbar-border-color">Navbar Border Color (Leave blank for no border):</label>
+					<input type="text" name="navbar-border-color" id="navbar-border-color"><br>
+					<label for="subnav-link-font">Link Font (Leave blank for default):</label>
+					<input type="text" name="subnav-link-font" id="subnav-link-font"><br>
+					<label for="subnav-link-color">Link Color (Leave blank for default):</label>
+					<input type="text" name="subnav-link-color" id="subnav-link-color"><br>
+					<label for="subnav-active-color">Active Link Color (Leave blank for none):</label>
+					<input type="text" name="subnav-active-color" id="subnav-active-color"><br>
+					<label for="subnav-hover-color">Link Hover Color (Leave blank for same as active color):</label>
+					<input type="text" name="subnav-hover-color" id="subnav-hover-color"><br>
+					<label for="subnav-content-background-color">Subnav Background Color:</label>
+					<input type="text" name="subnav-content-background-color" id="subnav-content-background-color"><br>
+					<label for="subnav-content-link-font">Subnav Link Font (Leave blank for default):</label>
+					<input type="text" name="subnav-content-link-font" id="subnav-content-link-font"><br>
+					<label for="subnav-content-link-color">Subnav Link Color (Leave blank for default):</label>
+					<input type="text" name="subnav-content-link-color" id="subnav-content-link-color"><br>
+					<label for="subnav-content-hover-color">Subnav link Hover Color (Leave blank for none):</label>
+					<input type="text" name="subnav-content-hover-color" id="subnav-content-hover-color"><br>
+					<label for="subnav-content-hover-background-color">Subnav Hover Background Color (Leave blank for none):</label>
+					<input type="text" name="subnav-content-hover-background-color" id="subnav-content-hover-background-color"><br>
 					<button type="submit" id="generateTextFileButton">Generate</button>
 					<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
 				</div>
