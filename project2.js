@@ -1,4 +1,14 @@
+
 const MAX_LAYER = 2;
+const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
+const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
+const BKGD_IMAGE_PATH = "RubyPorterProject/hero-image.jpg";
+const EDIT_PATH = "index.html";
+const MENU_USER = "megan";
+const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
+const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
+const MOBILE_CSS_PATH = "RubyPorterProject/mobilestyle.css";
+
 
 class NavItem {
 	constructor(id, parentId, layer, name, link, isDisabled = false) {
@@ -32,29 +42,41 @@ class NavBar {
 		this.items[2].items.push(new NavItem(13, 2, 2, "Move to end", "#"));
 		this.items[3].items.push(new NavItem(14, 3, 2, "Move to end", "#"));
 
-		this.logo = "gates-of-fennario-logo.png";
-		this.icon = "gates-of-fennario-icon.png";
+		this.logo = LOGO_PATH;
+		this.icon = ICON_PATH;
 
 		this.lastId = 14;
-		this.navStyle = "none";	
-		this.editMode = true;
-		this.stylesAreAdded = false;
 		
 		this.bindElements();
 
-    	this.settings = {
-			user: this.$userInput.value,
-			navStyle: this.navStyle,
-			items: this.items
-		};
+		this.editingPage = window.location.pathname.includes(EDIT_PATH);
+		if (this.editingPage) {
+			this.navStyle = "none";	
+			this.editMode = true;		
+      		this.stylesAreAdded = false;
+			
+			this.bindElements();
 
-		this.disableAll();
-		let disabled = [
-			this.$name,
-			this.$link,
-			this.$addButton
-		];
-		disabled.forEach(element => element.disabled = true);
+			this.settings = {
+				user: this.$userInput.value,
+				navStyle: this.navStyle,
+				items: this.items
+			};
+
+			this.retrieveNavSettings(new Event('submit'));
+
+			this.disableAll();
+			let disabled = [
+				this.$name,
+				this.$link,
+				this.$addButton
+			];
+			disabled.forEach(element => element.disabled = true);
+		}
+		else {
+			this.bindElementsStaticMenu();
+			this.retrieveNavSettings(new Event('submit'));			
+		}
 	}
 
 	//Binds all class properties to their corresponding html elements.
@@ -106,6 +128,16 @@ class NavBar {
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 		this.$addStylesToSettingsButton.onclick = this.toggleAddStyles.bind(this);
+    	window.onresize = this.changeNavStyle.bind(this);
+
+	}
+
+	bindElementsStaticMenu() {
+		
+		this.$navbar = document.getElementById("navbar");
+		this.$cssId = document.getElementById("cssId");	
+		this.$container = document.querySelector(".container");	
+
     	window.onresize = this.changeNavStyle.bind(this);
 	}
 
@@ -320,15 +352,18 @@ body {
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
 	changeNavStyle() {
 		this.$navbar.removeAttribute("style");
-		this.$container.removeAttribute("style");
+		if (this.$container != null) {
+			this.$container.removeAttribute("style");
+		}
+
 		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$cssId.href = "navbarstyles.css";
+			this.$cssId.href = HORIZONTAL_CSS_PATH;
 			window.onscroll = this.scroll.bind(this);
 		}
 		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
 			this.navStyle = "vertical";
-			this.$cssId.href = "project1.css";
+			this.$cssId.href = VERTICAL_CSS_PATH;
 			window.onscroll = () => {};
 		}
 		if (this.navStyle == "none") {
@@ -336,13 +371,20 @@ body {
 			window.onscroll = () => {};
 		}
 		if (window.innerWidth < 1024) {
-			this.$cssId.href = "mobilestyle.css";
+			this.$cssId.href = MOBILE_CSS_PATH;
 			window.onscroll = () => {};
 		}
 
-		this.enableAll();
-		this.load();
-		this.changeContainer();
+		
+		if (this.editingPage) {
+			this.enableAll();
+			this.load();
+			this.changeContainer();
+		}
+		else {
+			this.loadStaticMenu();
+		}
+		
 	}
 
 	//Calls many other methods in order to properly render the navbar and set all forms to default.
@@ -358,6 +400,17 @@ body {
 		this.disableAll();
 		this.checkNone();
 		this.resetForms();
+	}
+
+	loadStaticMenu() {
+		if (window.innerWidth < 1024) {
+			this.fillItemsMobile();
+		}
+		else {
+			this.fillItems();
+		}				
+		this.changeActive(this.items, window.location.hash);
+		this.addEventListeners();
 	}
 
 	//Same as load, expect without rendering the navbar or adding event listeners.
@@ -406,6 +459,7 @@ body {
 
 	//Sets the css file that will be used based on user settings, then calls renderNavItem to generate the navbar html.
 	fillItems() {
+
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join(''); //Generates html for each navbar item, then joins them all together.
 		this.$navbar.innerHTML = `
 			<div>
@@ -413,6 +467,7 @@ body {
 				${this.navStyle == "horizontal" ? "<img class='icon' id='icon' src='" + this.icon + "' alt='icon'>" : ""}
 			</div>
 			<div class="navbar-content">
+
 				${itemsHTML}
 				<i class="fa-brands fa-instagram fa-2xl social"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
@@ -421,10 +476,12 @@ body {
 	}
 
 	fillItemsMobile() {
+
 		let itemsHTML = this.items.map(item => this.renderNavItem(item)).join('');
 		this.$navbar.innerHTML = `
 			<div>
 				<img class="logo" src="${this.logo}" alt="Logo">
+
 				<i class="fa-brands fa-instagram fa-2xl social" style="margin-left: auto"></i>
 				<i class="fa-brands fa-facebook fa-2xl social"></i>
 				<i class="fa-solid fa-bars" id="bars"></i>
@@ -470,7 +527,9 @@ body {
 
 	//Adds click and submit events for navbar items and buttons.
 	addEventListeners() {
+
 		document.onkeydown = this.toggleEditing.bind(this);
+
 		for (let i = 0; i <= this.lastId; i++) {
 			let item = document.querySelector(`a[data-id="${i}"]`);
 			if (item != null) {
@@ -492,8 +551,10 @@ body {
 	//Changes the bulk of the page's html depending on if edit mode is on or off.
 	changeContainer() {
 		if (this.editMode == false) {
-			this.$container.innerHTML = `
-				<img src="hero image.jpg" alt="hero image" width="100%">
+
+			document.querySelector(".container").innerHTML = `
+				<img src=${BKGD_IMAGE_PATH} alt="hero image" width="100%">
+
 				<div class="containerText">
 					<h2 style="letter-spacing: 5px;">WELCOME.</h2>
 					<p>
@@ -996,18 +1057,32 @@ body {
 
 	//Retrieve navigation items and navigation bar style based on user
 	retrieveNavSettings(event) {
-		event.preventDefault();		
-		fetch(`http://justin.navigation.test/user/${this.$userInput.value}`)
+		if(event && event.preventDefault) {
+			event.preventDefault();
+		}	
+		let username = "";
+		if (this.$userInput != null && this.$userInput.value != "") {
+			username = this.$userInput.value;
+		}
+		else {
+			username = MENU_USER;
+		}
+
+		fetch(`http://justin.navigation.test/user/${username}`)
 		.then(response => response.json())
 		.then(data => {
 			if (data) {
 				this.items = data.items;
+
 				this.navStyle = data.navStyle;
 				this.findLastId(this.items);
+
 			}
 			else {
 				this.items = [];
-				this.$navStyle.value = "";
+				if(this.$navStyle != null){
+					this.$navStyle.value = "";
+				}
 				this.navStyle = 'none';
 				console.log("User doesn't exist");
 			}
