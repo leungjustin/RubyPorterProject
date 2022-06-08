@@ -38,7 +38,7 @@ class NavBar {
 		this.lastId = 14;
 		this.navStyle = "none";	
 		this.editMode = true;
-		this.stylesAreSet = false;
+		this.stylesAreAdded = false;
 		
 		this.bindElements();
 
@@ -85,7 +85,7 @@ class NavBar {
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
-		this.$generateTextFileButton = document.getElementById("generateTextFileButton");
+		this.$addStylesToSettingsButton = document.getElementById("add-styles-to-settings-button");
 		this.$downloadTextFileButton = document.getElementById("downloadTextFileButton");
 		this.$navbarBackgroundColor = document.getElementById("navbar-background-color");
 		this.$navbarBorderColor = document.getElementById("navbar-border-color");
@@ -105,12 +105,18 @@ class NavBar {
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
-		this.$generateTextFileButton.onclick = this.toggleSetStyles.bind(this);
+		this.$addStylesToSettingsButton.onclick = this.toggleAddStyles.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
 	}
 
-	toggleSetStyles() {
-		this.stylesAreSet = !this.stylesAreSet;
+	toggleAddStyles() {
+		this.stylesAreAdded = !this.stylesAreAdded;
+		if (this.stylesAreAdded == true) {
+			this.$addStylesToSettingsButton.innerHTML = "Remove Styles from Settings";
+		}
+		else {
+			this.$addStylesToSettingsButton.innerHTML = "Add Styles to Settings";
+		}
 	}
 
 	generateTextFile() {
@@ -1065,7 +1071,7 @@ body {
 					console.error("Error", error);
 				});
 
-				if (this.stylesAreSet == true) {
+				if (this.stylesAreAdded == true) {
 					let styles = this.generateTextFile();
 					fetch(`http://justin.navigation.test/user/${this.$userInput.value}/setStyles`, {
 						method: "POST",
