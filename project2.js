@@ -2,7 +2,7 @@ const MAX_LAYER = 2;
 const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
 const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
 const BKGD_IMAGE_PATH = "RubyPorterProject/hero-image.jpg";
-const EDIT_PATH = "";
+const EDIT_PATH = "http://justin.navigation.test";
 const MENU_USER = "megan";
 const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
 const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
@@ -50,7 +50,7 @@ class NavBar {
 		this.verticalStyle = VERTICAL_CSS_PATH;
 		this.mobileStyle = MOBILE_CSS_PATH;
 		
-		this.editingPage = window.location.pathname.includes(EDIT_PATH);
+		this.editingPage = window.location.href == EDIT_PATH;
 		if (this.editingPage) {
 			this.navStyle = "none";	
 			this.editMode = true;		
