@@ -1,9 +1,8 @@
-
 const MAX_LAYER = 2;
 const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
 const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
 const BKGD_IMAGE_PATH = "RubyPorterProject/hero-image.jpg";
-const EDIT_PATH = "index.html";
+const EDIT_PATH = "project1.html";
 const MENU_USER = "megan";
 const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
 const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
@@ -47,8 +46,6 @@ class NavBar {
 
 		this.lastId = 14;
 		
-		this.bindElements();
-
 		this.editingPage = window.location.pathname.includes(EDIT_PATH);
 		if (this.editingPage) {
 			this.navStyle = "none";	
@@ -63,8 +60,6 @@ class NavBar {
 				items: this.items
 			};
 
-			this.retrieveNavSettings(new Event('submit'));
-
 			this.disableAll();
 			let disabled = [
 				this.$name,
@@ -75,7 +70,6 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(new Event('submit'));			
 		}
 	}
 
@@ -108,7 +102,6 @@ class NavBar {
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
 		this.$addStylesToSettingsButton = document.getElementById("add-styles-to-settings-button");
-		this.$downloadTextFileButton = document.getElementById("downloadTextFileButton");
 		this.$navbarBackgroundColor = document.getElementById("navbar-background-color");
 		this.$navbarBorderColor = document.getElementById("navbar-border-color");
 		this.$subnavLinkFont = document.getElementById("subnav-link-font");
@@ -129,11 +122,9 @@ class NavBar {
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
 		this.$addStylesToSettingsButton.onclick = this.toggleAddStyles.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
-
 	}
 
 	bindElementsStaticMenu() {
-		
 		this.$navbar = document.getElementById("navbar");
 		this.$cssId = document.getElementById("cssId");	
 		this.$container = document.querySelector(".container");	
@@ -151,8 +142,8 @@ class NavBar {
 		}
 	}
 
-	generateTextFile() {
-		let text = `
+	generateCustomStyles() {
+		return `
 /* Custom Horizontal Navbar CSS */
 
 body {
@@ -326,27 +317,6 @@ body {
 	border: dashed 2px red;
 }
 		`;
-		//this.$downloadTextFileButton.href = this.downloadTextFile(text);
-		//this.$downloadTextFileButton.style.display = "inline-block";
-		return text;
-	}
-
-	downloadTextFile(text) {
-		let file = null;
-		let fileName = "";
-		if (this.settings.user == "") {
-			fileName = "CustomStyles.css";
-		}
-		else {
-			fileName = this.settings.user + ".css";
-		}
-		let data = new File([text], fileName, { type: "text/css" });
-		this.$downloadTextFileButton.download = fileName;
-		if (file !== null) {
-			window.URL.revokeObjectURL(data);
-		}
-		file = window.URL.createObjectURL(data);
-		return file;
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -649,8 +619,7 @@ body {
 					<input type="text" name="subnav-content-hover-color" id="subnav-content-hover-color"><br>
 					<label for="subnav-content-hover-background-color">Subnav Hover Background Color (Leave blank for none):</label>
 					<input type="text" name="subnav-content-hover-background-color" id="subnav-content-hover-background-color"><br>
-					<button type="submit" id="generateTextFileButton">Generate</button>
-					<a download="test.txt" id="downloadTextFileButton" style="display: none;">Download</a>
+					<button type="submit" id="add-styles-to-settings-button">Generate</button>
 				</div>
 			`;
 			this.bindElements();
@@ -1147,7 +1116,7 @@ body {
 				});
 
 				if (this.stylesAreAdded == true) {
-					let styles = this.generateTextFile();
+					let styles = this.generateCustomStyles();
 					fetch(`http://justin.navigation.test/user/${this.$userInput.value}/setStyles`, {
 						method: "POST",
 						headers: {
