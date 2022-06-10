@@ -13,9 +13,18 @@ function getPageData() {
 	return $data;
 }
 
+function render_php($path) {
+	ob_start();
+	include($path);
+	$var=ob_get_contents();
+	ob_end_clean();
+	return $var;
+}
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Content-Type: application/json; charset=utf-8');
+// header('Content-Type: application/json; charset=utf-8');
+
 
 $uriArray = explode('/',$path);
 
@@ -27,33 +36,39 @@ try {
 */
 if ($uriArray[1] == 'users'){
 	// Return list of users
+	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode(dbGetUsers($conn));
 }
 else if ($uriArray[1] == 'user'){
 	// Add user if no username comes after /user
-	if (is_null($uriArray[2])){
+	if (count($uriArray) == 2){
 	        $data = getPageData();
                 $isAdded = dbAddUser($data, $conn);
-                if ($isAdded) {
+                header('Content-Type: application/json; charset=utf-8');
+
+		if ($isAdded) {
                         echo json_encode("user added");
                 }
                 else {
                         echo json_encode("error");
                 }
 	}
-	else{
-		//If a username is included, check what comes after
-		switch($uriArray[3]){
-			case NULL:
-				// Retrieve user record from the db and return to page
-				$user = $uriArray[2];
-				echo json_encode(dbGetUserRecord($user, $conn));
+	else if (count($uriArray) == 3) {
+		// Retrieve user record from the db and return to page
+		$user = $uriArray[2];
+		header('Content-Type: application/json; charset=utf-8');
 
-				break;
+		echo json_encode(dbGetUserRecord($user, $conn));
+	}
+	//If a username is included, check what comes after
+	else {
+		switch($uriArray[3]){
 			case 'edit':
 				// Save user settings
 				$data = getPageData();
 				$isUpdated = dbUpdateSettings($data, $conn);
+				header('Content-Type: application/json; charset=utf-8');
+
 				if ($isUpdated) {
 					echo json_encode("settings updated");
 				}
@@ -61,10 +76,37 @@ else if ($uriArray[1] == 'user'){
 					echo json_encode("error");
 				}
 				break;
+			case 'setStyles':
+				// Save custom styles
+				$data = getPageData();
+				$fileName = 'user_styles/' . $uriArray[2] . '.css';
+				$fileCreated = file_put_contents($fileName, $data);
+				header('Content-Type: application/json; charset=utf-8');
+				if ($fileCreated !== false) {
+					echo json_encode("styles created");
+				}
+				else {
+					echo json_encode("error");
+				}
+				break;
+			case 'getStyles':
+				// Retrieve custom styles
+				$fileName = 'user_styles/' . $uriArray[2] . '.css';
+				$fileExists = file_exists($fileName);
+				header('Content-Type: application/json; charset=utf-8');
+				if ($fileExists) {
+					echo json_encode($fileName);
+				}
+				else {
+					echo json_encode("");
+				}
+				break;
 			case 'delete':
 				// Delete user and settings
 				$data = getPageData();
 				$isDeleted = dbDeleteUser($data, $conn);
+				header('Content-Type: application/json; charset=utf-8');
+
 				if ($isDeleted) {
 					echo json_encode("user deleted");
 				}
@@ -79,26 +121,18 @@ else if ($uriArray[1] == 'user'){
 	}
 }
 else {
-	echo 'no data';
+	echo render_php('template_parts/header.php');
+	switch($uriArray[1]) {
+		case '':
+			include 'index.html';
+			break;
+		case 'products':
+			include 'productpage.html';
+			break;
+		default:
+			echo 'no data';
+			break;
+	}
+	echo render_php('template_parts/footer.php');
 }
-/*
-} catch(\Exception $e) {
-var_dump($e);
-}
-/*
-if($path == "/users")
-{
-	echo json_encode($userpass);
-};
 
-if($uriArray[0] == "/userdata")
-{
-	$indexOfUser = -1;
-	for($i = 0; $i < count($userdata); $i++) {
-		if($userdata[$i]['user']== $_SERVER['QUERY_STRING']) {
-			$indexOfUser = $i;
-		}
-	} 
-	echo json_encode($userdata[$indexOfUser]);
-}
-*/
