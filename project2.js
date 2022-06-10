@@ -45,6 +45,10 @@ class NavBar {
 		this.icon = ICON_PATH;
 
 		this.lastId = 14;
+
+		this.horizontalStyle = HORIZONTAL_CSS_PATH;
+		this.verticalStyle = VERTICAL_CSS_PATH;
+		this.mobileStyle = MOBILE_CSS_PATH;
 		
 		this.editingPage = window.location.pathname.includes(EDIT_PATH);
 		if (this.editingPage) {
@@ -331,12 +335,12 @@ body {
 
 		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$cssId.href = HORIZONTAL_CSS_PATH;
+			this.$cssId.href = this.horizontalStyle;
 			window.onscroll = this.scroll.bind(this);
 		}
 		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
 			this.navStyle = "vertical";
-			this.$cssId.href = VERTICAL_CSS_PATH;
+			this.$cssId.href = this.verticalStyle;
 			window.onscroll = () => {};
 		}
 		if (this.navStyle == "none") {
@@ -344,7 +348,7 @@ body {
 			window.onscroll = () => {};
 		}
 		if (window.innerWidth < 1024) {
-			this.$cssId.href = MOBILE_CSS_PATH;
+			this.$cssId.href = this.mobileStyle;
 			window.onscroll = () => {};
 		}
 
@@ -1052,7 +1056,8 @@ body {
 				.then(response => response.json())
 				.then(data => {
 					if (data != "") {
-						this.$cssId.href = data;
+						this.horizontalStyle = data;
+						this.changeNavStyle();
 					}
 					else {
 						console.log("No custom styles exist for this user.");
