@@ -13,6 +13,12 @@ body {
 	margin: 8px;
 }
 
+.right-column {
+	position: absolute;
+	top: 114px;
+	left: 400px;
+}
+
 .navbar {
 	overflow: visible;
 	background-color: #ece5f0;
@@ -21,6 +27,7 @@ body {
 	border-bottom: 6px solid #003b36;
 	position: fixed;
 	top: 0;
+	z-index: 2;
 	transition: height 0.2s;
 }
 
@@ -32,6 +39,7 @@ body {
 	border-bottom: 6px solid #003b36;
 	position: fixed;
 	top: 0;
+	z-index: 2;
 	transition: height 0.2s;
 }
 
