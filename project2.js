@@ -1,9 +1,8 @@
-
 const MAX_LAYER = 2;
 const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
 const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
 const BKGD_IMAGE_PATH = "RubyPorterProject/hero-image.jpg";
-const EDIT_PATH = "index.html";
+const EDIT_PATH = "http://justin.navigation.test/";
 const MENU_USER = "megan";
 const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
 const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
@@ -47,10 +46,15 @@ class NavBar {
 
 		this.lastId = 14;
 
-		this.editingPage = window.location.pathname.includes(EDIT_PATH);
+		this.horizontalStyle = HORIZONTAL_CSS_PATH;
+		this.verticalStyle = VERTICAL_CSS_PATH;
+		this.mobileStyle = MOBILE_CSS_PATH;
+		
+		this.editingPage = window.location.href == EDIT_PATH;
 		if (this.editingPage) {
 			this.navStyle = "none";	
-			this.editMode = true;			
+			this.editMode = true;		
+      		this.stylesAreAdded = false;
 			
 			this.bindElements();
 
@@ -72,7 +76,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
-			this.retrieveNavSettings(new Event('submit'));			
+			this.retrieveNavSettings(new Event('submit'));
 		}
 	}
 
@@ -104,23 +108,222 @@ class NavBar {
 		this.$addUserInput = document.getElementById("addUserInput");
 		this.$deleteUserButton = document.getElementById("deleteUserButton");
 
+		this.$addStylesToSettingsButton = document.getElementById("add-styles-to-settings-button");
+		this.$navbarBackgroundColor = document.getElementById("navbar-background-color");
+		this.$navbarBorderColor = document.getElementById("navbar-border-color");
+		this.$subnavLinkFont = document.getElementById("subnav-link-font");
+		this.$subnavLinkColor = document.getElementById("subnav-link-color");
+		this.$subnavActiveColor = document.getElementById("subnav-active-color");
+		this.$subnavHoverColor = document.getElementById("subnav-hover-color");
+		this.$subnavContentBackgroundColor = document.getElementById("subnav-content-background-color");
+		this.$subnavContentLinkFont = document.getElementById("subnav-content-link-font");
+		this.$subnavContentLinkColor = document.getElementById("subnav-content-link-color");
+		this.$subnavContentHoverColor = document.getElementById("subnav-content-hover-color");
+		this.$subnavContentHoverBackgroundColor = document.getElementById("subnav-content-hover-background-color");
+
 		this.$addForm.onsubmit = this.addNavItem.bind(this, null);
 		this.$navStyle.onchange = this.changeNavStyle.bind(this);
 		this.$userForm.onsubmit = this.retrieveNavSettings.bind(this);
 		this.$editSettings.onclick = this.setNavSettings.bind(this);
 		this.$addUserForm.onsubmit = this.addUser.bind(this);	
 		this.$deleteUserButton.onclick = this.deleteUser.bind(this);
+		this.$addStylesToSettingsButton.onclick = this.toggleAddStyles.bind(this);
     	window.onresize = this.changeNavStyle.bind(this);
-
 	}
 
 	bindElementsStaticMenu() {
-		
 		this.$navbar = document.getElementById("navbar");
 		this.$cssId = document.getElementById("cssId");	
 		this.$container = document.querySelector(".container");	
 
     	window.onresize = this.changeNavStyle.bind(this);
+	}
+
+	toggleAddStyles() {
+		this.stylesAreAdded = !this.stylesAreAdded;
+		if (this.stylesAreAdded == true) {
+			this.$addStylesToSettingsButton.innerHTML = "Remove Styles from Settings";
+		}
+		else {
+			this.$addStylesToSettingsButton.innerHTML = "Add Styles to Settings";
+		}
+	}
+
+	generateCustomStyles() {
+		return `
+/* Custom Horizontal Navbar CSS */
+
+body {
+	margin: 0px;
+}
+
+.container {
+	padding-top: 106px;
+	margin: 8px;
+}
+
+.right-column {
+	position: absolute;
+	top: 114px;
+	left: 400px;
+}
+
+.navbar {
+	overflow: visible;
+	${this.$navbarBackgroundColor.value != "" ? "background-color: " + this.$navbarBackgroundColor.value + ";" : ""}
+	width: 100%;
+	height: 100px;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
+	position: fixed;
+	top: 0;
+	transition: height 0.2s;
+}
+
+.navbar-scroll {
+	overflow: visible;
+	${this.$navbarBackgroundColor.value != "" ? "background-color: " + this.$navbarBackgroundColor.value + ";" : ""}
+	width: 100%;
+	height: 70px;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
+	position: fixed;
+	top: 0;
+	transition: height 0.2s;
+}
+
+.navbar-content {
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-content: center;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.logo {
+	float: left;
+	height: 50px;
+	padding: 25px;
+	position: absolute;
+	opacity: 1;
+	transition: height 0.2s, opacity 0.2s ease-in-out;
+}
+
+.icon {
+	float: left;
+	height: 50px;
+	padding: 25px;
+	position: absolute;
+	transition: height 0.2s;
+}
+
+.logo-scroll {
+	float: left;
+	height: 40px;
+	padding: 15px;
+	position: absolute;
+	opacity: 0;
+	transition: height 0.2s, opacity 0.2s ease-in-out;
+}
+
+.icon-scroll {
+	float: left;
+	height: 40px;
+	padding: 15px;
+	position: absolute;
+	transition: height 0.2s;
+}
+
+.subnav {
+	padding-top: 30px;
+	padding-bottom: 24px;
+	${this.$navbarBorderColor.value != "" ? "border-bottom: 6px solid " + this.$navbarBorderColor.value + ";" : ""}
+}
+
+.subnav .active {
+	${this.$subnavActiveColor.value != "" ? "color: " + this.$subnavActiveColor.value + ";" : this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
+}
+
+.subnav > a {
+	float: left;
+	font-size: 24px;
+	${this.$subnavLinkFont.value != "" ? "font-family: " + this.$subnavLinkFont.value + ";" : ""}
+	font-weight: 700;
+	letter-spacing: 2px;
+	${this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
+	padding: 14px 16px;
+	background-color: inherit;
+	text-decoration: none;
+}
+
+.subnav > button {
+	float: left;
+	${this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
+	margin-top: 14px;
+	margin-bottom: 14px;
+	text-decoration: none;
+}
+
+.subnav > a:hover {
+	${this.$subnavHoverColor.value != "" ? "color: " + this.$subnavHoverColor.value + ";" : this.$subnavActiveColor.value != "" ? "color :" + this.$subnavActiveColor.value + ";" : ""}
+	transition: color 0.2s;
+}
+
+.subnav-content {
+	display: none;
+	position: absolute;
+	top: 106px;
+	${this.$subnavContentBackgroundColor.value != "" ? "background-color: " + this.$subnavContentBackgroundColor.value + ";" : ""}
+}
+
+.subnav-content > .subnav {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	border-bottom: 0px;
+}
+
+.subnav-content a {
+	font-size: 24px;
+	${this.$subnavContentLinkFont.value != "" ? "font-family: " + this.$subnavContentLinkFont.value + ";" : this.$subnavLinkFont.value != "" ? "font-family: " + this.$subnavLinkFont.value + ";" : ""}
+	font-weight: 700;
+	letter-spacing: 2px;
+	${this.$subnavContentLinkColor.value != "" ? "color: " + this.$subnavContentLinkColor.value + ";" : this.$subnavLinkColor.value != "" ? "color: " + this.$subnavLinkColor.value + ";" : ""}
+	text-decoration: none;
+}
+
+.subnav:hover > .subnav-content {
+	display: grid;
+	animation: fadeIn linear 0.2s;
+}
+
+@keyframes fadeIn {
+	0% {opacity: 0;}
+	100% {opacity: 1;}
+}
+
+.subnav-content > .subnav:hover {
+	${this.$subnavContentHoverColor.value != "" ? "color: " + this.$subnavContentHoverColor.value + ";" : ""}
+	${this.$subnavContentHoverBackgroundColor.value != "" ? "background-color: " + this.$subnavContentHoverBackgroundColor.value + ";" : ""}
+	transition: color 0.2s, background-color 0.2s;
+}
+
+.social {
+	float: left;
+	padding: 49.5px 16px;
+}
+
+.max-layer {
+	display: none;
+}
+
+.isDisabled {
+	pointer-events: none;
+}
+
+.drag-over {
+	border: dashed 2px red;
+}
+		`;
 	}
 
 	//This method runs when the navigation style is chosen and changes the css link to the correct file.
@@ -132,14 +335,12 @@ class NavBar {
 
 		if ((this.$navStyle != null && this.$navStyle.value == "horizontal") || this.navStyle == "horizontal") {
 			this.navStyle = "horizontal";
-			this.$cssId.href = HORIZONTAL_CSS_PATH;
+			this.$cssId.href = this.horizontalStyle;
 			window.onscroll = this.scroll.bind(this);
 		}
-		
 		if ((this.$navStyle != null && this.$navStyle.value == "vertical") || this.navStyle == "vertical") {
-
 			this.navStyle = "vertical";
-			this.$cssId.href = VERTICAL_CSS_PATH;
+			this.$cssId.href = this.verticalStyle;
 			window.onscroll = () => {};
 		}
 		if (this.navStyle == "none") {
@@ -147,7 +348,7 @@ class NavBar {
 			window.onscroll = () => {};
 		}
 		if (window.innerWidth < 1024) {
-			this.$cssId.href = MOBILE_CSS_PATH;
+			this.$cssId.href = this.mobileStyle;
 			window.onscroll = () => {};
 		}
 
@@ -400,6 +601,33 @@ class NavBar {
 					<button type="submit" id="addUserButton">Add User</button>
 				</form>
 				<button id="deleteUserButton">Remove User</button>
+
+				<div class="right-column">
+					<h2>Edit Navbar Style:</h2>
+					<label for="navbar-background-color">Navbar Background Color:</label>
+					<input type="text" name="navbar-background-color" id="navbar-background-color"><br>
+					<label for="navbar-border-color">Navbar Border Color (Leave blank for no border):</label>
+					<input type="text" name="navbar-border-color" id="navbar-border-color"><br>
+					<label for="subnav-link-font">Link Font (Leave blank for default):</label>
+					<input type="text" name="subnav-link-font" id="subnav-link-font"><br>
+					<label for="subnav-link-color">Link Color (Leave blank for default):</label>
+					<input type="text" name="subnav-link-color" id="subnav-link-color"><br>
+					<label for="subnav-active-color">Active Link Color (Leave blank for none):</label>
+					<input type="text" name="subnav-active-color" id="subnav-active-color"><br>
+					<label for="subnav-hover-color">Link Hover Color (Leave blank for same as active color):</label>
+					<input type="text" name="subnav-hover-color" id="subnav-hover-color"><br>
+					<label for="subnav-content-background-color">Subnav Background Color:</label>
+					<input type="text" name="subnav-content-background-color" id="subnav-content-background-color"><br>
+					<label for="subnav-content-link-font">Subnav Link Font (Leave blank for default):</label>
+					<input type="text" name="subnav-content-link-font" id="subnav-content-link-font"><br>
+					<label for="subnav-content-link-color">Subnav Link Color (Leave blank for default):</label>
+					<input type="text" name="subnav-content-link-color" id="subnav-content-link-color"><br>
+					<label for="subnav-content-hover-color">Subnav link Hover Color (Leave blank for none):</label>
+					<input type="text" name="subnav-content-hover-color" id="subnav-content-hover-color"><br>
+					<label for="subnav-content-hover-background-color">Subnav Hover Background Color (Leave blank for none):</label>
+					<input type="text" name="subnav-content-hover-background-color" id="subnav-content-hover-background-color"><br>
+					<button type="submit" id="add-styles-to-settings-button">Add Styles to Settings</button>
+				</div>
 			`;
 			this.bindElements();
 			this.disableAll();
@@ -821,10 +1049,23 @@ class NavBar {
 		.then(data => {
 			if (data) {
 				this.items = data.items;
-
 				this.navStyle = data.navStyle;
 				this.findLastId(this.items);
 
+				fetch(`http://justin.navigation.test/user/${username}/getStyles`)
+				.then(response => response.json())
+				.then(data => {
+					if (data != "") {
+						this.horizontalStyle = data;
+						this.changeNavStyle();
+					}
+					else {
+						console.log("No custom styles exist for this user.");
+					}
+				})
+				.catch(error => {
+					console.log("There was a problem getting custom styles.");
+				});
 			}
 			else {
 				this.items = [];
@@ -840,7 +1081,7 @@ class NavBar {
 		.catch(error => {
 			console.log("There was a problem getting user settings.");
 			this.disableAll();
-		})
+		});
 	}
 
 	findLastId(objectArray) {
@@ -893,11 +1134,29 @@ class NavBar {
 				.catch(error => {
 					console.error("Error", error);
 				});
+
+				if (this.stylesAreAdded == true) {
+					let styles = this.generateCustomStyles();
+					fetch(`http://justin.navigation.test/user/${this.$userInput.value}/setStyles`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(styles)
+					})
+					.then(response => response.json())
+					.then(data => {
+						console.log("Success", data);
+					})
+					.catch(error => {
+						console.error("Error", error);
+					});
+				}
 			}
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})				
+		});
 	}	
 
 	// Adds a user to the files on the webserver
@@ -953,7 +1212,7 @@ class NavBar {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})		
+		});		
 	}
 
 	// Deletes user from files on the webserver
@@ -1001,7 +1260,7 @@ class NavBar {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})				
+		});				
 	}
 	
 }
