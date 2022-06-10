@@ -1051,7 +1051,12 @@ body {
 				fetch(`http://justin.navigation.test/user/${username}/getStyles`)
 				.then(response => response.json())
 				.then(data => {
-					this.$cssId.href = data;
+					if (data != "") {
+						this.$cssId.href = data;
+					}
+					else {
+						console.log("No custom styles exist for this user.");
+					}
 				})
 				.catch(error => {
 					console.log("There was a problem getting custom styles.");
