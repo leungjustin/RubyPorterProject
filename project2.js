@@ -1045,10 +1045,17 @@ body {
 		.then(data => {
 			if (data) {
 				this.items = data.items;
-
 				this.navStyle = data.navStyle;
 				this.findLastId(this.items);
 
+				fetch(`http://justin.navigation.test/user/${username}/getStyles`)
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+				})
+				.catch(error => {
+					console.log("There was a problem getting custom styles.");
+				});
 			}
 			else {
 				this.items = [];
@@ -1064,7 +1071,7 @@ body {
 		.catch(error => {
 			console.log("There was a problem getting user settings.");
 			this.disableAll();
-		})
+		});
 	}
 
 	findLastId(objectArray) {
@@ -1139,7 +1146,7 @@ body {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})				
+		});
 	}	
 
 	// Adds a user to the files on the webserver
@@ -1195,7 +1202,7 @@ body {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})		
+		});		
 	}
 
 	// Deletes user from files on the webserver
@@ -1243,7 +1250,7 @@ body {
 		})
 		.catch(error => {
 			console.log("Could not get user data.");
-		})				
+		});				
 	}
 	
 }
