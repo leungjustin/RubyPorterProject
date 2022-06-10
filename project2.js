@@ -622,7 +622,7 @@ body {
 					<input type="text" name="subnav-content-hover-color" id="subnav-content-hover-color"><br>
 					<label for="subnav-content-hover-background-color">Subnav Hover Background Color (Leave blank for none):</label>
 					<input type="text" name="subnav-content-hover-background-color" id="subnav-content-hover-background-color"><br>
-					<button type="submit" id="add-styles-to-settings-button">Generate</button>
+					<button type="submit" id="add-styles-to-settings-button">Add Styles to Settings</button>
 				</div>
 			`;
 			this.bindElements();
