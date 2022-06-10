@@ -2,7 +2,7 @@ const MAX_LAYER = 2;
 const LOGO_PATH = "RubyPorterProject/gates-of-fennario-logo.png";
 const ICON_PATH = "RubyPorterProject/gates-of-fennario-icon.png";
 const BKGD_IMAGE_PATH = "RubyPorterProject/hero-image.jpg";
-const EDIT_PATH = "project1.html";
+const EDIT_PATH = "index.html";
 const MENU_USER = "megan";
 const HORIZONTAL_CSS_PATH = "RubyPorterProject/navbarstyles.css";
 const VERTICAL_CSS_PATH = "RubyPorterProject/project1.css";
@@ -60,6 +60,8 @@ class NavBar {
 				items: this.items
 			};
 
+			this.retrieveNavSettings(new Event('submit'));
+
 			this.disableAll();
 			let disabled = [
 				this.$name,
@@ -70,6 +72,7 @@ class NavBar {
 		}
 		else {
 			this.bindElementsStaticMenu();
+			this.retrieveNavSettings(new Event('submit'));
 		}
 	}
 
