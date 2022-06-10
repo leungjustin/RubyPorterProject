@@ -1051,7 +1051,7 @@ body {
 				fetch(`http://justin.navigation.test/user/${username}/getStyles`)
 				.then(response => response.json())
 				.then(data => {
-					console.log(data);
+					this.$cssId.href = data;
 				})
 				.catch(error => {
 					console.log("There was a problem getting custom styles.");
